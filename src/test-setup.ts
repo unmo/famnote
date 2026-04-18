@@ -8,16 +8,13 @@ vi.mock('@/lib/firebase/config', () => ({
   storage: {},
 }));
 
-// Firebase auth モック
+// Firebase auth モック（Googleログインのみ）
 vi.mock('firebase/auth', () => ({
   getAuth: vi.fn(() => ({})),
   onAuthStateChanged: vi.fn(),
-  signInWithEmailAndPassword: vi.fn(),
-  createUserWithEmailAndPassword: vi.fn(),
   signInWithPopup: vi.fn(),
   GoogleAuthProvider: vi.fn(() => ({})),
   signOut: vi.fn(),
-  sendPasswordResetEmail: vi.fn(),
 }));
 
 // Firebase firestore モック

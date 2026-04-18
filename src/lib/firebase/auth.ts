@@ -1,10 +1,7 @@
 import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
-  sendPasswordResetEmail,
   type User as FirebaseUser,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -21,31 +18,9 @@ export async function signInWithGoogle(): Promise<FirebaseUser> {
   return result.user;
 }
 
-// メール/パスワードログイン
-export async function signInWithEmail(email: string, password: string): Promise<FirebaseUser> {
-  const result = await signInWithEmailAndPassword(auth, email, password);
-  return result.user;
-}
-
-// 新規アカウント作成
-export async function signUpWithEmail(
-  email: string,
-  password: string,
-  displayName: string
-): Promise<FirebaseUser> {
-  const result = await createUserWithEmailAndPassword(auth, email, password);
-  await createUserProfile(result.user.uid, displayName, email, null);
-  return result.user;
-}
-
 // ログアウト
 export async function logout(): Promise<void> {
   await signOut(auth);
-}
-
-// パスワードリセットメール送信
-export async function sendResetEmail(email: string): Promise<void> {
-  await sendPasswordResetEmail(auth, email);
 }
 
 // ユーザープロフィール作成（初回ログイン時）

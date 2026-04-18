@@ -1,9 +1,8 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/components/shared/AppLayout';
 import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
 import { LandingPage } from '@/routes/app/LandingPage';
 import { LoginPage } from '@/routes/auth/LoginPage';
-import { SignupPage } from '@/routes/auth/SignupPage';
 import { ProfileSetupPage } from '@/routes/onboarding/ProfileSetupPage';
 import { CreateGroupPage } from '@/routes/onboarding/CreateGroupPage';
 import { JoinGroupPage } from '@/routes/onboarding/JoinGroupPage';
@@ -33,8 +32,14 @@ export const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
+    // /signup へのアクセスは /login にリダイレクト
     path: '/signup',
-    element: <SignupPage />,
+    element: <Navigate to="/login" replace />,
+  },
+  {
+    // /auth/signup へのアクセスも /login にリダイレクト
+    path: '/auth/signup',
+    element: <Navigate to="/login" replace />,
   },
   {
     // オンボーディング: 認証済みだがグループ未参加ユーザー用
