@@ -1,0 +1,36 @@
+# ログ
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# エディタ
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 環境変数（秘密情報を含むため必ずignore）
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# テストレポート
+coverage/
+playwright-report/
+test-results/

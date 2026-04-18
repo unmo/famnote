@@ -1,0 +1,48 @@
+{
+  "feature": "famnote-mvp",
+  "phase": "commit",
+  "loop_count": 3,
+  "max_loops": 3,
+  "stop_requested": false,
+  "history": [
+    {"phase": "planner",   "status": "completed", "timestamp": "2026-04-17T00:00:00Z"},
+    {"phase": "designer",  "status": "completed", "timestamp": "2026-04-17T01:00:00Z"},
+    {"phase": "generator", "status": "completed", "timestamp": "2026-04-17T02:00:00Z"},
+    {"phase": "evaluator", "status": "failed",    "timestamp": "2026-04-17T03:00:00Z",
+     "issues": [
+       "undici high 脆弱性（Firebase SDK v10.14.1 の推移的依存）",
+       "DashboardPage.tsx にハードコードされた日本語テキストが複数存在",
+       "NoteNewPage.tsx にハードコードされた日本語テキストが存在"
+     ]},
+    {"phase": "generator", "status": "completed", "timestamp": "2026-04-17T09:18:00Z",
+     "fixes": [
+       "package.json に overrides で undici ^6.21.2 を固定",
+       "DashboardPage.tsx のハードコード文字列をt()に置き換え（部分的）",
+       "NoteNewPage.tsx のハードコード文字列をt()に置き換え（部分的）",
+       "ja.json / en.json に翻訳キーを追加"
+     ]},
+    {"phase": "evaluator", "status": "failed",    "timestamp": "2026-04-18T09:48:00Z",
+     "issues": [
+       "DashboardPage.tsx 行97 '練習を記録' が未置換",
+       "DashboardPage.tsx 行113 '試合を記録' が未置換",
+       "NoteNewPage.tsx 行250 '保存中...' が未置換",
+       "aria-label='戻る' が複数ファイルでハードコード（中優先）",
+       "'保存中...' が他5ファイルにも残存（中優先）"
+     ]},
+    {"phase": "generator", "status": "completed", "timestamp": "2026-04-18T13:00:00Z",
+     "fixes": [
+       "aria-label='戻る' を t('common.back') に置き換え（8ファイル）",
+       "MatchesListPage の空状態テキストをi18n化（matches.empty / matches.createFirst）",
+       "ja.json / en.json に matches.empty / matches.createFirst / common.back を追加",
+       "streak.test.ts の toZonedTime モックを identity 関数に修正"
+     ]},
+    {"phase": "evaluator", "status": "passed",    "timestamp": "2026-04-18T22:22:00Z",
+     "result": {
+       "build": "OK（TypeScriptエラーなし、EXIT:0）",
+       "audit": "moderate 6件（esbuild/Vite/Vitest系・開発環境のみ）→ 許容",
+       "unit_tests": "33件 PASS",
+       "code_review": "aria-label修正OK・matches i18n修正OK・streak.testモック修正OK",
+       "remaining_minor": "MatchesListPage resultLabels（勝ち/引き分け/負け）がハードコード残存（低優先・次イテレーション推奨）"
+     }}
+  ]
+}

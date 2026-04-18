@@ -1,0 +1,152 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isSameGroup(groupId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.groupId == groupId;
+    }
+
+    function isGroupMember(groupId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
+    }
+
+    function isGroupOwner(groupId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)).data.role == 'owner';
+    }
+
+    function isValidNote(data) {
+      return data.content is string && data.content.size() > 0 && data.content.size() <= 1000 &&
+             data.sport in ['soccer', 'baseball', 'basketball', 'tennis', 'volleyball', 'swimming', 'athletics', 'other'] &&
+             data.isPublic is bool &&
+             data.isDraft is bool;
+    }
+
+    function isValidMatch(data) {
+      return data.opponent is string && data.opponent.size() > 0 &&
+             data.sport in ['soccer', 'baseball', 'basketball', 'tennis', 'volleyball', 'swimming', 'athletics', 'other'] &&
+             data.isPublic is bool;
+    }
+
+    // ユーザードキュメント
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.uid == userId;
+      allow update: if isOwner(userId) &&
+                       !request.resource.data.diff(resource.data).affectedKeys()
+                         .hasAny(['uid', 'createdAt', 'totalNotes', 'totalMatches', 'currentStreak', 'longestStreak']);
+      allow delete: if false;
+    }
+
+    // グループドキュメント
+    match /groups/{groupId} {
+      allow read: if isGroupMember(groupId);
+      allow create: if isAuthenticated() &&
+                       request.resource.data.ownerUid == request.auth.uid &&
+                       request.resource.data.memberCount == 1 &&
+                       request.resource.data.maxMembers == 10;
+      allow update: if isGroupOwner(groupId) &&
+                       !request.resource.data.diff(resource.data).affectedKeys().hasAny(['id', 'createdAt', 'ownerUid']);
+      allow delete: if false;
+
+      match /members/{memberId} {
+        allow read: if isGroupMember(groupId);
+        allow create: if isAuthenticated() && memberId == request.auth.uid;
+        allow update: if isOwner(memberId);
+        allow delete: if isOwner(memberId) || isGroupOwner(groupId);
+      }
+    }
+
+    // 招待コード
+    match /inviteCodes/{code} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isGroupOwner(request.resource.data.groupId);
+      allow update, delete: if false;
+    }
+
+    // 練習ノート
+    match /notes/{noteId} {
+      allow read: if isOwner(resource.data.userId) ||
+                     (isSameGroup(resource.data.groupId) && resource.data.isPublic == true && resource.data.isDraft == false);
+      allow create: if isAuthenticated() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       isValidNote(request.resource.data) &&
+                       request.resource.data.imageUrls.size() <= 5;
+      allow update: if isOwner(resource.data.userId) &&
+                       request.resource.data.userId == resource.data.userId &&
+                       isValidNote(request.resource.data) &&
+                       request.resource.data.imageUrls.size() <= 5;
+      allow delete: if isOwner(resource.data.userId);
+
+      match /comments/{commentId} {
+        allow read: if isOwner(get(/databases/$(database)/documents/notes/$(noteId)).data.userId) ||
+                       isSameGroup(get(/databases/$(database)/documents/notes/$(noteId)).data.groupId);
+        allow create: if isAuthenticated() &&
+                         request.resource.data.userId == request.auth.uid &&
+                         request.resource.data.text is string &&
+                         request.resource.data.text.size() > 0 &&
+                         request.resource.data.text.size() <= 200;
+        allow delete: if isOwner(resource.data.userId);
+        allow update: if false;
+      }
+    }
+
+    // 試合記録
+    match /matches/{matchId} {
+      allow read: if isOwner(resource.data.userId) ||
+                     (isSameGroup(resource.data.groupId) && resource.data.isPublic == true && resource.data.isDraft == false);
+      allow create: if isAuthenticated() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       isValidMatch(request.resource.data) &&
+                       request.resource.data.imageUrls.size() <= 5;
+      allow update: if isOwner(resource.data.userId) &&
+                       request.resource.data.userId == resource.data.userId &&
+                       isValidMatch(request.resource.data);
+      allow delete: if isOwner(resource.data.userId);
+
+      match /comments/{commentId} {
+        allow read: if isOwner(get(/databases/$(database)/documents/matches/$(matchId)).data.userId) ||
+                       isSameGroup(get(/databases/$(database)/documents/matches/$(matchId)).data.groupId);
+        allow create: if isAuthenticated() &&
+                         request.resource.data.userId == request.auth.uid &&
+                         request.resource.data.text.size() <= 200;
+        allow delete: if isOwner(resource.data.userId);
+        allow update: if false;
+      }
+    }
+
+    // リアクション
+    match /reactions/{reactionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.reactionType in ['applause', 'fire', 'star', 'muscle'];
+      allow delete: if isOwner(resource.data.userId);
+      allow update: if false;
+    }
+
+    // 目標
+    match /goals/{goalId} {
+      allow read: if isOwner(resource.data.userId) ||
+                     (isSameGroup(resource.data.groupId) && resource.data.isPublic == true);
+      allow create: if isAuthenticated() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.title.size() <= 100;
+      allow update: if isOwner(resource.data.userId) &&
+                       request.resource.data.userId == resource.data.userId;
+      allow delete: if isOwner(resource.data.userId);
+    }
+  }
+}

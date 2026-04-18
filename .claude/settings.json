@@ -1,0 +1,49 @@
+{
+  "cleanupPeriodDays": 30,
+  "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git status)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
+      "Bash(npx:*)",
+      "Bash(cmd /c npm*)",
+      "Bash(cmd /c npx*)",
+      "Bash(cmd /c git*)",
+      "PowerShell(*)",
+      "Bash(dir *)",
+      "Bash(cmd /c \"npm run build\")",
+      "Read(//c/Users/TomokiUmezawa/work/code/skillsync/src/**)",
+      "Bash(npm audit *)",
+      "Bash(grep -v \"//.*any\")",
+      "Write(//c/Users/TomokiUmezawa/work/code/famnote/.claude/loop_state.json)"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/secrets/**)",
+      "Bash(sudo:*)",
+      "Bash(su:*)",
+      "Bash(rm -rf:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(ssh:*)"
+    ],
+    "defaultMode": "auto"
+  }
+}

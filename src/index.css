@@ -1,0 +1,88 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+@theme {
+  --color-brand-primary: #E85513;
+  --color-brand-secondary: #00133F;
+}
+
+:root {
+  --color-brand-primary: #E85513;
+  --color-brand-secondary: #00133F;
+  --color-brand-primary-light: color-mix(in srgb, var(--color-brand-primary) 15%, white);
+  --color-brand-primary-dark: color-mix(in srgb, var(--color-brand-primary) 80%, black);
+}
+
+* {
+  font-family: 'Inter', 'Noto Sans JP', sans-serif;
+}
+
+/* テキスト選択時のハイライト色 */
+::selection {
+  background: color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
+}
+
+/* スクロールバーのカスタマイズ（ダークテーマ対応） */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* 共通カードスタイル */
+.card-base {
+  @apply bg-zinc-900 border border-zinc-800 rounded-2xl;
+}
+
+/* 入力フォーム共通スタイル */
+.input-base {
+  @apply w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3
+         text-zinc-50 placeholder-zinc-500 text-base
+         focus:outline-none focus:border-[var(--color-brand-primary)]
+         focus:ring-1 focus:ring-[var(--color-brand-primary)]
+         transition-colors duration-200;
+}
+
+/* プライマリボタン */
+.btn-primary {
+  @apply bg-[var(--color-brand-primary)] text-white font-semibold
+         rounded-xl px-6 py-3 text-base
+         hover:opacity-90 active:scale-95
+         transition-all duration-200
+         disabled:opacity-40 disabled:cursor-not-allowed;
+  min-height: 44px;
+}
+
+/* セカンダリボタン */
+.btn-secondary {
+  @apply bg-zinc-800 text-zinc-50 font-semibold
+         border border-zinc-700 rounded-xl px-6 py-3 text-base
+         hover:bg-zinc-700 active:scale-95
+         transition-all duration-200;
+  min-height: 44px;
+}
+
+/* アウトラインボタン */
+.btn-outline {
+  @apply bg-transparent text-[var(--color-brand-primary)] font-semibold
+         border border-[var(--color-brand-primary)] rounded-xl px-6 py-3
+         transition-all duration-200;
+  min-height: 44px;
+}
+
+/* iOSでのズーム防止: フォームフィールドは16px以上 */
+input, textarea, select {
+  font-size: 16px;
+}

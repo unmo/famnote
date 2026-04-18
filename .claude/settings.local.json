@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(npx husky:*)",
+      "Bash(npm install:*)",
+      "Bash(npx vitest:*)",
+      "PowerShell($env:Path)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(find /c/Users/TomokiUmezawa/work/code/skillsync -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" \\\\\\) -path \"*/functions/*\" -exec head -30 {} +)",
+      "Bash(ls -la /c/Users/TomokiUmezawa/work/code/skillsync/*.rules)",
+      "Bash(xargs cat:*)",
+      "Bash(wc -l /c/Users/TomokiUmezawa/work/code/skillsync/functions/src/*.ts)",
+      "Bash(grep -n \"deleteMatchRecord\\\\|deleteDoc\\\\|deleteCategory\\\\|deletePractice\\\\|deleteMeasurement\\\\|deleteSchedule\" /c/Users/TomokiUmezawa/work/code/skillsync/src/services/*.ts)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\TomokiUmezawa\\\\work\\\\code\\\\skillsync\" -Force | Where-Object {$_.PSIsContainer -eq $false} | Select-Object Name | head -20)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\TomokiUmezawa\\\\work\\\\code\\\\skillsync\" -File | ForEach-Object {$_.Name})",
+      "PowerShell(git add firebase.json firestore.rules storage.rules src/App.tsx src/components/MatchRecordModal.tsx src/components/PracticeForm.tsx src/services/storageService.ts src/services/storageService.test.ts 2>&1)",
+      "PowerShell(git push 2>&1)",
+      "PowerShell(git add .github/workflows/deploy-dev.yml .github/workflows/deploy.yml firebase.json firebase/ 2>&1)",
+      "PowerShell(git rm firestore.rules storage.rules 2>&1)"
+    ]
+  }
+}
