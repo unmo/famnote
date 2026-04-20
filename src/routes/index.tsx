@@ -21,6 +21,11 @@ import { GoalNewPage } from '@/routes/app/goals/GoalNewPage';
 import { MyProfilePage } from '@/routes/app/profile/MyProfilePage';
 import { MemberProfilePage } from '@/routes/app/profile/MemberProfilePage';
 import { SettingsPage } from '@/routes/app/SettingsPage';
+import { JournalListPage } from '@/routes/app/journals/JournalListPage';
+import { JournalPrePage } from '@/routes/app/journals/JournalPrePage';
+import { JournalPostPage } from '@/routes/app/journals/JournalPostPage';
+import { JournalDetailPage } from '@/routes/app/journals/JournalDetailPage';
+import { HighlightsPage } from '@/routes/app/highlights/HighlightsPage';
 
 export const router = createBrowserRouter([
   {
@@ -73,6 +78,13 @@ export const router = createBrowserRouter([
           { path: '/profile', element: <MyProfilePage /> },
           { path: '/profile/:userId', element: <MemberProfilePage /> },
           { path: '/settings', element: <SettingsPage /> },
+          // 試合ジャーナル
+          { path: '/journals', element: <JournalListPage /> },
+          { path: '/journals/new', element: <JournalPrePage /> },
+          { path: '/journals/:id', element: <JournalDetailPage /> },
+          { path: '/journals/:id/post', element: <JournalPostPage /> },
+          // ハイライト
+          { path: '/highlights', element: <HighlightsPage /> },
         ],
       },
     ],

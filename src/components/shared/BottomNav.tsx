@@ -1,61 +1,49 @@
-import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Clock, Plus, BookOpen, User } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { Home, BookOpen, Star, User } from 'lucide-react';
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
+
+// ナビタブ定義
+const NAV_ITEMS = [
+  { path: '/dashboard', icon: Home, labelKey: 'nav.home' },
+  { path: '/journals', icon: BookOpen, labelKey: 'journals.title' },
+  { path: '/highlights', icon: Star, labelKey: 'highlights.title' },
+  { path: '/profile', icon: User, labelKey: 'nav.profile' },
+] as const;
 
 // モバイル用ボトムナビゲーション（〜767px）
 export function BottomNav() {
-  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 border-t border-zinc-800 md:hidden">
-      <div className="flex items-center justify-around px-2 py-2 max-w-lg mx-auto">
-        {/* ホーム */}
-        <NavLink to="/dashboard" className={({ isActive }) =>
-          clsx('flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-colors',
-            isActive ? 'text-[var(--color-brand-primary)]' : 'text-zinc-500 hover:text-zinc-300')
-        }>
-          <Home size={22} />
-          <span className="text-[10px] font-medium">ホーム</span>
-        </NavLink>
-
-        {/* タイムライン */}
-        <NavLink to="/timeline" className={({ isActive }) =>
-          clsx('flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-colors',
-            isActive ? 'text-[var(--color-brand-primary)]' : 'text-zinc-500 hover:text-zinc-300')
-        }>
-          <Clock size={22} />
-          <span className="text-[10px] font-medium">タイムライン</span>
-        </NavLink>
-
-        {/* クイック記録FAB（中央・強調） */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.05 }}
-          onClick={() => navigate('/notes/new')}
-          className="flex items-center justify-center w-14 h-14 rounded-full bg-[var(--color-brand-primary)] text-white shadow-lg -mt-5"
-          aria-label="練習ノートを作成"
-        >
-          <Plus size={28} strokeWidth={2.5} />
-        </motion.button>
-
-        {/* ノート */}
-        <NavLink to="/notes" className={({ isActive }) =>
-          clsx('flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-colors',
-            isActive ? 'text-[var(--color-brand-primary)]' : 'text-zinc-500 hover:text-zinc-300')
-        }>
-          <BookOpen size={22} />
-          <span className="text-[10px] font-medium">ノート</span>
-        </NavLink>
-
-        {/* プロフィール */}
-        <NavLink to="/profile" className={({ isActive }) =>
-          clsx('flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-colors',
-            isActive ? 'text-[var(--color-brand-primary)]' : 'text-zinc-500 hover:text-zinc-300')
-        }>
-          <User size={22} />
-          <span className="text-[10px] font-medium">プロフィール</span>
-        </NavLink>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 md:hidden">
+      <div className="flex items-stretch max-w-lg mx-auto">
+        {NAV_ITEMS.map(({ path, icon: Icon, labelKey }) => (
+          <NavLink
+            key={path}
+            to={path}
+            className={({ isActive }) =>
+              clsx(
+                'flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors relative min-h-[56px]',
+                isActive ? 'text-[var(--color-brand-primary)]' : 'text-zinc-500 hover:text-zinc-300'
+              )
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Icon size={22} />
+                <span className="text-[10px] font-medium">{t(labelKey)}</span>
+                {isActive && (
+                  <motion.span
+                    layoutId="activeTab"
+                    className="absolute bottom-0.5 w-4 h-0.5 bg-[var(--color-brand-primary)] rounded-full"
+                  />
+                )}
+              </>
+            )}
+          </NavLink>
+        ))}
       </div>
     </nav>
   );
@@ -63,13 +51,13 @@ export function BottomNav() {
 
 // デスクトップ用サイドナビゲーション（768px〜）
 export function SideNav() {
-  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const navItems = [
-    { to: '/dashboard', icon: Home, label: 'ホーム' },
-    { to: '/timeline', icon: Clock, label: 'タイムライン' },
-    { to: '/notes', icon: BookOpen, label: 'ノート一覧' },
-    { to: '/profile', icon: User, label: 'プロフィール' },
+    { to: '/dashboard', icon: Home, label: t('nav.home') },
+    { to: '/journals', icon: BookOpen, label: t('journals.title') },
+    { to: '/highlights', icon: Star, label: t('highlights.title') },
+    { to: '/profile', icon: User, label: t('nav.profile') },
   ];
 
   return (
@@ -102,15 +90,6 @@ export function SideNav() {
           </NavLink>
         ))}
 
-        {/* クイック記録ボタン */}
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={() => navigate('/notes/new')}
-          className="flex items-center gap-3 px-3 py-3 mt-4 rounded-xl bg-[var(--color-brand-primary)] text-white font-semibold hover:opacity-90 transition-all"
-        >
-          <Plus size={20} />
-          <span>練習ノートを書く</span>
-        </motion.button>
       </nav>
     </aside>
   );

@@ -31,7 +31,8 @@ export function CreateGroupPage() {
     try {
       const result = await createGroup(firebaseUser.uid, data.groupName, null);
       setInviteCode(result.inviteCode);
-    } catch {
+    } catch (err) {
+      console.error('グループ作成エラー:', err);
       toast.error('グループの作成に失敗しました');
     }
   };
