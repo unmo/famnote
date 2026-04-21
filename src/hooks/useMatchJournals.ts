@@ -3,7 +3,9 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import {
   createPreMatchNote,
+  updatePreMatchNote,
   addPostMatchNote,
+  updatePostMatchNote,
   createPostMatchOnly,
   deleteMatchJournal,
   fetchUserJournals,
@@ -66,7 +68,7 @@ export function useCreatePreMatchNote() {
       data,
     }: {
       userId: string;
-      groupId: string;
+      groupId: string | null;
       data: PreMatchFormData;
     }) => createPreMatchNote(userId, groupId, data),
     onSuccess: (_, { userId }) => {
@@ -77,6 +79,21 @@ export function useCreatePreMatchNote() {
     onError: () => {
       toast.error('保存に失敗しました。再試行してください');
     },
+  });
+}
+
+// 試合前ノート更新
+export function useUpdatePreMatchNote() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ journalId, userId, data }: { journalId: string; userId: string; data: PreMatchFormData }) =>
+      updatePreMatchNote(journalId, userId, data),
+    onSuccess: (_, { journalId, userId }) => {
+      qc.invalidateQueries({ queryKey: ['matchJournal', journalId] });
+      qc.invalidateQueries({ queryKey: ['matchJournalsList', userId] });
+      toast.success('試合前ノートを更新しました！');
+    },
+    onError: () => { toast.error('更新に失敗しました'); },
   });
 }
 
@@ -108,6 +125,21 @@ export function useAddPostMatchNote() {
   });
 }
 
+// 試合後ノート更新
+export function useUpdatePostMatchNote() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ journalId, userId, data }: { journalId: string; userId: string; data: PostMatchFormData }) =>
+      updatePostMatchNote(journalId, userId, data),
+    onSuccess: (_, { journalId, userId }) => {
+      qc.invalidateQueries({ queryKey: ['matchJournal', journalId] });
+      qc.invalidateQueries({ queryKey: ['matchJournalsList', userId] });
+      toast.success('振り返りを更新しました！');
+    },
+    onError: () => { toast.error('更新に失敗しました'); },
+  });
+}
+
 // 試合後ノートのみ作成
 export function useCreatePostMatchOnly() {
   const qc = useQueryClient();
@@ -121,7 +153,7 @@ export function useCreatePostMatchOnly() {
       imageUrls,
     }: {
       userId: string;
-      groupId: string;
+      groupId: string | null;
       baseData: { sport: Sport; date: string; opponent: string; venue: string | null };
       postData: PostMatchFormData;
       imageUrls?: string[];

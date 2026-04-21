@@ -23,7 +23,9 @@ import { MemberProfilePage } from '@/routes/app/profile/MemberProfilePage';
 import { SettingsPage } from '@/routes/app/SettingsPage';
 import { JournalListPage } from '@/routes/app/journals/JournalListPage';
 import { JournalPrePage } from '@/routes/app/journals/JournalPrePage';
+import { JournalPreEditPage } from '@/routes/app/journals/JournalPreEditPage';
 import { JournalPostPage } from '@/routes/app/journals/JournalPostPage';
+import { JournalPostEditPage } from '@/routes/app/journals/JournalPostEditPage';
 import { JournalDetailPage } from '@/routes/app/journals/JournalDetailPage';
 import { HighlightsPage } from '@/routes/app/highlights/HighlightsPage';
 
@@ -83,6 +85,8 @@ export const router = createBrowserRouter([
           { path: '/journals/new', element: <JournalPrePage /> },
           { path: '/journals/:id', element: <JournalDetailPage /> },
           { path: '/journals/:id/post', element: <JournalPostPage /> },
+          { path: '/journals/:id/edit/pre', element: <JournalPreEditPage /> },
+          { path: '/journals/:id/edit/post', element: <JournalPostEditPage /> },
           // ハイライト
           { path: '/highlights', element: <HighlightsPage /> },
         ],

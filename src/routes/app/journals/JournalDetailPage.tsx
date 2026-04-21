@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ChevronLeft, Pin } from 'lucide-react';
+import { ChevronLeft, Pin, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
@@ -30,35 +30,47 @@ interface PinnedBulletItemProps {
 
 function PinnedBulletItem({ item, isPinned, onPinToggle, showPinButton }: PinnedBulletItemProps) {
   return (
-    <div className={`flex items-start gap-2.5 py-2 rounded-lg transition-colors ${isPinned ? 'bg-amber-500/10 border-l-2 border-amber-500 pl-2' : ''}`}>
+    <div className={`flex items-start gap-2.5 py-2.5 rounded-lg transition-colors ${isPinned ? 'bg-amber-500/10 border-l-2 border-amber-500 pl-2' : ''}`}>
+      <p className="text-sm text-zinc-200 leading-relaxed flex-1">
+        {isPinned && <span className="mr-1">📌</span>}
+        {item.text}
+      </p>
       {showPinButton && (
         <motion.button
           type="button"
           onClick={onPinToggle}
-          animate={isPinned ? { scale: [1, 1.4, 1] } : { scale: 1 }}
-          transition={{ duration: 0.3 }}
-          aria-label={isPinned ? 'ピンを解除する' : 'この項目をピンする'}
+          animate={isPinned ? { scale: [1, 1.3, 1] } : { scale: 1 }}
+          transition={{ duration: 0.25 }}
+          aria-label={isPinned ? '気づきのかけらから削除' : '気づきのかけらに追加'}
           aria-pressed={isPinned}
-          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-            isPinned ? 'text-amber-400 bg-amber-400/10' : 'text-zinc-600 hover:text-amber-400 hover:bg-amber-400/10'
+          className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs flex-shrink-0 transition-colors ${
+            isPinned
+              ? 'text-amber-400 bg-amber-400/15 border border-amber-400/30'
+              : 'text-zinc-500 bg-zinc-800 border border-zinc-700 hover:text-amber-400 hover:border-amber-400/40'
           }`}
         >
-          <Pin size={12} />
+          <Pin size={11} />
+          <span>{isPinned ? 'ピン済み' : '保存'}</span>
         </motion.button>
       )}
-      <p className="text-sm text-zinc-300 leading-relaxed flex-1">
-        {isPinned && <span className="mr-1">📌</span>}
-        {item.text}
-      </p>
     </div>
   );
 }
 
-function SectionHeader({ icon, title }: { icon: string; title: string }) {
+function SectionHeader({ icon, title, onEdit }: { icon: string; title: string; onEdit?: () => void }) {
   return (
     <div className="px-4 py-3 flex items-center gap-2">
       <span className="text-base">{icon}</span>
-      <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide">{title}</h2>
+      <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide flex-1">{title}</h2>
+      {onEdit && (
+        <button
+          onClick={onEdit}
+          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-zinc-400 bg-zinc-800 border border-zinc-700 hover:text-zinc-200 hover:border-zinc-600 transition-colors"
+        >
+          <Pencil size={11} />
+          <span>編集</span>
+        </button>
+      )}
     </div>
   );
 }
@@ -84,16 +96,14 @@ export function JournalDetailPage() {
     sourceType: HighlightSourceType,
     journal: MatchJournal
   ) => {
-    if (!user || !group) return;
+    if (!user) return;
 
     if (pinnedBulletIds.has(item.id)) {
-      // ピン解除
       unpinMutation.mutate({ userId: user.uid, bulletItemId: item.id });
     } else {
-      // ピン追加
       pinMutation.mutate({
         userId: user.uid,
-        groupId: group.id,
+        groupId: group?.id ?? '',
         sport: journal.sport,
         sourceType,
         sourceId: journal.id,
@@ -228,7 +238,11 @@ export function JournalDetailPage() {
       {/* セクション1: 試合前の目標 */}
       {journal.preNote && (
         <div className="mt-4">
-          <SectionHeader icon="🎯" title={t('journals.preGoals')} />
+          <SectionHeader
+            icon="🎯"
+            title={t('journals.preGoals')}
+            onEdit={isOwner ? () => navigate(`/journals/${journal.id}/edit/pre`) : undefined}
+          />
           <div className="px-4 pb-4">
             {journal.preNote.goals.map((item) => (
               <PinnedBulletItem
@@ -260,7 +274,11 @@ export function JournalDetailPage() {
       {/* セクション2: 試合後の振り返り */}
       {journal.postNote && (
         <div className="mt-2 border-t border-zinc-800">
-          <SectionHeader icon="💡" title={t('journals.postReview')} />
+          <SectionHeader
+            icon="💡"
+            title={t('journals.postReview')}
+            onEdit={isOwner ? () => navigate(`/journals/${journal.id}/edit/post`) : undefined}
+          />
           <div className="px-4 pb-4 space-y-4">
             {/* 目標達成状況 */}
             {journal.preNote && journal.preNote.goals.length > 0 && (

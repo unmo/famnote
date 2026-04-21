@@ -91,6 +91,62 @@ export async function addPostMatchNote(
   });
 }
 
+// 試合前ノート更新
+export async function updatePreMatchNote(
+  journalId: string,
+  userId: string,
+  data: PreMatchFormData
+): Promise<void> {
+  const journalRef = doc(db, 'matchJournals', journalId);
+  const snap = await getDoc(journalRef);
+  if (!snap.exists() || snap.data()?.userId !== userId) {
+    throw new Error('UNAUTHORIZED');
+  }
+  await updateDoc(journalRef, {
+    sport: data.sport,
+    date: Timestamp.fromDate(new Date(data.date)),
+    opponent: data.opponent,
+    venue: data.venue,
+    isPublic: data.isPublic,
+    preNote: {
+      goals: textsToBullets(data.goals),
+      challenges: textsToBullets(data.challenges),
+      recordedAt: serverTimestamp(),
+    },
+    updatedAt: serverTimestamp(),
+  });
+}
+
+// 試合後ノート更新
+export async function updatePostMatchNote(
+  journalId: string,
+  userId: string,
+  data: PostMatchFormData,
+  imageUrls: string[] = []
+): Promise<void> {
+  const journalRef = doc(db, 'matchJournals', journalId);
+  const snap = await getDoc(journalRef);
+  if (!snap.exists() || snap.data()?.userId !== userId) {
+    throw new Error('UNAUTHORIZED');
+  }
+  await updateDoc(journalRef, {
+    isPublic: data.isPublic,
+    postNote: {
+      result: data.result,
+      myScore: data.myScore,
+      opponentScore: data.opponentScore,
+      goalReviews: data.goalReviews,
+      achievements: textsToBullets(data.achievements),
+      improvements: textsToBullets(data.improvements),
+      explorations: textsToBullets(data.explorations),
+      performance: data.performance,
+      imageUrls,
+      recordedAt: serverTimestamp(),
+    },
+    updatedAt: serverTimestamp(),
+  });
+}
+
 // 試合後ノートのみ作成（試合前なし）
 export async function createPostMatchOnly(
   userId: string,
