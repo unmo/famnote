@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Plus, BookOpen, NotebookPen, Star, Clock, User } from 'lucide-react';
+import { Plus, BookOpen, NotebookPen, Star, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useStreak } from '@/hooks/useStreak';
@@ -45,15 +45,6 @@ const MENU_ITEMS = [
     color: 'from-amber-500/20 to-amber-600/5',
     iconColor: 'text-amber-400',
     borderColor: 'border-amber-500/20',
-  },
-  {
-    to: '/timeline',
-    icon: Clock,
-    label: 'タイムライン',
-    sub: '家族の活動',
-    color: 'from-green-500/20 to-green-600/5',
-    iconColor: 'text-green-400',
-    borderColor: 'border-green-500/20',
   },
   {
     to: '/profile',
@@ -171,33 +162,6 @@ export function DashboardPage() {
         </Link>
       </div>
 
-      {/* セクションナビゲーション */}
-      <div>
-        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3">メニュー</h2>
-        <motion.div
-          variants={containerVariants}
-          initial="initial"
-          animate="animate"
-          className="grid grid-cols-2 gap-3"
-        >
-          {MENU_ITEMS.map(({ to, icon: Icon, label, sub, color, iconColor, borderColor }) => (
-            <motion.div key={to} variants={itemVariants}>
-              <Link to={to}>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  className={`bg-gradient-to-br ${color} border ${borderColor} rounded-2xl p-4 transition-all duration-150`}
-                >
-                  <Icon size={24} className={`${iconColor} mb-3`} />
-                  <p className="text-zinc-100 font-semibold text-sm">{label}</p>
-                  <p className="text-zinc-500 text-xs mt-0.5">{sub}</p>
-                </motion.div>
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-
       {/* 最近のアクティビティ */}
       <div>
         <div className="flex items-center justify-between mb-4">
@@ -245,6 +209,33 @@ export function DashboardPage() {
             </Link>
           </div>
         )}
+      </div>
+
+      {/* セクションナビゲーション */}
+      <div>
+        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3">メニュー</h2>
+        <motion.div
+          variants={containerVariants}
+          initial="initial"
+          animate="animate"
+          className="grid grid-cols-2 gap-3"
+        >
+          {MENU_ITEMS.map(({ to, icon: Icon, label, sub, color, iconColor, borderColor }) => (
+            <motion.div key={to} variants={itemVariants}>
+              <Link to={to}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={`bg-gradient-to-br ${color} border ${borderColor} rounded-2xl p-4 transition-all duration-150`}
+                >
+                  <Icon size={24} className={`${iconColor} mb-3`} />
+                  <p className="text-zinc-100 font-semibold text-sm">{label}</p>
+                  <p className="text-zinc-500 text-xs mt-0.5">{sub}</p>
+                </motion.div>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </div>
   );
