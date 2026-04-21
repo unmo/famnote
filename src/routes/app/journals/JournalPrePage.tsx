@@ -88,15 +88,29 @@ export function JournalPrePage() {
       className="min-h-screen bg-zinc-950 pb-32"
     >
       {/* ヘッダー */}
-      <header className="flex items-center gap-3 px-4 py-3 sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-zinc-800/50">
-        <button
-          onClick={() => navigate(-1)}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-100"
-          aria-label={t('common.back')}
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <h1 className="text-lg font-semibold text-zinc-50">{t('journals.preTitle')}</h1>
+      <header className="sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-zinc-800/50">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-100"
+            aria-label={t('common.back')}
+          >
+            <ChevronLeft size={22} />
+          </button>
+          <h1 className="text-lg font-semibold text-zinc-50">{t('journals.preTitle')}</h1>
+        </div>
+        {/* ステップインジケーター */}
+        <div className="flex items-center px-4 pb-3 gap-2">
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-full bg-[var(--color-brand-primary)] flex items-center justify-center text-[11px] font-bold text-white">1</div>
+            <span className="text-xs font-medium text-[var(--color-brand-primary)]">試合前の目標</span>
+          </div>
+          <div className="flex-1 h-px bg-zinc-700 mx-1" />
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[11px] font-bold text-zinc-500">2</div>
+            <span className="text-xs text-zinc-600">試合後の振り返り</span>
+          </div>
+        </div>
       </header>
 
       {/* フォーム */}

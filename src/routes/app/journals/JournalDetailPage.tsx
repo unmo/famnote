@@ -196,16 +196,31 @@ export function JournalDetailPage() {
 
       {/* 試合後ノート未記入時のCTA */}
       {journal.status === 'pre' && isOwner && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-5 mx-4 my-4 text-center">
-          <p className="text-3xl mb-2">📝</p>
-          <p className="text-sm font-semibold text-zinc-200">試合の振り返りを記録しましょう</p>
-          <p className="text-sm text-zinc-400 mt-1">試合はどうでしたか？</p>
+        <div className="mx-4 my-4">
+          {/* ステップインジケーター */}
+          <div className="flex items-center mb-3 gap-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[11px] font-bold text-zinc-400">1</div>
+              <span className="text-xs text-zinc-500 line-through">試合前の目標</span>
+            </div>
+            <div className="flex-1 h-px bg-[var(--color-brand-primary)]/40 mx-1 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-brand-primary)]/40 to-transparent" />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 rounded-full bg-[var(--color-brand-primary)] flex items-center justify-center text-[11px] font-bold text-white animate-pulse">2</div>
+              <span className="text-xs font-medium text-[var(--color-brand-primary)]">試合後の振り返り</span>
+            </div>
+          </div>
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={() => navigate(`/journals/${journal.id}/post`)}
-            className="mt-3 w-full bg-[var(--color-brand-primary)] text-white rounded-lg px-5 py-2.5 text-sm font-medium"
+            className="w-full bg-[var(--color-brand-primary)] text-white rounded-xl px-5 py-4 text-sm font-semibold flex items-center justify-between"
           >
-            {t('journals.writePost')}
+            <div className="flex flex-col items-start gap-0.5">
+              <span className="text-base font-bold">試合の振り返りを記録</span>
+              <span className="text-xs text-white/70">結果・できたこと・課題を入力</span>
+            </div>
+            <span className="text-xl">→</span>
           </motion.button>
         </div>
       )}

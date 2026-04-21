@@ -1,6 +1,6 @@
 import { useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Pin } from 'lucide-react';
+import { Pin, Plus, Trash2 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface BulletListInputProps {
@@ -18,8 +18,8 @@ interface BulletListInputProps {
 }
 
 const itemVariants = {
-  initial: { opacity: 0, height: 0, y: -4 },
-  animate: { opacity: 1, height: 'auto', y: 0, transition: { duration: 0.15 } },
+  initial: { opacity: 0, height: 0 },
+  animate: { opacity: 1, height: 'auto', transition: { duration: 0.15 } },
   exit: { opacity: 0, height: 0, transition: { duration: 0.1 } },
 };
 
@@ -37,7 +37,6 @@ export function BulletListInput({
 }: BulletListInputProps) {
   const inputRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
 
-  // 表示用リスト（最低1行は表示）
   const items = value.length > 0 ? value : [''];
 
   const updateItem = useCallback(
@@ -55,7 +54,6 @@ export function BulletListInput({
       const newItems = [...items];
       newItems.splice(afterIndex + 1, 0, '');
       onChange(newItems);
-      // 次フレームでフォーカス
       setTimeout(() => {
         inputRefs.current[afterIndex + 1]?.focus();
       }, 50);
@@ -86,7 +84,7 @@ export function BulletListInput({
   };
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       <AnimatePresence initial={false}>
         {items.map((item, index) => {
           const isPinned = pinnedIndices.has(index);
@@ -100,37 +98,21 @@ export function BulletListInput({
               initial="initial"
               animate="animate"
               exit="exit"
-              className={clsx(
-                'flex items-start gap-2 group rounded-lg transition-colors duration-150',
-                isPinned && 'bg-amber-500/10 border-l-2 border-amber-500 pl-2'
-              )}
             >
-              {/* ピンボタン */}
-              {showPinButton && (
-                <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
-                  <motion.button
-                    type="button"
-                    onClick={() => onPinToggle?.(index)}
-                    disabled={disabled}
-                    aria-label={isPinned ? 'ピンを解除する' : 'この項目をピンする'}
-                    aria-pressed={isPinned}
-                    animate={isPinned ? { scale: [1, 1.4, 1] } : { scale: 1 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className={clsx(
-                      'w-7 h-7 rounded-full flex items-center justify-center text-base transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)] focus-visible:outline-none',
-                      isPinned
-                        ? 'text-amber-400 bg-amber-400/10 opacity-100'
-                        : 'text-zinc-600 hover:text-amber-400 hover:bg-amber-400/10 opacity-0 group-hover:opacity-100 focus:opacity-100 md:opacity-0 max-md:opacity-100'
-                    )}
-                  >
-                    <Pin size={14} />
-                  </motion.button>
-                </div>
-              )}
+              <div
+                className={clsx(
+                  'flex items-center gap-2 bg-zinc-800 rounded-xl px-3 py-2.5 border transition-colors duration-150',
+                  isPinned
+                    ? 'border-amber-500/60 bg-amber-500/5'
+                    : 'border-zinc-700/60 focus-within:border-[var(--color-brand-primary)]/60'
+                )}
+              >
+                {/* 番号バッジ */}
+                <span className="w-5 h-5 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-400 flex-shrink-0">
+                  {index + 1}
+                </span>
 
-              {/* 入力フィールド */}
-              <div className="flex-1 flex items-center gap-2">
-                <span className="text-zinc-500 text-sm flex-shrink-0 mt-2">•</span>
+                {/* 入力フィールド */}
                 <textarea
                   ref={(el) => { inputRefs.current[index] = el; }}
                   value={item}
@@ -141,25 +123,54 @@ export function BulletListInput({
                   aria-label={`項目 ${index + 1}件目`}
                   rows={1}
                   className={clsx(
-                    'flex-1 bg-transparent border-0 border-b border-zinc-700/50',
-                    'focus:border-[var(--color-brand-primary)] outline-none',
-                    'text-base text-zinc-50 placeholder:text-zinc-600',
-                    'py-2 px-0 leading-relaxed resize-none min-h-[40px] max-md:min-h-[48px]',
-                    'transition-colors duration-150',
+                    'flex-1 bg-transparent border-0 outline-none',
+                    'text-sm text-zinc-100 placeholder:text-zinc-600',
+                    'py-0.5 leading-relaxed resize-none',
                     disabled && 'pointer-events-none opacity-50'
                   )}
                 />
-              </div>
 
-              {/* 文字数カウンター */}
-              <span
-                className={clsx(
-                  'text-xs self-end pb-1 flex-shrink-0',
-                  isNearLimit ? 'text-amber-500' : 'text-zinc-600'
+                {/* 文字数（上限付近のみ表示） */}
+                {isNearLimit && (
+                  <span className="text-[10px] text-amber-500 flex-shrink-0">
+                    {remaining}
+                  </span>
                 )}
-              >
-                {item.length}/{maxLength}
-              </span>
+
+                {/* ピンボタン */}
+                {showPinButton && (
+                  <motion.button
+                    type="button"
+                    onClick={() => onPinToggle?.(index)}
+                    disabled={disabled}
+                    aria-label={isPinned ? 'ピンを解除する' : 'この項目をピンする'}
+                    aria-pressed={isPinned}
+                    whileTap={{ scale: 0.85 }}
+                    className={clsx(
+                      'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150',
+                      isPinned
+                        ? 'text-amber-400 bg-amber-400/10'
+                        : 'text-zinc-600 hover:text-amber-400 hover:bg-amber-400/10'
+                    )}
+                  >
+                    <Pin size={13} />
+                  </motion.button>
+                )}
+
+                {/* 削除ボタン */}
+                {items.length > 1 && (
+                  <motion.button
+                    type="button"
+                    onClick={() => removeItem(index)}
+                    disabled={disabled}
+                    aria-label={`項目 ${index + 1} を削除`}
+                    whileTap={{ scale: 0.85 }}
+                    className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 transition-colors duration-150"
+                  >
+                    <Trash2 size={13} />
+                  </motion.button>
+                )}
+              </div>
             </motion.div>
           );
         })}
@@ -171,13 +182,13 @@ export function BulletListInput({
           type="button"
           onClick={() => addItem(items.length - 1)}
           disabled={disabled}
-          className="flex items-center gap-2 mt-1 text-xs text-zinc-500 hover:text-zinc-300 cursor-pointer transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-zinc-700 text-sm text-zinc-500 hover:text-zinc-300 hover:border-zinc-500 hover:bg-zinc-800/40 transition-all duration-150 disabled:pointer-events-none disabled:opacity-40"
         >
-          <span className="text-base leading-none">+</span>
-          <span>追加</span>
+          <Plus size={15} />
+          <span>追加する</span>
         </button>
       ) : (
-        <p className="text-xs text-zinc-600 mt-1">
+        <p className="text-xs text-zinc-600 text-center py-1">
           最大{maxItems}件まで入力できます
         </p>
       )}
