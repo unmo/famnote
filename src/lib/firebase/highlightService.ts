@@ -6,11 +6,8 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
   limit,
-  startAfter,
   serverTimestamp,
-  type DocumentSnapshot,
 } from 'firebase/firestore';
 import { db } from './config';
 import type { Highlight, HighlightSourceType } from '@/types/highlight';
@@ -86,16 +83,14 @@ export async function fetchUserHighlights(
     sport?: Sport;
     sourceType?: HighlightSourceType;
     pageSize?: number;
-    lastDoc?: DocumentSnapshot;
   }
-): Promise<{ highlights: Highlight[]; lastDoc: DocumentSnapshot | null }> {
+): Promise<{ highlights: Highlight[]; lastDoc: null }> {
   const pageSize = options?.pageSize ?? 20;
 
   let q = query(
     collection(db, 'highlights'),
     where('userId', '==', userId),
-    orderBy('sourceDate', 'desc'),
-    limit(pageSize)
+    limit(pageSize * 3)
   );
 
   if (options?.sport) {
@@ -103,16 +98,16 @@ export async function fetchUserHighlights(
       collection(db, 'highlights'),
       where('userId', '==', userId),
       where('sport', '==', options.sport),
-      orderBy('sourceDate', 'desc'),
-      limit(pageSize)
+      limit(pageSize * 3)
     );
   }
 
-  if (options?.lastDoc) q = query(q, startAfter(options.lastDoc));
-
   const snap = await getDocs(q);
-  const highlights = snap.docs.map((d) => ({ ...(d.data() as Highlight), id: d.id }));
-  return { highlights, lastDoc: snap.docs[snap.docs.length - 1] ?? null };
+  let highlights = snap.docs
+    .map((d) => ({ ...(d.data() as Highlight), id: d.id }))
+    .sort((a, b) => b.sourceDate.toMillis() - a.sourceDate.toMillis())
+    .slice(0, pageSize);
+  return { highlights, lastDoc: null };
 }
 
 // ユーザーのハイライト件数を取得

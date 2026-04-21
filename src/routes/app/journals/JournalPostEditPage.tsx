@@ -15,14 +15,6 @@ const pageVariants = {
   exit: { opacity: 0, y: -10 },
 };
 
-type MatchResult = 'win' | 'draw' | 'loss';
-
-const RESULT_STYLES: Record<MatchResult, { label: string; selected: string }> = {
-  win: { label: '勝', selected: 'bg-green-500/20 border-green-500 text-green-400' },
-  draw: { label: '分', selected: 'bg-zinc-700/50 border-zinc-500 text-zinc-300' },
-  loss: { label: '負', selected: 'bg-red-500/20 border-red-500 text-red-400' },
-};
-
 export function JournalPostEditPage() {
   const navigate = useNavigate();
   const { id: journalId } = useParams<{ id: string }>();
@@ -30,9 +22,7 @@ export function JournalPostEditPage() {
   const { data: journal, isLoading } = useJournal(journalId);
   const updateMutation = useUpdatePostMatchNote();
 
-  const [result, setResult] = useState<MatchResult | null>(null);
-  const [myScore, setMyScore] = useState<string>('');
-  const [opponentScore, setOpponentScore] = useState<string>('');
+  const [myGoals, setMyGoals] = useState<string>('');
   const [goalReviews, setGoalReviews] = useState<GoalReview[]>([]);
   const [achievements, setAchievements] = useState<string[]>(['']);
   const [improvements, setImprovements] = useState<string[]>(['']);
@@ -43,9 +33,7 @@ export function JournalPostEditPage() {
   useEffect(() => {
     if (!journal?.postNote) return;
     const p = journal.postNote;
-    setResult(p.result as MatchResult | null);
-    setMyScore(p.myScore != null ? String(p.myScore) : '');
-    setOpponentScore(p.opponentScore != null ? String(p.opponentScore) : '');
+    setMyGoals(p.myScore != null ? String(p.myScore) : '');
     setGoalReviews(p.goalReviews ?? []);
     setAchievements(p.achievements.map((a) => a.text) || ['']);
     setImprovements(p.improvements.map((i) => i.text) || ['']);
@@ -76,9 +64,9 @@ export function JournalPostEditPage() {
         journalId,
         userId: user.uid,
         data: {
-          result,
-          myScore: myScore !== '' ? Number(myScore) : null,
-          opponentScore: opponentScore !== '' ? Number(opponentScore) : null,
+          result: null,
+          myScore: myGoals !== '' ? Number(myGoals) : null,
+          opponentScore: null,
           goalReviews,
           achievements: achievements.filter((a) => a.trim()),
           improvements: improvements.filter((i) => i.trim()),
@@ -129,46 +117,19 @@ export function JournalPostEditPage() {
       )}
 
       <div className="px-4 py-4 space-y-6">
-        {/* 試合結果 */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium text-zinc-300">試合結果</label>
-          <div className="flex gap-3">
-            {(Object.keys(RESULT_STYLES) as MatchResult[]).map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setResult(r)}
-                className={`flex-1 py-3 rounded-lg border text-sm font-medium transition-all duration-150 ${
-                  result === r ? RESULT_STYLES[r].selected : 'bg-zinc-800 border-zinc-700 text-zinc-400'
-                }`}
-              >
-                {RESULT_STYLES[r].label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* スコア */}
+        {/* 自身のゴール数 */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-300">スコア</label>
+          <label className="text-sm font-medium text-zinc-300">自身のゴール数</label>
           <div className="flex items-center gap-3">
             <input
               type="number"
               min="0"
-              value={myScore}
-              onChange={(e) => setMyScore(e.target.value)}
+              value={myGoals}
+              onChange={(e) => setMyGoals(e.target.value)}
               placeholder="0"
               className="w-24 text-center text-xl font-bold bg-zinc-800 border border-zinc-700 rounded-lg py-2.5 text-zinc-50 focus:border-[var(--color-brand-primary)] focus:outline-none"
             />
-            <span className="text-zinc-600 text-xl font-bold">-</span>
-            <input
-              type="number"
-              min="0"
-              value={opponentScore}
-              onChange={(e) => setOpponentScore(e.target.value)}
-              placeholder="0"
-              className="w-24 text-center text-xl font-bold bg-zinc-800 border border-zinc-700 rounded-lg py-2.5 text-zinc-50 focus:border-[var(--color-brand-primary)] focus:outline-none"
-            />
+            <span className="text-sm text-zinc-500">ゴール</span>
           </div>
         </div>
 

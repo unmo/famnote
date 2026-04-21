@@ -78,7 +78,7 @@ export function GoalReviewItem({ goal, review, onChange, readonly = false }: Goa
 
   return (
     <div className="space-y-2 py-3 border-b border-zinc-800 last:border-0">
-      <p className="text-sm text-zinc-300 leading-relaxed">• {goal.text}</p>
+      <p className="text-sm text-zinc-300 leading-relaxed">{goal.text}</p>
 
       {/* 達成状況ボタン群 */}
       <div className="flex gap-2 mt-2 flex-wrap">
