@@ -11,8 +11,6 @@ import { db } from '@/lib/firebase/config';
 import { useQuery } from '@tanstack/react-query';
 import type { GroupMember } from '@/types/group';
 import { Avatar } from '@/components/shared/Avatar';
-import type { Sport } from '@/types/sport';
-import { SportBadge } from '@/components/shared/SportBadge';
 
 // テーマ選択UIコンポーネント
 function ThemeSelector() {
@@ -175,11 +173,6 @@ function GroupManagement() {
               <Avatar size="sm" name={member.displayName} src={member.avatarUrl ?? undefined} />
               <div className="flex-1">
                 <p className="text-zinc-200 text-sm font-medium">{member.displayName}</p>
-                <div className="flex gap-1 mt-0.5">
-                  {member.sports?.slice(0, 3).map((sport) => (
-                    <SportBadge key={sport} sport={sport as Sport} size="sm" />
-                  ))}
-                </div>
               </div>
               {member.role === 'owner' && (
                 <span className="text-[10px] bg-[color-mix(in_srgb,var(--color-brand-primary)_15%,transparent)] text-[var(--color-brand-primary)] border border-[var(--color-brand-primary)]/30 rounded-full px-2 py-0.5">

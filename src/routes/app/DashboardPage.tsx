@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useStreak } from '@/hooks/useStreak';
 import { useGroupNotes } from '@/hooks/useNotes';
-import { SportBadge } from '@/components/shared/SportBadge';
 import { Avatar } from '@/components/shared/Avatar';
 import { formatRelativeTime } from '@/lib/utils/date';
 
@@ -145,7 +144,6 @@ export function DashboardPage() {
                   <Avatar size="sm" name={note.userId} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <SportBadge sport={note.sport} size="sm" />
                       <span className="text-zinc-500 text-xs">
                         {formatRelativeTime(note.createdAt)}
                       </span>
