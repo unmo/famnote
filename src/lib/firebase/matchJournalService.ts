@@ -31,7 +31,7 @@ function textsToBullets(texts: string[]) {
 // 試合前ノート作成
 export async function createPreMatchNote(
   userId: string,
-  groupId: string,
+  groupId: string | null,
   data: PreMatchFormData
 ): Promise<{ journalId: string }> {
   const ref = await addDoc(collection(db, 'matchJournals'), {
@@ -94,7 +94,7 @@ export async function addPostMatchNote(
 // 試合後ノートのみ作成（試合前なし）
 export async function createPostMatchOnly(
   userId: string,
-  groupId: string,
+  groupId: string | null,
   baseData: { sport: Sport; date: string; opponent: string; venue: string | null },
   postData: PostMatchFormData,
   imageUrls: string[] = []
@@ -156,7 +156,7 @@ export async function deleteMatchJournal(journalId: string, userId: string): Pro
   await deleteDoc(journalRef);
 }
 
-// ユーザーのジャーナル一覧（月別フィルター対応）
+// ユーザーのジャーナル一覧（月別フィルター・クライアントソート）
 export async function fetchUserJournals(
   userId: string,
   year: number,
@@ -164,37 +164,37 @@ export async function fetchUserJournals(
 ): Promise<MatchJournal[]> {
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 0, 23, 59, 59);
+  const startTs = Timestamp.fromDate(startDate);
+  const endTs = Timestamp.fromDate(endDate);
 
   const q = query(
     collection(db, 'matchJournals'),
-    where('userId', '==', userId),
-    where('isDraft', '==', false),
-    where('date', '>=', Timestamp.fromDate(startDate)),
-    where('date', '<=', Timestamp.fromDate(endDate)),
-    orderBy('date', 'desc')
+    where('userId', '==', userId)
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ ...(d.data() as MatchJournal), id: d.id }));
+  return snap.docs
+    .map((d) => ({ ...(d.data() as MatchJournal), id: d.id }))
+    .filter((j) => j.date.toMillis() >= startTs.toMillis() && j.date.toMillis() <= endTs.toMillis())
+    .sort((a, b) => b.date.toMillis() - a.date.toMillis());
 }
 
-// ユーザーのジャーナル全件取得（ページネーション対応）
+// ユーザーのジャーナル全件取得（クライアントソート）
 export async function fetchUserJournalsPaged(
   userId: string,
   pageSize = 20,
-  lastDoc?: DocumentSnapshot
+  _lastDoc?: DocumentSnapshot
 ): Promise<{ journals: MatchJournal[]; lastDoc: DocumentSnapshot | null }> {
-  let q = query(
+  const q = query(
     collection(db, 'matchJournals'),
     where('userId', '==', userId),
-    where('isDraft', '==', false),
-    orderBy('date', 'desc'),
     limit(pageSize)
   );
-  if (lastDoc) q = query(q, startAfter(lastDoc));
 
   const snap = await getDocs(q);
-  const journals = snap.docs.map((d) => ({ ...(d.data() as MatchJournal), id: d.id }));
-  return { journals, lastDoc: snap.docs[snap.docs.length - 1] ?? null };
+  const journals = snap.docs
+    .map((d) => ({ ...(d.data() as MatchJournal), id: d.id }))
+    .sort((a, b) => b.date.toMillis() - a.date.toMillis());
+  return { journals, lastDoc: null };
 }
 
 // グループのジャーナル一覧取得

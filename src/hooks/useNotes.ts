@@ -16,12 +16,14 @@ export function useNotes(userId: string | undefined) {
       const q = query(
         collection(db, 'notes'),
         where('userId', '==', userId),
-        where('isDraft', '==', false),
-        orderBy('createdAt', 'desc'),
-        limit(20)
+        limit(50)
       );
       const snap = await getDocs(q);
-      return snap.docs.map((d) => ({ ...(d.data() as Note), id: d.id }));
+      return snap.docs
+        .map((d) => ({ ...(d.data() as Note), id: d.id }))
+        .filter((n) => !n.isDraft)
+        .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis())
+        .slice(0, 20);
     },
   });
 }
