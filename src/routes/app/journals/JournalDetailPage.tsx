@@ -30,9 +30,8 @@ interface PinnedBulletItemProps {
 
 function PinnedBulletItem({ item, isPinned, onPinToggle, showPinButton }: PinnedBulletItemProps) {
   return (
-    <div className={`flex items-start gap-2.5 py-2.5 rounded-lg transition-colors ${isPinned ? 'bg-amber-500/10 border-l-2 border-amber-500 pl-2' : ''}`}>
+    <div className={`group flex items-start gap-2.5 py-2.5 rounded-lg transition-colors ${isPinned ? 'bg-amber-500/10 border-l-2 border-amber-500 pl-2' : ''}`}>
       <p className="text-sm text-zinc-200 leading-relaxed flex-1">
-        {isPinned && <span className="mr-1">📌</span>}
         {item.text}
       </p>
       {showPinButton && (
@@ -43,14 +42,14 @@ function PinnedBulletItem({ item, isPinned, onPinToggle, showPinButton }: Pinned
           transition={{ duration: 0.25 }}
           aria-label={isPinned ? '気づきのかけらから削除' : '気づきのかけらに追加'}
           aria-pressed={isPinned}
-          className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs flex-shrink-0 transition-colors ${
+          title={isPinned ? '気づきのかけらから削除' : '気づきのかけらに追加'}
+          className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
             isPinned
-              ? 'text-amber-400 bg-amber-400/15 border border-amber-400/30'
-              : 'text-zinc-500 bg-zinc-800 border border-zinc-700 hover:text-amber-400 hover:border-amber-400/40'
+              ? 'text-amber-400 bg-amber-400/20'
+              : 'text-zinc-500 hover:text-amber-400 hover:bg-amber-400/10'
           }`}
         >
-          <Pin size={11} />
-          <span>{isPinned ? 'ピン済み' : '保存'}</span>
+          <Pin size={14} fill={isPinned ? 'currentColor' : 'none'} />
         </motion.button>
       )}
     </div>
@@ -295,7 +294,7 @@ export function JournalDetailPage() {
               </div>
             )}
 
-            {/* できたこと */}
+            {/* できたこと（ピンなし） */}
             {journal.postNote.achievements.length > 0 && (
               <div>
                 <p className="text-xs text-zinc-500 mb-2">✅ できたこと</p>
@@ -303,18 +302,21 @@ export function JournalDetailPage() {
                   <PinnedBulletItem
                     key={item.id}
                     item={item}
-                    isPinned={pinnedBulletIds.has(item.id)}
-                    showPinButton={isOwner}
-                    onPinToggle={() => handlePinToggle(item, 'journal_post_achievement', journal)}
+                    isPinned={false}
+                    showPinButton={false}
+                    onPinToggle={() => {}}
                   />
                 ))}
               </div>
             )}
 
-            {/* できなかったこと */}
+            {/* できなかったこと（📌 気づきのかけらに追加可能） */}
             {journal.postNote.improvements.length > 0 && (
               <div>
-                <p className="text-xs text-zinc-500 mb-2">📈 できなかったこと / 課題</p>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <p className="text-xs text-zinc-500">📈 できなかったこと / 課題</p>
+                  {isOwner && <span className="text-[10px] text-amber-500/70 bg-amber-500/10 rounded px-1.5 py-0.5">📌 タップで気づきに保存</span>}
+                </div>
                 {journal.postNote.improvements.map((item) => (
                   <PinnedBulletItem
                     key={item.id}
@@ -327,10 +329,13 @@ export function JournalDetailPage() {
               </div>
             )}
 
-            {/* 探求したいこと */}
+            {/* 探求したいこと（📌 気づきのかけらに追加可能） */}
             {journal.postNote.explorations.length > 0 && (
               <div>
-                <p className="text-xs text-zinc-500 mb-2">🔍 もっと探求したいこと</p>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <p className="text-xs text-zinc-500">🔍 もっと探求したいこと</p>
+                  {isOwner && <span className="text-[10px] text-amber-500/70 bg-amber-500/10 rounded px-1.5 py-0.5">📌 タップで気づきに保存</span>}
+                </div>
                 {journal.postNote.explorations.map((item) => (
                   <PinnedBulletItem
                     key={item.id}

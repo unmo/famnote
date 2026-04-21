@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Plus, BookOpen, Swords } from 'lucide-react';
+import { Plus, BookOpen, NotebookPen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useStreak } from '@/hooks/useStreak';
@@ -99,14 +99,14 @@ export function DashboardPage() {
           </motion.div>
         </Link>
 
-        <Link to="/matches/new">
+        <Link to="/journals/new">
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center gap-3 hover:border-zinc-600 transition-colors"
+            className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center gap-3 hover:border-[var(--color-brand-primary)] transition-colors"
           >
-            <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center">
-              <Swords size={20} className="text-zinc-400" />
+            <div className="w-10 h-10 rounded-xl bg-[color-mix(in_srgb,var(--color-brand-primary)_15%,transparent)] flex items-center justify-center">
+              <NotebookPen size={20} className="text-[var(--color-brand-primary)]" />
             </div>
             <div>
               <p className="text-zinc-50 font-medium text-sm">{t('dashboard.matchRecord')}</p>
