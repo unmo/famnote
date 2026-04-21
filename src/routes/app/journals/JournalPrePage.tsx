@@ -9,7 +9,7 @@ import { useGroupStore } from '@/store/groupStore';
 import { useCreatePreMatchNote } from '@/hooks/useMatchJournals';
 import { BulletListInput } from '@/components/journals/BulletListInput';
 import { preMatchSchema } from '@/lib/validations/matchJournalSchema';
-import { SPORTS, SPORT_LABELS } from '@/types/sport';
+import type { Sport } from '@/types/sport';
 import { format } from 'date-fns';
 
 const pageVariants = {
@@ -27,7 +27,7 @@ export function JournalPrePage() {
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const [date, setDate] = useState(today);
-  const [sport, setSport] = useState<string>(user?.sports[0] ?? 'soccer');
+  const sport = (user?.sports[0] ?? 'soccer') as Sport;
   const [opponent, setOpponent] = useState('');
   const [venue, setVenue] = useState('');
   const [goals, setGoals] = useState<string[]>(['']);
@@ -37,7 +37,7 @@ export function JournalPrePage() {
 
   const handleSubmit = async () => {
     const formData = {
-      sport: sport as typeof SPORTS[number],
+      sport,
       date,
       opponent: opponent.trim(),
       venue: venue.trim() || null,
@@ -57,20 +57,24 @@ export function JournalPrePage() {
       return;
     }
 
-    if (!user || !group) {
+    if (!user) {
       toast.error('ユーザー情報が取得できません');
       return;
     }
 
+    // グループ未参加でも個人ノートとして保存できる
+    const groupId = group?.id ?? user.groupId ?? null;
+
     try {
       const { journalId } = await createMutation.mutateAsync({
         userId: user.uid,
-        groupId: group.id,
+        groupId,
         data: result.data,
       });
       navigate(`/journals/${journalId}`);
-    } catch {
-      // エラーはmutationのonErrorで処理済み
+    } catch (err) {
+      console.error('[JournalPrePage] createPreMatchNote failed:', err);
+      toast.error('保存に失敗しました。再試行してください');
     }
   };
 
@@ -97,29 +101,15 @@ export function JournalPrePage() {
 
       {/* フォーム */}
       <div className="px-4 py-4 space-y-6">
-        {/* 日付・スポーツ */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">{t('journals.date')}</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">{t('journals.sport')}</label>
-            <select
-              value={sport}
-              onChange={(e) => setSport(e.target.value)}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none appearance-none"
-            >
-              {SPORTS.map((s) => (
-                <option key={s} value={s}>{SPORT_LABELS[s]}</option>
-              ))}
-            </select>
-          </div>
+        {/* 日付 */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-300">{t('journals.date')}</label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none"
+          />
         </div>
 
         {/* 対戦相手 */}

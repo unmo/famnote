@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,16 +8,22 @@ import { useTranslation } from 'react-i18next';
 import { noteSchema, type NoteSchema } from '@/lib/validations/noteSchema';
 import { useAuthStore } from '@/store/authStore';
 import { useCreateNote } from '@/hooks/useNotes';
-import { SPORTS, SPORT_LABELS } from '@/types/sport';
 import { Timestamp } from 'firebase/firestore';
 import { getTodayInputValue } from '@/lib/utils/date';
+import { toast } from 'sonner';
 
-// 練習ノート新規作成ページ
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 },
+};
+
 export function NoteNewPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { userProfile, firebaseUser } = useAuthStore();
   const createNote = useCreateNote();
+  const [isDraftSaving, setIsDraftSaving] = useState(false);
 
   const {
     register,
@@ -39,11 +46,15 @@ export function NoteNewPage() {
   });
 
   const onSubmit = async (data: NoteSchema, isDraft = false) => {
-    if (!firebaseUser || !userProfile?.groupId) return;
+    if (!firebaseUser) {
+      toast.error(t('common.notAuthenticated'));
+      return;
+    }
 
     await createNote.mutateAsync({
       userId: firebaseUser.uid,
-      groupId: userProfile.groupId,
+      // グループ未参加でも自分のノートとして保存できる
+      groupId: userProfile?.groupId ?? null,
       sport: data.sport,
       date: Timestamp.fromDate(new Date(data.date)),
       durationMinutes: data.durationMinutes ?? null,
@@ -60,112 +71,114 @@ export function NoteNewPage() {
     navigate('/notes');
   };
 
+  const handleDraftSave = async () => {
+    setIsDraftSaving(true);
+    await handleSubmit((data) => onSubmit(data, true))();
+    setIsDraftSaving(false);
+  };
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
-      {/* ヘッダー */}
-      <div className="flex items-center gap-3 mb-6">
+    <motion.div
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className="min-h-screen bg-zinc-950 pb-32"
+    >
+      {/* ヘッダー（JournalPrePageと同構造） */}
+      <header className="flex items-center gap-3 px-4 py-3 sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-zinc-800/50">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-100"
           aria-label={t('common.back')}
         >
-          <ChevronLeft size={24} />
+          <ChevronLeft size={22} />
         </button>
-        <h1 className="text-xl font-bold text-zinc-50">{t('notes.new')}</h1>
-      </div>
+        <h1 className="text-lg font-semibold text-zinc-50">{t('notes.new')}</h1>
+      </header>
 
-      <form onSubmit={handleSubmit((data) => onSubmit(data, false))} className="space-y-5">
-        {/* スポーツ種目 */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-zinc-300">{t('notes.sport')}</label>
-          <select {...register('sport')} className="input-base" aria-invalid={!!errors.sport}>
-            {SPORTS.map((s) => (
-              <option key={s} value={s}>{SPORT_LABELS[s]}</option>
-            ))}
-          </select>
-          {errors.sport && <p className="text-red-500 text-xs">{errors.sport.message}</p>}
-        </div>
+      {/* フォーム */}
+      <form onSubmit={handleSubmit((data) => onSubmit(data, false))} className="px-4 py-4 space-y-6">
 
         {/* 日付 */}
-        <div className="flex flex-col gap-1.5">
+        <div className="space-y-2">
           <label className="text-sm font-medium text-zinc-300">{t('notes.date')}</label>
           <input
             {...register('date')}
             type="date"
             max={getTodayInputValue()}
-            className="input-base"
-            aria-invalid={!!errors.date}
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none"
           />
-          {errors.date && <p className="text-red-500 text-xs">{errors.date.message}</p>}
+          {errors.date && <p className="text-xs text-red-400">⚠ {errors.date.message}</p>}
         </div>
 
         {/* 練習時間・場所 */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-300">{t('notes.duration')}</label>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">{t('notes.duration')} <span className="text-zinc-500 text-xs">（任意）</span></label>
             <input
               {...register('durationMinutes', { valueAsNumber: true })}
               type="number"
               min="1"
               max="600"
               placeholder="90"
-              className="input-base"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none placeholder:text-zinc-600"
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-300">{t('notes.location')}</label>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">{t('notes.location')} <span className="text-zinc-500 text-xs">（任意）</span></label>
             <input
               {...register('location')}
               type="text"
               placeholder="市営グラウンド"
-              className="input-base"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none placeholder:text-zinc-600"
             />
           </div>
         </div>
 
         {/* 今日の目標 */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-zinc-300">{t('notes.todayGoal')}</label>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-300">{t('notes.todayGoal')} <span className="text-zinc-500 text-xs">（任意）</span></label>
           <textarea
             {...register('todayGoal')}
             placeholder="今日達成したいこと..."
             rows={2}
-            className="input-base resize-none"
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none placeholder:text-zinc-600 resize-none"
             maxLength={200}
           />
         </div>
 
         {/* 練習内容（必須） */}
-        <div className="flex flex-col gap-1.5">
+        <div className="space-y-2">
           <label className="text-sm font-medium text-zinc-300">
-            {t('notes.content')}
-            <span className="text-red-500 ml-1">*</span>
+            {t('notes.content')} <span className="text-red-400 text-xs">*</span>
           </label>
           <textarea
             {...register('content')}
-            placeholder="今日の練習内容を詳しく記録しましょう..."
+            placeholder="今日の練習内容を記録しましょう..."
             rows={5}
-            className="input-base resize-none"
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none placeholder:text-zinc-600 resize-none"
             maxLength={1000}
             aria-invalid={!!errors.content}
           />
-          {errors.content && <p className="text-red-500 text-xs">{errors.content.message}</p>}
+          {errors.content && <p className="text-xs text-red-400">⚠ {errors.content.message}</p>}
         </div>
 
         {/* 振り返り */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-zinc-300">{t('notes.reflection')}</label>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-300">{t('notes.reflection')} <span className="text-zinc-500 text-xs">（任意）</span></label>
           <textarea
             {...register('reflection')}
             placeholder="良かった点・改善点..."
             rows={3}
-            className="input-base resize-none"
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none placeholder:text-zinc-600 resize-none"
             maxLength={500}
           />
         </div>
 
         {/* 体調 */}
-        <div className="flex flex-col gap-2">
+        <div className="space-y-2">
           <label className="text-sm font-medium text-zinc-300">{t('notes.condition')}</label>
           <Controller
             name="condition"
@@ -177,13 +190,13 @@ export function NoteNewPage() {
                     key={val}
                     type="button"
                     onClick={() => field.onChange(field.value === val ? null : val)}
-                    className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${
+                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
                       field.value === val
                         ? 'bg-[var(--color-brand-primary)] text-white'
-                        : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                        : 'bg-zinc-800 border border-zinc-700 text-zinc-400 hover:bg-zinc-700'
                     }`}
                   >
-                    {val}
+                    {t(`notes.conditionLabels.${val}`)}
                   </button>
                 ))}
               </div>
@@ -196,7 +209,7 @@ export function NoteNewPage() {
           name="isPublic"
           control={control}
           render={({ field }) => (
-            <div className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+            <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50">
               <div className="flex items-center gap-3">
                 {field.value ? (
                   <Globe size={20} className="text-[var(--color-brand-primary)]" />
@@ -204,10 +217,10 @@ export function NoteNewPage() {
                   <Lock size={20} className="text-zinc-400" />
                 )}
                 <div>
-                  <p className="text-zinc-200 text-sm font-medium">
+                  <p className="text-sm font-medium text-zinc-200">
                     {field.value ? t('notes.isPublic') : t('notes.isPrivate')}
                   </p>
-                  <p className="text-zinc-500 text-xs">
+                  <p className="text-xs text-zinc-500 mt-0.5">
                     {field.value ? t('notes.visibility.public') : t('notes.visibility.private')}
                   </p>
                 </div>
@@ -217,40 +230,37 @@ export function NoteNewPage() {
                 role="switch"
                 aria-checked={field.value}
                 onClick={() => field.onChange(!field.value)}
-                className={`w-12 h-6 rounded-full transition-colors relative ${
-                  field.value ? 'bg-[var(--color-brand-primary)]' : 'bg-zinc-700'
-                }`}
+                className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${field.value ? 'bg-[var(--color-brand-primary)]' : 'bg-zinc-700'}`}
               >
                 <span
-                  className={`absolute top-[3px] left-[3px] w-[18px] h-[18px] rounded-full bg-white transition-transform ${
-                    field.value ? 'translate-x-[22px]' : 'translate-x-0'
-                  }`}
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 ${field.value ? 'translate-x-5' : 'translate-x-0'}`}
                 />
               </button>
             </div>
           )}
         />
-
-        {/* 送信ボタン */}
-        <div className="flex gap-3 pt-4">
-          <button
-            type="button"
-            onClick={() => handleSubmit((data) => onSubmit(data, true))()}
-            disabled={isSubmitting}
-            className="btn-secondary flex-1"
-          >
-            {t('notes.saveDraft')}
-          </button>
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            disabled={isSubmitting || createNote.isPending}
-            className="btn-primary flex-1"
-          >
-            {isSubmitting || createNote.isPending ? t('common.saving') : t('notes.save')}
-          </motion.button>
-        </div>
       </form>
-    </div>
+
+      {/* 固定フッター（JournalPrePageと同構造） */}
+      <div className="fixed bottom-0 left-0 right-0 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 px-4 py-3 flex gap-3">
+        <button
+          type="button"
+          onClick={handleDraftSave}
+          disabled={isDraftSaving || isSubmitting}
+          className="flex-1 bg-zinc-800 text-zinc-100 rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-zinc-700 disabled:opacity-40"
+        >
+          {isDraftSaving ? t('common.saving') : t('notes.saveDraft')}
+        </button>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          type="button"
+          onClick={() => handleSubmit((data) => onSubmit(data, false))()}
+          disabled={isSubmitting || createNote.isPending}
+          className="flex-[2] bg-[var(--color-brand-primary)] text-white rounded-lg px-4 py-2.5 text-sm font-medium disabled:opacity-40"
+        >
+          {isSubmitting || createNote.isPending ? t('common.saving') : t('notes.save')}
+        </motion.button>
+      </div>
+    </motion.div>
   );
 }
