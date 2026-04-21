@@ -56,23 +56,6 @@ function PinnedBulletItem({ item, isPinned, onPinToggle, showPinButton }: Pinned
   );
 }
 
-function SectionHeader({ icon, title, onEdit }: { icon: string; title: string; onEdit?: () => void }) {
-  return (
-    <div className="px-4 py-3 flex items-center gap-2">
-      <span className="text-base">{icon}</span>
-      <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wide flex-1">{title}</h2>
-      {onEdit && (
-        <button
-          onClick={onEdit}
-          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-zinc-400 bg-zinc-800 border border-zinc-700 hover:text-zinc-200 hover:border-zinc-600 transition-colors"
-        >
-          <Pencil size={11} />
-          <span>編集</span>
-        </button>
-      )}
-    </div>
-  );
-}
 
 export function JournalDetailPage() {
   const { t } = useTranslation();
@@ -236,33 +219,25 @@ export function JournalDetailPage() {
 
       {/* セクション1: 試合前の目標 */}
       {journal.preNote && (
-        <div className="mt-4">
-          <SectionHeader
-            icon="🎯"
-            title={t('journals.preGoals')}
-            onEdit={isOwner ? () => navigate(`/journals/${journal.id}/edit/pre`) : undefined}
-          />
-          <div className="px-4 pb-4">
+        <div className="mx-4 mt-3 bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
+            <span>🎯</span>
+            <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide flex-1">{t('journals.preGoals')}</h2>
+            {isOwner && (
+              <button onClick={() => navigate(`/journals/${journal.id}/edit/pre`)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-zinc-400 bg-zinc-800 border border-zinc-700 hover:text-zinc-200 transition-colors">
+                <Pencil size={11} />編集
+              </button>
+            )}
+          </div>
+          <div className="px-4 py-3 space-y-1">
             {journal.preNote.goals.map((item) => (
-              <PinnedBulletItem
-                key={item.id}
-                item={item}
-                isPinned={pinnedBulletIds.has(item.id)}
-                showPinButton={isOwner}
-                onPinToggle={() => handlePinToggle(item, 'journal_pre_goal', journal)}
-              />
+              <PinnedBulletItem key={item.id} item={item} isPinned={pinnedBulletIds.has(item.id)} showPinButton={isOwner} onPinToggle={() => handlePinToggle(item, 'journal_pre_goal', journal)} />
             ))}
             {journal.preNote.challenges.length > 0 && (
               <>
-                <p className="text-xs text-zinc-500 mt-3 mb-1">チャレンジしたいこと</p>
+                <p className="text-xs text-zinc-600 mt-3 mb-1 pt-2 border-t border-zinc-800/60">チャレンジしたいこと</p>
                 {journal.preNote.challenges.map((item) => (
-                  <PinnedBulletItem
-                    key={item.id}
-                    item={item}
-                    isPinned={pinnedBulletIds.has(item.id)}
-                    showPinButton={isOwner}
-                    onPinToggle={() => handlePinToggle(item, 'journal_pre_challenge', journal)}
-                  />
+                  <PinnedBulletItem key={item.id} item={item} isPinned={pinnedBulletIds.has(item.id)} showPinButton={isOwner} onPinToggle={() => handlePinToggle(item, 'journal_pre_challenge', journal)} />
                 ))}
               </>
             )}
@@ -272,93 +247,89 @@ export function JournalDetailPage() {
 
       {/* セクション2: 試合後の振り返り */}
       {journal.postNote && (
-        <div className="mt-2 border-t border-zinc-800">
-          <SectionHeader
-            icon="💡"
-            title={t('journals.postReview')}
-            onEdit={isOwner ? () => navigate(`/journals/${journal.id}/edit/post`) : undefined}
-          />
-          <div className="px-4 pb-4 space-y-4">
-            {/* 目標達成状況 */}
-            {journal.preNote && journal.preNote.goals.length > 0 && (
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">目標の達成状況</p>
+        <div className="mx-4 mt-3 space-y-3">
+          {/* 目標達成状況 */}
+          {journal.preNote && journal.preNote.goals.length > 0 && (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
+                <span>📊</span>
+                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide flex-1">目標の達成状況</h2>
+                {isOwner && (
+                  <button onClick={() => navigate(`/journals/${journal.id}/edit/post`)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-zinc-400 bg-zinc-800 border border-zinc-700 hover:text-zinc-200 transition-colors">
+                    <Pencil size={11} />編集
+                  </button>
+                )}
+              </div>
+              <div className="px-4 py-3">
                 {journal.preNote.goals.map((goal) => (
-                  <GoalReviewItem
-                    key={goal.id}
-                    goal={goal}
-                    review={journal.postNote?.goalReviews.find((r) => r.goalItemId === goal.id)}
-                    readonly
-                  />
+                  <GoalReviewItem key={goal.id} goal={goal} review={journal.postNote?.goalReviews.find((r) => r.goalItemId === goal.id)} readonly />
                 ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* できたこと（ピンなし） */}
-            {journal.postNote.achievements.length > 0 && (
-              <div>
-                <p className="text-xs text-zinc-500 mb-2">✅ できたこと</p>
+          {/* できたこと */}
+          {journal.postNote.achievements.length > 0 && (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
+                <span>✅</span>
+                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">できたこと</h2>
+              </div>
+              <div className="px-4 py-3 space-y-1">
                 {journal.postNote.achievements.map((item) => (
-                  <PinnedBulletItem
-                    key={item.id}
-                    item={item}
-                    isPinned={false}
-                    showPinButton={false}
-                    onPinToggle={() => {}}
-                  />
+                  <PinnedBulletItem key={item.id} item={item} isPinned={false} showPinButton={false} onPinToggle={() => {}} />
                 ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* できなかったこと（📌 気づきのかけらに追加可能） */}
-            {journal.postNote.improvements.length > 0 && (
-              <div>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <p className="text-xs text-zinc-500">📈 できなかったこと / 課題</p>
-                  {isOwner && <span className="text-[10px] text-amber-500/70 bg-amber-500/10 rounded px-1.5 py-0.5">📌 タップで気づきに保存</span>}
-                </div>
+          {/* できなかったこと */}
+          {journal.postNote.improvements.length > 0 && (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
+                <span>📈</span>
+                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide flex-1">できなかったこと / 課題</h2>
+                {isOwner && <span className="text-[10px] text-amber-500/70 bg-amber-500/10 rounded px-1.5 py-0.5">📌 タップで気づきに保存</span>}
+              </div>
+              <div className="px-4 py-3 space-y-1">
                 {journal.postNote.improvements.map((item) => (
-                  <PinnedBulletItem
-                    key={item.id}
-                    item={item}
-                    isPinned={pinnedBulletIds.has(item.id)}
-                    showPinButton={isOwner}
-                    onPinToggle={() => handlePinToggle(item, 'journal_post_improvement', journal)}
-                  />
+                  <PinnedBulletItem key={item.id} item={item} isPinned={pinnedBulletIds.has(item.id)} showPinButton={isOwner} onPinToggle={() => handlePinToggle(item, 'journal_post_improvement', journal)} />
                 ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* 探求したいこと（📌 気づきのかけらに追加可能） */}
-            {journal.postNote.explorations.length > 0 && (
-              <div>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <p className="text-xs text-zinc-500">🔍 もっと探求したいこと</p>
-                  {isOwner && <span className="text-[10px] text-amber-500/70 bg-amber-500/10 rounded px-1.5 py-0.5">📌 タップで気づきに保存</span>}
-                </div>
+          {/* 探求したいこと */}
+          {journal.postNote.explorations.length > 0 && (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
+                <span>🔍</span>
+                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide flex-1">もっと探求したいこと</h2>
+                {isOwner && <span className="text-[10px] text-amber-500/70 bg-amber-500/10 rounded px-1.5 py-0.5">📌 タップで気づきに保存</span>}
+              </div>
+              <div className="px-4 py-3 space-y-1">
                 {journal.postNote.explorations.map((item) => (
-                  <PinnedBulletItem
-                    key={item.id}
-                    item={item}
-                    isPinned={pinnedBulletIds.has(item.id)}
-                    showPinButton={isOwner}
-                    onPinToggle={() => handlePinToggle(item, 'journal_post_exploration', journal)}
-                  />
+                  <PinnedBulletItem key={item.id} item={item} isPinned={pinnedBulletIds.has(item.id)} showPinButton={isOwner} onPinToggle={() => handlePinToggle(item, 'journal_post_exploration', journal)} />
                 ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {/* 自己評価 */}
-            {journal.postNote.performance && (
-              <div>
-                <p className="text-xs text-zinc-500 mb-1">自己評価</p>
+          {/* 自己評価 */}
+          {journal.postNote.performance && (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
+                <span>⭐</span>
+                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">自己評価</h2>
+              </div>
+              <div className="px-4 py-3">
                 <p className="text-xl text-amber-400">
                   {'★'.repeat(journal.postNote.performance)}
-                  <span className="text-zinc-600">{'★'.repeat(5 - journal.postNote.performance)}</span>
+                  <span className="text-zinc-700">{'★'.repeat(5 - journal.postNote.performance)}</span>
                 </p>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 

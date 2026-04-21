@@ -68,63 +68,47 @@ export function NotesListPage() {
       {/* コンテンツ */}
       <div className="px-4 pt-4">
         {isLoading ? (
-          <div className="space-y-3" role="status" aria-label={t('common.loading')}>
-            {[1, 2, 3].map((i) => <NoteCardSkeleton key={i} />)}
+          <div className="grid grid-cols-2 gap-3" role="status" aria-label={t('common.loading')}>
+            {[1, 2, 3, 4].map((i) => <NoteCardSkeleton key={i} />)}
           </div>
         ) : notes && notes.length > 0 ? (
           <motion.div
             variants={containerVariants}
             initial="initial"
             animate="animate"
-            className="space-y-3"
+            className="grid grid-cols-2 gap-3"
           >
             {notes.map((note) => (
               <motion.div key={note.id} variants={cardVariants}>
                 <Link to={`/notes/${note.id}`}>
-                  <motion.div
-                    whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}
-                    transition={{ duration: 0.15 }}
-                    className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700/60 transition-colors duration-150"
+                  <motion.article
+                    whileTap={{ scale: 0.97 }}
+                    className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden active:bg-zinc-800/80 transition-colors duration-100"
                   >
-                    <div className="h-1 w-full bg-[var(--color-brand-primary)] opacity-50" />
-                    <div className="p-4">
-                      {/* 上段: 日付・体調 */}
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs text-zinc-500">{formatDateJa(note.date)}</span>
+                    <div className="h-1 w-full bg-[var(--color-brand-primary)] opacity-60" />
+                    <div className="p-3 flex flex-col gap-2">
+                      {/* 日付・体調 */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-zinc-500">{formatDateJa(note.date)}</span>
                         {note.condition && (
-                          <div className="flex gap-0.5">
-                            {[1,2,3,4,5].map((s) => (
-                              <span key={s} className={`text-[10px] ${s <= note.condition! ? 'text-amber-400' : 'text-zinc-700'}`}>★</span>
-                            ))}
-                          </div>
+                          <span className="text-[10px] text-amber-400">{'★'.repeat(note.condition)}</span>
                         )}
                       </div>
-
-                      {/* メインテキスト */}
-                      <p className="text-zinc-100 text-sm font-medium line-clamp-2 leading-relaxed mb-2">
+                      {/* 本文 */}
+                      <p className="text-xs font-medium text-zinc-100 line-clamp-3 leading-relaxed">
                         {note.content || note.todayGoal || ''}
                       </p>
-
-                      {/* 下段: 時間・場所 */}
-                      <div className="flex items-center gap-3 text-xs text-zinc-500">
+                      {/* メタ */}
+                      <div className="flex items-center gap-2 text-[10px] text-zinc-600">
                         {note.durationMinutes && (
-                          <span className="flex items-center gap-1">
-                            <Clock size={10} />
-                            {note.durationMinutes}分
-                          </span>
+                          <span className="flex items-center gap-0.5"><Clock size={9} />{note.durationMinutes}分</span>
                         )}
                         {note.location && (
-                          <span className="flex items-center gap-1">
-                            <MapPin size={10} />
-                            {note.location}
-                          </span>
-                        )}
-                        {!note.isPublic && (
-                          <span className="ml-auto text-zinc-600">🔒 非公開</span>
+                          <span className="flex items-center gap-0.5 truncate"><MapPin size={9} />{note.location}</span>
                         )}
                       </div>
                     </div>
-                  </motion.div>
+                  </motion.article>
                 </Link>
               </motion.div>
             ))}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus } from 'lucide-react';
+import { Plus, Trophy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useUserJournalsList } from '@/hooks/useMatchJournals';
@@ -75,13 +75,13 @@ export function JournalListPage() {
       {/* コンテンツ */}
       <div className="px-4 pt-4">
         {isLoading ? (
-          <div className="space-y-3" role="status" aria-label="読み込み中">
-            {[1, 2, 3].map((i) => <JournalCardSkeleton key={i} />)}
+          <div className="grid grid-cols-2 gap-3" role="status" aria-label="読み込み中">
+            {[1, 2, 3, 4].map((i) => <JournalCardSkeleton key={i} />)}
           </div>
         ) : journals.length === 0 ? (
           /* 空状態 */
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="text-6xl mb-4 opacity-20">⚽</div>
+            <div className="mb-4 opacity-20 flex justify-center"><Trophy size={64} className="text-zinc-400" /></div>
             <h2 className="text-lg font-semibold text-zinc-300 mt-4">{t('journals.emptyTitle')}</h2>
             <p className="text-sm text-zinc-500 mt-2 max-w-[240px]">{t('journals.emptyDesc')}</p>
             <motion.button
@@ -97,7 +97,7 @@ export function JournalListPage() {
             variants={containerVariants}
             initial="initial"
             animate="animate"
-            className="space-y-3"
+            className="grid grid-cols-2 gap-3"
           >
             {journals.map((journal) => (
               <motion.div key={journal.id} variants={cardVariants}>

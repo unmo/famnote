@@ -1,15 +1,29 @@
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ChevronLeft, Edit2, Trash2, Globe, Lock } from 'lucide-react';
+import { ChevronLeft, Edit2, Trash2, Clock, MapPin, Globe, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNote, useDeleteNote } from '@/hooks/useNotes';
 import { useAuthStore } from '@/store/authStore';
-import { SportBadge } from '@/components/shared/SportBadge';
 import { formatDateJa } from '@/lib/utils/date';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
-import { useState } from 'react';
 
-// ノート詳細ページ
+const CONDITION_LABEL: Record<number, string> = {
+  1: '最悪', 2: '悪い', 3: '普通', 4: '良い', 5: '最高',
+};
+
+function SectionCard({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
+        <span className="text-base">{icon}</span>
+        <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">{title}</h3>
+      </div>
+      <div className="px-4 py-3">{children}</div>
+    </div>
+  );
+}
+
 export function NoteDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
@@ -23,7 +37,7 @@ export function NoteDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-zinc-950">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -31,11 +45,9 @@ export function NoteDetailPage() {
 
   if (!note) {
     return (
-      <div className="text-center py-20 px-4">
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center gap-4">
         <p className="text-zinc-400">ノートが見つかりません</p>
-        <Link to="/notes" className="text-[var(--color-brand-primary)] text-sm mt-4 inline-block">
-          ノート一覧に戻る
-        </Link>
+        <Link to="/notes" className="text-[var(--color-brand-primary)] text-sm">{t('common.back')}</Link>
       </div>
     );
   }
@@ -46,99 +58,91 @@ export function NoteDetailPage() {
     navigate('/notes');
   };
 
-  const conditionLabels: Record<number, string> = {
-    1: '😞 最悪',
-    2: '😕 悪い',
-    3: '😐 普通',
-    4: '😊 良い',
-    5: '😄 最高',
-  };
-
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className="min-h-screen bg-zinc-950 pb-8"
+    >
       {/* ヘッダー */}
-      <div className="flex items-center justify-between mb-6">
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-zinc-800/50">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-100"
           aria-label={t('common.back')}
         >
-          <ChevronLeft size={24} />
+          <ChevronLeft size={22} />
         </button>
+        <span className="text-sm font-semibold text-zinc-300">練習ノート</span>
         {isOwner && (
-          <div className="flex gap-2">
+          <div className="flex items-center">
             <Link
               to={`/notes/${note.id}/edit`}
-              className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-100"
               aria-label="編集"
             >
-              <Edit2 size={20} />
+              <Edit2 size={18} />
             </Link>
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="p-2 text-zinc-400 hover:text-red-400 transition-colors"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-red-400"
               aria-label="削除"
             >
-              <Trash2 size={20} />
+              <Trash2 size={18} />
             </button>
           </div>
         )}
+      </header>
+
+      {/* ヒーローカード: メタ情報 */}
+      <div className="mx-4 mt-3 bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+        <div className="h-1 w-full bg-[var(--color-brand-primary)] opacity-60" />
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-semibold text-zinc-100">{formatDateJa(note.date)}</span>
+            {note.isPublic
+              ? <span className="flex items-center gap-1 text-[11px] text-zinc-500"><Globe size={12} />公開中</span>
+              : <span className="flex items-center gap-1 text-[11px] text-zinc-600"><Lock size={12} />非公開</span>
+            }
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-zinc-500">
+            {note.durationMinutes && (
+              <span className="flex items-center gap-1"><Clock size={12} />{note.durationMinutes}分</span>
+            )}
+            {note.location && (
+              <span className="flex items-center gap-1"><MapPin size={12} />{note.location}</span>
+            )}
+            {note.condition && (
+              <span className="flex items-center gap-1">
+                <span className="text-amber-400">{'★'.repeat(note.condition)}</span>
+                <span className="text-zinc-600">{'★'.repeat(5 - note.condition)}</span>
+                <span className="ml-0.5">{CONDITION_LABEL[note.condition]}</span>
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* コンテンツ */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
-        {/* スポーツ・日付 */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <SportBadge sport={note.sport} />
-          <span className="text-zinc-400 text-sm">{formatDateJa(note.date)}</span>
-          {note.isPublic ? (
-            <Globe size={14} className="text-zinc-500" />
-          ) : (
-            <Lock size={14} className="text-zinc-500" />
-          )}
-        </div>
-
-        {/* メタ情報 */}
-        <div className="flex gap-4 text-sm text-zinc-400">
-          {note.durationMinutes && <span>⏱ {note.durationMinutes}分</span>}
-          {note.location && <span>📍 {note.location}</span>}
-          {note.condition && (
-            <span>{conditionLabels[note.condition]}</span>
-          )}
-        </div>
-
-        {/* 今日の目標 */}
+      <div className="mx-4 mt-3 space-y-3">
         {note.todayGoal && (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-            <h3 className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">
-              今日の目標
-            </h3>
-            <p className="text-zinc-300">{note.todayGoal}</p>
-          </div>
+          <SectionCard icon="🎯" title="今日の目標">
+            <p className="text-sm text-zinc-200 leading-relaxed">{note.todayGoal}</p>
+          </SectionCard>
         )}
 
-        {/* 練習内容 */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-          <h3 className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">
-            {t('notes.content')}
-          </h3>
-          <p className="text-zinc-200 whitespace-pre-wrap leading-relaxed">{note.content}</p>
-        </div>
+        <SectionCard icon="📝" title={t('notes.content')}>
+          <p className="text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed">{note.content}</p>
+        </SectionCard>
 
-        {/* 振り返り */}
         {note.reflection && (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-            <h3 className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">
-              {t('notes.reflection')}
-            </h3>
-            <p className="text-zinc-300 whitespace-pre-wrap">{note.reflection}</p>
-          </div>
+          <SectionCard icon="💡" title={t('notes.reflection')}>
+            <p className="text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed">{note.reflection}</p>
+          </SectionCard>
         )}
-      </motion.div>
+      </div>
 
       {/* 削除確認ダイアログ */}
       {showDeleteConfirm && (
@@ -153,14 +157,14 @@ export function NoteDetailPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="btn-secondary flex-1"
+                className="flex-1 bg-zinc-800 text-zinc-200 rounded-xl py-3 text-sm font-medium"
               >
                 {t('common.cancel')}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleteNote.isPending}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl py-3 transition-colors"
+                className="flex-1 bg-red-600 text-white rounded-xl py-3 text-sm font-semibold disabled:opacity-40"
               >
                 {deleteNote.isPending ? '削除中...' : t('common.delete')}
               </button>
@@ -168,6 +172,6 @@ export function NoteDetailPage() {
           </motion.div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
