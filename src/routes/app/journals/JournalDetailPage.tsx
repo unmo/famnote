@@ -1,19 +1,15 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ChevronLeft, Pin, Pencil } from 'lucide-react';
+import { ChevronLeft, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useAuthStore } from '@/store/authStore';
-import { useGroupStore } from '@/store/groupStore';
 import { useJournal, useDeleteJournal } from '@/hooks/useMatchJournals';
-import { usePinToggle, useHighlights } from '@/hooks/useHighlights';
 import { StatusBadge } from '@/components/journals/StatusBadge';
 import { GoalReviewItem } from '@/components/journals/GoalReviewItem';
 import { SPORT_LABELS } from '@/types/sport';
-import type { BulletItem, MatchJournal } from '@/types/matchJournal';
-import type { HighlightSourceType } from '@/types/highlight';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -21,79 +17,25 @@ const pageVariants = {
   exit: { opacity: 0, y: -10 },
 };
 
-interface PinnedBulletItemProps {
-  item: BulletItem;
-  isPinned: boolean;
-  onPinToggle: () => void;
-  showPinButton: boolean;
-}
-
-function PinnedBulletItem({ item, isPinned, onPinToggle, showPinButton }: PinnedBulletItemProps) {
+function BulletList({ items }: { items: { id: string; text: string }[] }) {
   return (
-    <div className={`group flex items-start gap-2.5 py-2.5 rounded-lg transition-colors ${isPinned ? 'bg-amber-500/10 border-l-2 border-amber-500 pl-2' : ''}`}>
-      <p className="text-sm text-zinc-200 leading-relaxed flex-1">
-        {item.text}
-      </p>
-      {showPinButton && (
-        <motion.button
-          type="button"
-          onClick={onPinToggle}
-          animate={isPinned ? { scale: [1, 1.3, 1] } : { scale: 1 }}
-          transition={{ duration: 0.25 }}
-          aria-label={isPinned ? '気づきのかけらから削除' : '気づきのかけらに追加'}
-          aria-pressed={isPinned}
-          title={isPinned ? '気づきのかけらから削除' : '気づきのかけらに追加'}
-          className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-            isPinned
-              ? 'text-amber-400 bg-amber-400/20'
-              : 'text-zinc-500 hover:text-amber-400 hover:bg-amber-400/10'
-          }`}
-        >
-          <Pin size={14} fill={isPinned ? 'currentColor' : 'none'} />
-        </motion.button>
-      )}
+    <div className="space-y-2">
+      {items.map((item) => (
+        <p key={item.id} className="text-sm text-zinc-200 leading-relaxed">{item.text}</p>
+      ))}
     </div>
   );
 }
-
 
 export function JournalDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id: journalId } = useParams<{ id: string }>();
   const user = useAuthStore((s) => s.userProfile);
-  const group = useGroupStore((s) => s.group);
   const { data: journal, isLoading } = useJournal(journalId);
   const deleteMutation = useDeleteJournal();
-  const { pinMutation, unpinMutation } = usePinToggle();
-  const { data: highlightsData } = useHighlights(user?.uid);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-  const highlights = highlightsData?.highlights ?? [];
-  const pinnedBulletIds = new Set(highlights.map((h) => h.bulletItemId));
-
-  const handlePinToggle = async (
-    item: BulletItem,
-    sourceType: HighlightSourceType,
-    journal: MatchJournal
-  ) => {
-    if (!user) return;
-
-    if (pinnedBulletIds.has(item.id)) {
-      unpinMutation.mutate({ userId: user.uid, bulletItemId: item.id });
-    } else {
-      pinMutation.mutate({
-        userId: user.uid,
-        groupId: group?.id ?? '',
-        sport: journal.sport,
-        sourceType,
-        sourceId: journal.id,
-        bulletItem: item,
-        sourceDate: journal.date,
-      });
-    }
-  };
 
   const handleDelete = async () => {
     if (!user || !journalId) return;
@@ -173,15 +115,10 @@ export function JournalDetailPage() {
           <p className="text-xl font-bold text-zinc-50">{journal.opponent}</p>
         </div>
 
-        {journal.postNote && (
-          <div className="flex justify-center items-center gap-4 mt-3">
-            <span className="text-5xl font-black text-zinc-50">
-              {journal.postNote.myScore ?? '-'}
-            </span>
-            <span className="text-2xl text-zinc-600">-</span>
-            <span className="text-5xl font-black text-zinc-400">
-              {journal.postNote.opponentScore ?? '-'}
-            </span>
+        {journal.postNote?.myScore != null && (
+          <div className="text-center mt-2">
+            <span className="text-sm text-zinc-400">自分のゴール数: </span>
+            <span className="text-xl font-black text-zinc-50">{journal.postNote.myScore}</span>
           </div>
         )}
       </div>
@@ -189,15 +126,12 @@ export function JournalDetailPage() {
       {/* 試合後ノート未記入時のCTA */}
       {journal.status === 'pre' && isOwner && (
         <div className="mx-4 my-4">
-          {/* ステップインジケーター */}
           <div className="flex items-center mb-3 gap-2">
             <div className="flex items-center gap-1.5">
               <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[11px] font-bold text-zinc-400">1</div>
               <span className="text-xs text-zinc-500 line-through">試合前の目標</span>
             </div>
-            <div className="flex-1 h-px bg-[var(--color-brand-primary)]/40 mx-1 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-brand-primary)]/40 to-transparent" />
-            </div>
+            <div className="flex-1 h-px bg-[var(--color-brand-primary)]/40 mx-1" />
             <div className="flex items-center gap-1.5">
               <div className="w-6 h-6 rounded-full bg-[var(--color-brand-primary)] flex items-center justify-center text-[11px] font-bold text-white animate-pulse">2</div>
               <span className="text-xs font-medium text-[var(--color-brand-primary)]">試合後の振り返り</span>
@@ -210,7 +144,7 @@ export function JournalDetailPage() {
           >
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-base font-bold">試合の振り返りを記録</span>
-              <span className="text-xs text-white/70">結果・できたこと・課題を入力</span>
+              <span className="text-xs text-white/70">気づき・できたこと・課題を入力</span>
             </div>
             <span className="text-xl">→</span>
           </motion.button>
@@ -230,15 +164,11 @@ export function JournalDetailPage() {
             )}
           </div>
           <div className="px-4 py-3 space-y-1">
-            {journal.preNote.goals.map((item) => (
-              <PinnedBulletItem key={item.id} item={item} isPinned={pinnedBulletIds.has(item.id)} showPinButton={isOwner} onPinToggle={() => handlePinToggle(item, 'journal_pre_goal', journal)} />
-            ))}
+            <BulletList items={journal.preNote.goals} />
             {journal.preNote.challenges.length > 0 && (
               <>
                 <p className="text-xs text-zinc-600 mt-3 mb-1 pt-2 border-t border-zinc-800/60">チャレンジしたいこと</p>
-                {journal.preNote.challenges.map((item) => (
-                  <PinnedBulletItem key={item.id} item={item} isPinned={pinnedBulletIds.has(item.id)} showPinButton={isOwner} onPinToggle={() => handlePinToggle(item, 'journal_pre_challenge', journal)} />
-                ))}
+                <BulletList items={journal.preNote.challenges} />
               </>
             )}
           </div>
@@ -268,6 +198,19 @@ export function JournalDetailPage() {
             </div>
           )}
 
+          {/* 気づき */}
+          {(journal.postNote.insights ?? []).length > 0 && (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
+                <span>💡</span>
+                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">気づき</h2>
+              </div>
+              <div className="px-4 py-3 space-y-1">
+                <BulletList items={journal.postNote.insights ?? []} />
+              </div>
+            </div>
+          )}
+
           {/* できたこと */}
           {journal.postNote.achievements.length > 0 && (
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
@@ -276,9 +219,7 @@ export function JournalDetailPage() {
                 <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">できたこと</h2>
               </div>
               <div className="px-4 py-3 space-y-1">
-                {journal.postNote.achievements.map((item) => (
-                  <PinnedBulletItem key={item.id} item={item} isPinned={false} showPinButton={false} onPinToggle={() => {}} />
-                ))}
+                <BulletList items={journal.postNote.achievements} />
               </div>
             </div>
           )}
@@ -288,13 +229,10 @@ export function JournalDetailPage() {
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
                 <span>📈</span>
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide flex-1">できなかったこと / 課題</h2>
-                {isOwner && <span className="text-[10px] text-amber-500/70 bg-amber-500/10 rounded px-1.5 py-0.5">📌 タップで気づきに保存</span>}
+                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">できなかったこと / 課題</h2>
               </div>
               <div className="px-4 py-3 space-y-1">
-                {journal.postNote.improvements.map((item) => (
-                  <PinnedBulletItem key={item.id} item={item} isPinned={pinnedBulletIds.has(item.id)} showPinButton={isOwner} onPinToggle={() => handlePinToggle(item, 'journal_post_improvement', journal)} />
-                ))}
+                <BulletList items={journal.postNote.improvements} />
               </div>
             </div>
           )}
@@ -304,13 +242,10 @@ export function JournalDetailPage() {
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
                 <span>🔍</span>
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide flex-1">もっと探求したいこと</h2>
-                {isOwner && <span className="text-[10px] text-amber-500/70 bg-amber-500/10 rounded px-1.5 py-0.5">📌 タップで気づきに保存</span>}
+                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">もっと探求したいこと</h2>
               </div>
               <div className="px-4 py-3 space-y-1">
-                {journal.postNote.explorations.map((item) => (
-                  <PinnedBulletItem key={item.id} item={item} isPinned={pinnedBulletIds.has(item.id)} showPinButton={isOwner} onPinToggle={() => handlePinToggle(item, 'journal_post_exploration', journal)} />
-                ))}
+                <BulletList items={journal.postNote.explorations} />
               </div>
             </div>
           )}

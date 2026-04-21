@@ -19,6 +19,7 @@ import { ref, deleteObject } from 'firebase/storage';
 import { db, storage } from './config';
 import type { MatchJournal, PreMatchFormData, PostMatchFormData } from '@/types/matchJournal';
 import type { Sport } from '@/types/sport';
+import { replaceInsightHighlights } from './highlightService';
 import { v4 as uuidv4 } from 'uuid';
 
 // テキスト配列をBulletItem配列に変換
@@ -71,6 +72,7 @@ export async function addPostMatchNote(
   if (!snap.exists() || snap.data()?.userId !== userId) {
     throw new Error('UNAUTHORIZED');
   }
+  const journalData = snap.data() as MatchJournal;
 
   await updateDoc(journalRef, {
     status: 'completed',
@@ -83,12 +85,18 @@ export async function addPostMatchNote(
       achievements: textsToBullets(data.achievements),
       improvements: textsToBullets(data.improvements),
       explorations: textsToBullets(data.explorations),
+      insights: textsToBullets(data.insights),
       performance: data.performance,
       imageUrls,
       recordedAt: serverTimestamp(),
     },
     updatedAt: serverTimestamp(),
   });
+
+  await replaceInsightHighlights(
+    userId, journalData.groupId ?? '', journalData.sport,
+    'journal_insight', journalId, data.insights, journalData.date
+  );
 }
 
 // 試合前ノート更新
@@ -129,6 +137,8 @@ export async function updatePostMatchNote(
   if (!snap.exists() || snap.data()?.userId !== userId) {
     throw new Error('UNAUTHORIZED');
   }
+  const journalData = snap.data() as MatchJournal;
+
   await updateDoc(journalRef, {
     isPublic: data.isPublic,
     postNote: {
@@ -139,12 +149,18 @@ export async function updatePostMatchNote(
       achievements: textsToBullets(data.achievements),
       improvements: textsToBullets(data.improvements),
       explorations: textsToBullets(data.explorations),
+      insights: textsToBullets(data.insights),
       performance: data.performance,
       imageUrls,
       recordedAt: serverTimestamp(),
     },
     updatedAt: serverTimestamp(),
   });
+
+  await replaceInsightHighlights(
+    userId, journalData.groupId ?? '', journalData.sport,
+    'journal_insight', journalId, data.insights, journalData.date
+  );
 }
 
 // 試合後ノートのみ作成（試合前なし）
@@ -174,6 +190,7 @@ export async function createPostMatchOnly(
       achievements: textsToBullets(postData.achievements),
       improvements: textsToBullets(postData.improvements),
       explorations: textsToBullets(postData.explorations),
+      insights: textsToBullets(postData.insights),
       performance: postData.performance,
       imageUrls,
       recordedAt: serverTimestamp(),
@@ -184,6 +201,12 @@ export async function createPostMatchOnly(
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+
+  const sourceDate = Timestamp.fromDate(new Date(baseData.date));
+  await replaceInsightHighlights(
+    userId, groupId ?? '', baseData.sport,
+    'journal_post_improvement', ref.id, postData.insights, sourceDate
+  );
   return { journalId: ref.id };
 }
 

@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { noteSchema, type NoteSchema } from '@/lib/validations/noteSchema';
 import { useAuthStore } from '@/store/authStore';
 import { useCreateNote } from '@/hooks/useNotes';
+import { BulletListInput } from '@/components/journals/BulletListInput';
 import { Timestamp } from 'firebase/firestore';
 import { getTodayInputValue } from '@/lib/utils/date';
 import { toast } from 'sonner';
@@ -24,6 +25,7 @@ export function NoteNewPage() {
   const { userProfile, firebaseUser } = useAuthStore();
   const createNote = useCreateNote();
   const [isDraftSaving, setIsDraftSaving] = useState(false);
+  const [insights, setInsights] = useState<string[]>(['']);
 
   const {
     register,
@@ -62,6 +64,7 @@ export function NoteNewPage() {
       todayGoal: data.todayGoal ?? null,
       content: data.content,
       reflection: data.reflection ?? null,
+      insights: insights.filter((i) => i.trim()),
       condition: data.condition ?? null,
       imageUrls: [],
       isDraft,
@@ -174,6 +177,17 @@ export function NoteNewPage() {
             rows={3}
             className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-zinc-50 text-base focus:border-[var(--color-brand-primary)] focus:outline-none placeholder:text-zinc-600 resize-none"
             maxLength={500}
+          />
+        </div>
+
+        {/* 気づき */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-300">💡 気づき <span className="text-zinc-500 text-xs">（任意・気づきのかけらに自動保存）</span></label>
+          <BulletListInput
+            value={insights}
+            onChange={setInsights}
+            maxItems={10}
+            placeholder="例: フォームを意識したら安定した"
           />
         </div>
 

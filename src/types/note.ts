@@ -6,7 +6,7 @@ import { ReactionType } from './reaction';
 export interface Note {
   id: string;
   userId: string;
-  groupId: string;
+  groupId: string | null;
   sport: Sport;
   date: Timestamp;
   durationMinutes: number | null;
@@ -14,6 +14,7 @@ export interface Note {
   todayGoal: string | null;
   content: string;
   reflection: string | null;
+  insights: string[];
   condition: 1 | 2 | 3 | 4 | 5 | null;
   imageUrls: string[];
   isDraft: boolean;
@@ -44,6 +45,7 @@ export interface NoteFormData {
   todayGoal: string | null;
   content: string;
   reflection: string | null;
+  insights: string[];
   condition: 1 | 2 | 3 | 4 | 5 | null;
   isPublic: boolean;
 }

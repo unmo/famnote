@@ -27,6 +27,7 @@ export function JournalPostEditPage() {
   const [achievements, setAchievements] = useState<string[]>(['']);
   const [improvements, setImprovements] = useState<string[]>(['']);
   const [explorations, setExplorations] = useState<string[]>(['']);
+  const [insights, setInsights] = useState<string[]>(['']);
   const [performance, setPerformance] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
   const [isPublic, setIsPublic] = useState(true);
 
@@ -38,6 +39,7 @@ export function JournalPostEditPage() {
     setAchievements(p.achievements.map((a) => a.text) || ['']);
     setImprovements(p.improvements.map((i) => i.text) || ['']);
     setExplorations(p.explorations.map((e) => e.text) || ['']);
+    setInsights((p.insights ?? []).map((i) => i.text) || ['']);
     setPerformance(p.performance as 1 | 2 | 3 | 4 | 5 | null);
     setIsPublic(journal.isPublic);
   }, [journal]);
@@ -71,6 +73,7 @@ export function JournalPostEditPage() {
           achievements: achievements.filter((a) => a.trim()),
           improvements: improvements.filter((i) => i.trim()),
           explorations: explorations.filter((e) => e.trim()),
+          insights: insights.filter((i) => i.trim()),
           performance,
           isPublic,
         },
@@ -166,6 +169,12 @@ export function JournalPostEditPage() {
         <div className="space-y-2">
           <label className="text-sm font-medium text-zinc-300">🔍 もっと探求したいこと</label>
           <BulletListInput value={explorations} onChange={setExplorations} maxItems={5} placeholder="例: 次は左足のシュートも試したい" />
+        </div>
+
+        {/* 気づき */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-300">💡 気づき <span className="text-zinc-500 text-xs">（気づきのかけらに自動保存）</span></label>
+          <BulletListInput value={insights} onChange={setInsights} maxItems={10} placeholder="例: 体の向きを変えるとパスコースが増える" />
         </div>
 
         {/* 自己評価 */}

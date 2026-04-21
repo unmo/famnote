@@ -15,6 +15,8 @@ const SOURCE_TYPE_LABELS: Record<HighlightSourceType, { label: string; badge: st
   journal_post_achievement: { label: '試合後 / できたこと', badge: 'bg-green-500/20 text-green-400' },
   journal_post_improvement: { label: '試合後 / 課題', badge: 'bg-red-500/20 text-red-400' },
   journal_post_exploration: { label: '試合後 / 探求', badge: 'bg-purple-500/20 text-purple-400' },
+  journal_insight: { label: '試合 / 気づき', badge: 'bg-amber-500/20 text-amber-400' },
+  note_insight: { label: '練習 / 気づき', badge: 'bg-amber-500/20 text-amber-400' },
   practice_bullet: { label: '練習メモ', badge: 'bg-purple-500/20 text-purple-400' },
 };
 

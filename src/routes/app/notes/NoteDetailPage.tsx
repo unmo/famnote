@@ -137,8 +137,18 @@ export function NoteDetailPage() {
           <p className="text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed">{note.content}</p>
         </SectionCard>
 
+        {(note.insights ?? []).length > 0 && (
+          <SectionCard icon="💡" title="気づき">
+            <div className="space-y-2">
+              {(note.insights ?? []).map((text, i) => (
+                <p key={i} className="text-sm text-zinc-200 leading-relaxed">{text}</p>
+              ))}
+            </div>
+          </SectionCard>
+        )}
+
         {note.reflection && (
-          <SectionCard icon="💡" title={t('notes.reflection')}>
+          <SectionCard icon="📝" title={t('notes.reflection')}>
             <p className="text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed">{note.reflection}</p>
           </SectionCard>
         )}

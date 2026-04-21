@@ -7,6 +7,8 @@ export type HighlightSourceType =
   | 'journal_post_achievement'
   | 'journal_post_improvement'
   | 'journal_post_exploration'
+  | 'journal_insight'
+  | 'note_insight'
   | 'practice_bullet';
 
 export interface Highlight {

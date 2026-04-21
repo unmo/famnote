@@ -110,6 +110,44 @@ export async function fetchUserHighlights(
   return { highlights, lastDoc: null };
 }
 
+// 気づきをハイライトとして一括置換（保存時に呼び出す）
+export async function replaceInsightHighlights(
+  userId: string,
+  groupId: string,
+  sport: Sport,
+  sourceType: HighlightSourceType,
+  sourceId: string,
+  insightTexts: string[],
+  sourceDate: Timestamp
+): Promise<void> {
+  // 既存のこのsource由来のハイライトを削除
+  const existingQ = query(
+    collection(db, 'highlights'),
+    where('userId', '==', userId),
+    where('sourceId', '==', sourceId)
+  );
+  const existingSnap = await getDocs(existingQ);
+  for (const d of existingSnap.docs) {
+    await deleteDoc(d.ref);
+  }
+
+  // 新しい気づきをハイライトとして追加
+  for (const text of insightTexts.filter((t) => t.trim())) {
+    const highlightData: Omit<Highlight, 'id'> = {
+      userId,
+      groupId,
+      sport,
+      sourceType,
+      sourceId,
+      bulletItemId: `${sourceId}_insight_${Math.random().toString(36).slice(2)}`,
+      text: text.trim(),
+      sourceDate,
+      createdAt: serverTimestamp() as Timestamp,
+    };
+    await addDoc(collection(db, 'highlights'), highlightData);
+  }
+}
+
 // ユーザーのハイライト件数を取得
 export async function fetchUserHighlightsCount(userId: string): Promise<number> {
   const q = query(collection(db, 'highlights'), where('userId', '==', userId));

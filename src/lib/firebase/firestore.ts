@@ -26,6 +26,7 @@ import type { Match, MatchComment } from '@/types/match';
 import type { Goal } from '@/types/goal';
 import type { Reaction, ReactionType } from '@/types/reaction';
 import { generateInviteCode } from '@/lib/utils/inviteCode';
+import { replaceInsightHighlights } from './highlightService';
 
 // ===================== グループ関連 =====================
 
@@ -160,11 +161,20 @@ export async function createNote(
 ): Promise<{ noteId: string }> {
   const ref = await addDoc(collection(db, 'notes'), {
     ...data,
+    insights: data.insights ?? [],
     reactionCounts: { applause: 0, fire: 0, star: 0, muscle: 0 },
     commentCount: 0,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+
+  if ((data.insights ?? []).length > 0) {
+    await replaceInsightHighlights(
+      data.userId, data.groupId ?? '', data.sport,
+      'note_insight', ref.id, data.insights ?? [], data.date
+    );
+  }
+
   return { noteId: ref.id };
 }
 

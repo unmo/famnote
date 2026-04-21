@@ -23,7 +23,7 @@ export interface GoalReview {
 export interface MatchJournal {
   id: string;
   userId: string;
-  groupId: string;
+  groupId: string | null;
   sport: Sport;
   date: Timestamp;
   opponent: string;
@@ -48,6 +48,7 @@ export interface MatchJournal {
     achievements: BulletItem[];  // できたこと（最大10項目）
     improvements: BulletItem[];  // できなかったこと/課題（最大10項目）
     explorations: BulletItem[];  // もっと探求したいこと（最大5項目）
+    insights: BulletItem[];      // 気づき（最大10項目）
     performance: 1 | 2 | 3 | 4 | 5 | null;
     imageUrls: string[];
     recordedAt: Timestamp;
@@ -94,6 +95,7 @@ export interface PostMatchFormData {
   achievements: string[];
   improvements: string[];
   explorations: string[];
+  insights: string[];
   performance: 1 | 2 | 3 | 4 | 5 | null;
   isPublic: boolean;
 }
