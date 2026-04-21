@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Plus, BookOpen, NotebookPen } from 'lucide-react';
+import { Plus, BookOpen, NotebookPen, Star, Clock, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useStreak } from '@/hooks/useStreak';
@@ -15,6 +15,64 @@ const flameVariants = {
     scale: [1, 1.05, 1],
     transition: { repeat: Infinity, duration: 1.5, ease: 'easeInOut' as const },
   },
+};
+
+// ショートカットメニュー定義
+const MENU_ITEMS = [
+  {
+    to: '/journals',
+    icon: NotebookPen,
+    label: '試合ノート',
+    sub: '記録・振り返り',
+    color: 'from-orange-500/20 to-orange-600/5',
+    iconColor: 'text-orange-400',
+    borderColor: 'border-orange-500/20',
+  },
+  {
+    to: '/notes',
+    icon: BookOpen,
+    label: '練習ノート',
+    sub: '練習内容を記録',
+    color: 'from-blue-500/20 to-blue-600/5',
+    iconColor: 'text-blue-400',
+    borderColor: 'border-blue-500/20',
+  },
+  {
+    to: '/highlights',
+    icon: Star,
+    label: '気づきのかけら',
+    sub: '蓄積した気づき',
+    color: 'from-amber-500/20 to-amber-600/5',
+    iconColor: 'text-amber-400',
+    borderColor: 'border-amber-500/20',
+  },
+  {
+    to: '/timeline',
+    icon: Clock,
+    label: 'タイムライン',
+    sub: '家族の活動',
+    color: 'from-green-500/20 to-green-600/5',
+    iconColor: 'text-green-400',
+    borderColor: 'border-green-500/20',
+  },
+  {
+    to: '/profile',
+    icon: User,
+    label: 'プロフィール',
+    sub: '設定・実績',
+    color: 'from-purple-500/20 to-purple-600/5',
+    iconColor: 'text-purple-400',
+    borderColor: 'border-purple-500/20',
+  },
+] as const;
+
+const containerVariants = {
+  animate: { transition: { staggerChildren: 0.06 } },
+};
+
+const itemVariants = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
 };
 
 // ダッシュボードページ
@@ -68,9 +126,7 @@ export function DashboardPage() {
                 <div
                   key={i}
                   className={`w-6 h-6 rounded-full transition-all ${
-                    active
-                      ? 'bg-[var(--color-brand-primary)]'
-                      : 'bg-zinc-800'
+                    active ? 'bg-[var(--color-brand-primary)]' : 'bg-zinc-800'
                   }`}
                   aria-label={active ? '記録あり' : '記録なし'}
                 />
@@ -115,14 +171,38 @@ export function DashboardPage() {
         </Link>
       </div>
 
+      {/* セクションナビゲーション */}
+      <div>
+        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3">メニュー</h2>
+        <motion.div
+          variants={containerVariants}
+          initial="initial"
+          animate="animate"
+          className="grid grid-cols-2 gap-3"
+        >
+          {MENU_ITEMS.map(({ to, icon: Icon, label, sub, color, iconColor, borderColor }) => (
+            <motion.div key={to} variants={itemVariants}>
+              <Link to={to}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  className={`bg-gradient-to-br ${color} border ${borderColor} rounded-2xl p-4 transition-all duration-150`}
+                >
+                  <Icon size={24} className={`${iconColor} mb-3`} />
+                  <p className="text-zinc-100 font-semibold text-sm">{label}</p>
+                  <p className="text-zinc-500 text-xs mt-0.5">{sub}</p>
+                </motion.div>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+
       {/* 最近のアクティビティ */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-zinc-50">{t('dashboard.recentActivity')}</h2>
-          <Link
-            to="/timeline"
-            className="text-sm text-[var(--color-brand-primary)] hover:underline"
-          >
+          <Link to="/timeline" className="text-sm text-[var(--color-brand-primary)] hover:underline">
             {t('dashboard.viewMore')}
           </Link>
         </div>
@@ -144,9 +224,7 @@ export function DashboardPage() {
                   <Avatar size="sm" name={note.userId} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-zinc-500 text-xs">
-                        {formatRelativeTime(note.createdAt)}
-                      </span>
+                      <span className="text-zinc-500 text-xs">{formatRelativeTime(note.createdAt)}</span>
                     </div>
                     <p className="text-zinc-300 text-sm line-clamp-2">{note.content}</p>
                   </div>
