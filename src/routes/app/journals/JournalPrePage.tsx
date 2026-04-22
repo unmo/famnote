@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { useGroupStore } from '@/store/groupStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useCreatePreMatchNote } from '@/hooks/useMatchJournals';
 import { BulletListInput } from '@/components/journals/BulletListInput';
 import { preMatchSchema } from '@/lib/validations/matchJournalSchema';
@@ -23,6 +24,7 @@ export function JournalPrePage() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.userProfile);
   const group = useGroupStore((s) => s.group);
+  const { activeProfile } = useActiveProfile();
   const createMutation = useCreatePreMatchNote();
 
   const today = format(new Date(), 'yyyy-MM-dd');
@@ -57,17 +59,17 @@ export function JournalPrePage() {
       return;
     }
 
-    if (!user) {
-      toast.error('ユーザー情報が取得できません');
+    if (!activeProfile) {
+      toast.error('プロフィールが選択されていません');
       return;
     }
 
     // グループ未参加でも個人ノートとして保存できる
-    const groupId = group?.id ?? user.groupId ?? null;
+    const groupId = group?.id ?? user?.groupId ?? null;
 
     try {
       const { journalId } = await createMutation.mutateAsync({
-        userId: user.uid,
+        userId: activeProfile.uid,
         groupId,
         data: result.data,
       });

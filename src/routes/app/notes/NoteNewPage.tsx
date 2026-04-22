@@ -7,6 +7,7 @@ import { ChevronLeft, Globe, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { noteSchema, type NoteSchema } from '@/lib/validations/noteSchema';
 import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useCreateNote } from '@/hooks/useNotes';
 import { BulletListInput } from '@/components/journals/BulletListInput';
 import { Timestamp } from 'firebase/firestore';
@@ -22,7 +23,8 @@ const pageVariants = {
 export function NoteNewPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { userProfile, firebaseUser } = useAuthStore();
+  const { userProfile } = useAuthStore();
+  const { activeProfile } = useActiveProfile();
   const createNote = useCreateNote();
   const [isDraftSaving, setIsDraftSaving] = useState(false);
   const [insights, setInsights] = useState<string[]>(['']);
@@ -48,13 +50,13 @@ export function NoteNewPage() {
   });
 
   const onSubmit = async (data: NoteSchema, isDraft = false) => {
-    if (!firebaseUser) {
+    if (!activeProfile) {
       toast.error(t('common.notAuthenticated'));
       return;
     }
 
     await createNote.mutateAsync({
-      userId: firebaseUser.uid,
+      userId: activeProfile.uid,
       // グループ未参加でも自分のノートとして保存できる
       groupId: userProfile?.groupId ?? null,
       sport: data.sport,

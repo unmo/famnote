@@ -27,6 +27,14 @@ service cloud.firestore {
         get(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)).data.role == 'owner';
     }
 
+    // 認証ユーザーが指定uidのグループメンバーの代理で書けるか検証
+    // 条件: 書き込みユーザーと対象uidが同じグループに所属している
+    function isGroupMemberProxy(groupId, targetUid) {
+      return isAuthenticated() &&
+        isGroupMember(groupId) &&
+        exists(/databases/$(database)/documents/groups/$(groupId)/members/$(targetUid));
+    }
+
     function isValidNote(data) {
       return data.content is string && data.content.size() > 0 && data.content.size() <= 1000 &&
              data.sport in ['soccer', 'baseball', 'basketball', 'tennis', 'volleyball', 'swimming', 'athletics', 'other'] &&
@@ -79,16 +87,24 @@ service cloud.firestore {
     // 練習ノート
     match /notes/{noteId} {
       allow read: if isOwner(resource.data.userId) ||
-                     (isSameGroup(resource.data.groupId) && resource.data.isPublic == true && resource.data.isDraft == false);
+                     (resource.data.groupId != null &&
+                      isSameGroup(resource.data.groupId) &&
+                      resource.data.isPublic == true &&
+                      resource.data.isDraft == false);
+      // 同グループメンバーなら他のメンバープロフィールIDで代理作成可
       allow create: if isAuthenticated() &&
-                       request.resource.data.userId == request.auth.uid &&
+                       isValidNote(request.resource.data) &&
+                       request.resource.data.imageUrls.size() <= 5 &&
+                       (request.resource.data.userId == request.auth.uid ||
+                        (request.resource.data.groupId != null &&
+                         isGroupMemberProxy(request.resource.data.groupId, request.resource.data.userId)));
+      // 更新・削除は記録の所有者または同グループオーナー
+      allow update: if (isOwner(resource.data.userId) || isSameGroup(resource.data.groupId)) &&
+                       resource.data.userId == request.resource.data.userId &&
                        isValidNote(request.resource.data) &&
                        request.resource.data.imageUrls.size() <= 5;
-      allow update: if isOwner(resource.data.userId) &&
-                       request.resource.data.userId == resource.data.userId &&
-                       isValidNote(request.resource.data) &&
-                       request.resource.data.imageUrls.size() <= 5;
-      allow delete: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId) ||
+                       (resource.data.groupId != null && isGroupOwner(resource.data.groupId));
 
       match /comments/{commentId} {
         allow read: if isOwner(get(/databases/$(database)/documents/notes/$(noteId)).data.userId) ||
@@ -106,15 +122,21 @@ service cloud.firestore {
     // 試合記録
     match /matches/{matchId} {
       allow read: if isOwner(resource.data.userId) ||
-                     (isSameGroup(resource.data.groupId) && resource.data.isPublic == true && resource.data.isDraft == false);
+                     (resource.data.groupId != null &&
+                      isSameGroup(resource.data.groupId) &&
+                      resource.data.isPublic == true &&
+                      resource.data.isDraft == false);
       allow create: if isAuthenticated() &&
-                       request.resource.data.userId == request.auth.uid &&
                        isValidMatch(request.resource.data) &&
-                       request.resource.data.imageUrls.size() <= 5;
-      allow update: if isOwner(resource.data.userId) &&
-                       request.resource.data.userId == resource.data.userId &&
+                       request.resource.data.imageUrls.size() <= 5 &&
+                       (request.resource.data.userId == request.auth.uid ||
+                        (request.resource.data.groupId != null &&
+                         isGroupMemberProxy(request.resource.data.groupId, request.resource.data.userId)));
+      allow update: if (isOwner(resource.data.userId) || isSameGroup(resource.data.groupId)) &&
+                       resource.data.userId == request.resource.data.userId &&
                        isValidMatch(request.resource.data);
-      allow delete: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId) ||
+                       (resource.data.groupId != null && isGroupOwner(resource.data.groupId));
 
       match /comments/{commentId} {
         allow read: if isOwner(get(/databases/$(database)/documents/matches/$(matchId)).data.userId) ||
@@ -137,26 +159,31 @@ service cloud.firestore {
       allow update: if false;
     }
 
-    // 試合ジャーナルバリデーション関数
+    // 試合ジャーナルバリデーション関数（groupIdはnull許容）
     function isValidJournal(data) {
       return data.opponent is string && data.opponent.size() > 0 && data.opponent.size() <= 50 &&
              data.sport in ['soccer', 'baseball', 'basketball', 'tennis', 'volleyball', 'swimming', 'athletics', 'other'] &&
              data.isPublic is bool &&
-             data.isDraft is bool;
+             data.isDraft is bool &&
+             (data.groupId == null || data.groupId is string);
     }
 
     // 試合ジャーナル
     match /matchJournals/{journalId} {
       allow read: if isOwner(resource.data.userId) ||
-                     (isSameGroup(resource.data.groupId) &&
+                     (resource.data.groupId != null &&
+                      isSameGroup(resource.data.groupId) &&
                       resource.data.isPublic == true &&
                       resource.data.isDraft == false);
       allow create: if isAuthenticated() &&
-                       request.resource.data.userId == request.auth.uid &&
-                       isValidJournal(request.resource.data);
-      allow update: if isOwner(resource.data.userId) &&
-                       request.resource.data.userId == resource.data.userId;
-      allow delete: if isOwner(resource.data.userId);
+                       isValidJournal(request.resource.data) &&
+                       (request.resource.data.userId == request.auth.uid ||
+                        (request.resource.data.groupId != null &&
+                         isGroupMemberProxy(request.resource.data.groupId, request.resource.data.userId)));
+      allow update: if (isOwner(resource.data.userId) || isSameGroup(resource.data.groupId)) &&
+                       resource.data.userId == request.resource.data.userId;
+      allow delete: if isOwner(resource.data.userId) ||
+                       (resource.data.groupId != null && isGroupOwner(resource.data.groupId));
 
       match /comments/{commentId} {
         allow read: if isOwner(get(/databases/$(database)/documents/matchJournals/$(journalId)).data.userId) ||
@@ -171,10 +198,14 @@ service cloud.firestore {
 
     // ハイライトピン
     match /highlights/{highlightId} {
-      allow read: if isOwner(resource.data.userId);
+      allow read: if isOwner(resource.data.userId) ||
+                     (resource.data.groupId != null && isSameGroup(resource.data.groupId));
       allow create: if isAuthenticated() &&
-                       request.resource.data.userId == request.auth.uid;
-      allow delete: if isOwner(resource.data.userId);
+                       (request.resource.data.userId == request.auth.uid ||
+                        (request.resource.data.groupId != null &&
+                         isGroupMemberProxy(request.resource.data.groupId, request.resource.data.userId)));
+      allow delete: if isOwner(resource.data.userId) ||
+                       (resource.data.groupId != null && isGroupOwner(resource.data.groupId));
       allow update: if false;
     }
 
@@ -183,11 +214,14 @@ service cloud.firestore {
       allow read: if isOwner(resource.data.userId) ||
                      (isSameGroup(resource.data.groupId) && resource.data.isPublic == true);
       allow create: if isAuthenticated() &&
-                       request.resource.data.userId == request.auth.uid &&
-                       request.resource.data.title.size() <= 100;
-      allow update: if isOwner(resource.data.userId) &&
-                       request.resource.data.userId == resource.data.userId;
-      allow delete: if isOwner(resource.data.userId);
+                       request.resource.data.title.size() <= 100 &&
+                       (request.resource.data.userId == request.auth.uid ||
+                        (request.resource.data.groupId != null &&
+                         isGroupMemberProxy(request.resource.data.groupId, request.resource.data.userId)));
+      allow update: if (isOwner(resource.data.userId) || isSameGroup(resource.data.groupId)) &&
+                       resource.data.userId == request.resource.data.userId;
+      allow delete: if isOwner(resource.data.userId) ||
+                       (resource.data.groupId != null && isGroupOwner(resource.data.groupId));
     }
   }
 }

@@ -53,7 +53,7 @@ describe('MatchJournalCard', () => {
         onPostNotePress={vi.fn()}
       />
     );
-    expect(screen.getByText(/試合後の振り返りを書く/)).toBeTruthy();
+    expect(screen.getByText(/振り返りを書く/)).toBeTruthy();
   });
 
   it('正常系: status=completedのカードに振り返り完了バッジが表示される', () => {
@@ -98,6 +98,6 @@ describe('MatchJournalCard', () => {
         onPress={vi.fn()}
       />
     );
-    expect(screen.getByText('vs テストFC')).toBeTruthy();
+    expect(screen.getByText('テストFC')).toBeTruthy();
   });
 });

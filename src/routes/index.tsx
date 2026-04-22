@@ -28,6 +28,7 @@ import { JournalPostPage } from '@/routes/app/journals/JournalPostPage';
 import { JournalPostEditPage } from '@/routes/app/journals/JournalPostEditPage';
 import { JournalDetailPage } from '@/routes/app/journals/JournalDetailPage';
 import { HighlightsPage } from '@/routes/app/highlights/HighlightsPage';
+import { ProfileSelectPage } from '@/routes/app/ProfileSelectPage';
 
 export const router = createBrowserRouter([
   {
@@ -59,8 +60,16 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    // メインアプリ: 認証済み・グループ参加済みユーザー用
+    // プロフィール選択画面: 認証済み・グループ参加済み・プロフィール未選択
+    path: '/select-profile',
     element: <ProtectedRoute requireGroup={true} />,
+    children: [
+      { path: '', element: <ProfileSelectPage /> },
+    ],
+  },
+  {
+    // メインアプリ: 認証済み・グループ参加済み・プロフィール選択済み
+    element: <ProtectedRoute requireGroup={true} requireProfile={true} />,
     children: [
       {
         element: <AppLayout />,

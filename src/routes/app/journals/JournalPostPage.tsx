@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useAddPostMatchNote } from '@/hooks/useMatchJournals';
 import { useJournal } from '@/hooks/useMatchJournals';
 import { BulletListInput } from '@/components/journals/BulletListInput';
@@ -21,7 +21,7 @@ export function JournalPostPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id: journalId } = useParams<{ id: string }>();
-  const user = useAuthStore((s) => s.userProfile);
+  const { activeProfile } = useActiveProfile();
   const { data: journal } = useJournal(journalId);
   const addPostMutation = useAddPostMatchNote();
 
@@ -47,15 +47,15 @@ export function JournalPostPage() {
   };
 
   const handleSubmit = async () => {
-    if (!user || !journalId) {
-      toast.error('ユーザー情報が取得できません');
+    if (!activeProfile || !journalId) {
+      toast.error('プロフィールが選択されていません');
       return;
     }
 
     try {
       await addPostMutation.mutateAsync({
         journalId,
-        userId: user.uid,
+        userId: activeProfile.uid,
         data: {
           result: null,
           myScore: myGoals !== '' ? Number(myGoals) : null,

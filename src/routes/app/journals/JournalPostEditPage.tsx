@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useJournal, useUpdatePostMatchNote } from '@/hooks/useMatchJournals';
 import { BulletListInput } from '@/components/journals/BulletListInput';
 import { GoalReviewItem } from '@/components/journals/GoalReviewItem';
@@ -18,7 +18,7 @@ const pageVariants = {
 export function JournalPostEditPage() {
   const navigate = useNavigate();
   const { id: journalId } = useParams<{ id: string }>();
-  const user = useAuthStore((s) => s.userProfile);
+  const { activeProfile } = useActiveProfile();
   const { data: journal, isLoading } = useJournal(journalId);
   const updateMutation = useUpdatePostMatchNote();
 
@@ -57,14 +57,14 @@ export function JournalPostEditPage() {
   };
 
   const handleSubmit = async () => {
-    if (!user || !journalId) {
-      toast.error('ユーザー情報が取得できません');
+    if (!activeProfile || !journalId) {
+      toast.error('プロフィールが選択されていません');
       return;
     }
     try {
       await updateMutation.mutateAsync({
         journalId,
-        userId: user.uid,
+        userId: activeProfile.uid,
         data: {
           result: null,
           myScore: myGoals !== '' ? Number(myGoals) : null,

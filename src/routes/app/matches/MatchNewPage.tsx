@@ -6,6 +6,7 @@ import { ChevronLeft, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { matchSchema, type MatchSchema } from '@/lib/validations/matchSchema';
 import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useCreateMatch } from '@/hooks/useMatches';
 import { SPORTS, SPORT_LABELS } from '@/types/sport';
 import { Timestamp } from 'firebase/firestore';
@@ -16,7 +17,8 @@ import type { MatchResult } from '@/types/match';
 export function MatchNewPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { userProfile, firebaseUser } = useAuthStore();
+  const { userProfile } = useAuthStore();
+  const { activeProfile } = useActiveProfile();
   const createMatch = useCreateMatch();
 
   const {
@@ -57,13 +59,13 @@ export function MatchNewPage() {
   };
 
   const onSubmit = async (data: MatchSchema) => {
-    if (!firebaseUser || !userProfile?.groupId) return;
+    if (!activeProfile || !userProfile?.groupId) return;
 
     // スコアが両方入力されている場合は結果を自動判定
     const result = data.result ?? autoDetectResult();
 
     await createMatch.mutateAsync({
-      userId: firebaseUser.uid,
+      userId: activeProfile.uid,
       groupId: userProfile.groupId,
       sport: data.sport,
       date: Timestamp.fromDate(new Date(data.date)),

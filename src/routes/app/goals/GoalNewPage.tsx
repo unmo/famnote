@@ -6,6 +6,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { goalSchema, type GoalSchema } from '@/lib/validations/groupSchema';
 import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useCreateGoal } from '@/hooks/useGoals';
 import { SPORTS, SPORT_LABELS } from '@/types/sport';
 import { Timestamp } from 'firebase/firestore';
@@ -17,7 +18,8 @@ import type { Sport } from '@/types/sport';
 export function GoalNewPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { userProfile, firebaseUser } = useAuthStore();
+  const { userProfile } = useAuthStore();
+  const { activeProfile } = useActiveProfile();
   const createGoal = useCreateGoal();
 
   const {
@@ -35,10 +37,10 @@ export function GoalNewPage() {
   });
 
   const onSubmit = async (data: GoalSchema) => {
-    if (!firebaseUser || !userProfile?.groupId) return;
+    if (!activeProfile || !userProfile?.groupId) return;
 
     await createGoal.mutateAsync({
-      userId: firebaseUser.uid,
+      userId: activeProfile.uid,
       groupId: userProfile.groupId,
       title: data.title,
       description: data.description ?? null,

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useJournal, useUpdatePreMatchNote } from '@/hooks/useMatchJournals';
 import { BulletListInput } from '@/components/journals/BulletListInput';
 import { preMatchSchema } from '@/lib/validations/matchJournalSchema';
@@ -19,7 +19,7 @@ const pageVariants = {
 export function JournalPreEditPage() {
   const navigate = useNavigate();
   const { id: journalId } = useParams<{ id: string }>();
-  const user = useAuthStore((s) => s.userProfile);
+  const { activeProfile } = useActiveProfile();
   const { data: journal, isLoading } = useJournal(journalId);
   const updateMutation = useUpdatePreMatchNote();
 
@@ -68,10 +68,10 @@ export function JournalPreEditPage() {
       return;
     }
 
-    if (!user || !journalId) return;
+    if (!activeProfile || !journalId) return;
 
     try {
-      await updateMutation.mutateAsync({ journalId, userId: user.uid, data: result.data });
+      await updateMutation.mutateAsync({ journalId, userId: activeProfile.uid, data: result.data });
       navigate(`/journals/${journalId}`);
     } catch {
       // エラーはmutationのonErrorで処理済み
