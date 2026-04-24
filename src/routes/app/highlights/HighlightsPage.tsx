@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useHighlights } from '@/hooks/useHighlights';
 import { HighlightCard } from '@/components/highlights/HighlightCard';
 import type { HighlightSourceType } from '@/types/highlight';
@@ -35,9 +35,9 @@ function filterToSourceTypes(filter: FilterSourceType): HighlightSourceType[] | 
 export function HighlightsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const user = useAuthStore((s) => s.userProfile);
+  const { activeProfile } = useActiveProfile();
   const [sourceFilter, setSourceFilter] = useState<FilterSourceType>('all');
-  const { data, isLoading } = useHighlights(user?.uid);
+  const { data, isLoading } = useHighlights(activeProfile?.uid);
 
   const highlights = data?.highlights ?? [];
 

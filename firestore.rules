@@ -71,8 +71,10 @@ service cloud.firestore {
 
       match /members/{memberId} {
         allow read: if isGroupMember(groupId);
-        allow create: if isAuthenticated() && memberId == request.auth.uid;
-        allow update: if isOwner(memberId);
+        // 自分自身の参加 または グループオーナーによる子プロフィール追加
+        allow create: if isAuthenticated() &&
+                         (memberId == request.auth.uid || isGroupOwner(groupId));
+        allow update: if isOwner(memberId) || isGroupOwner(groupId);
         allow delete: if isOwner(memberId) || isGroupOwner(groupId);
       }
     }
@@ -88,9 +90,7 @@ service cloud.firestore {
     match /notes/{noteId} {
       allow read: if isOwner(resource.data.userId) ||
                      (resource.data.groupId != null &&
-                      isSameGroup(resource.data.groupId) &&
-                      resource.data.isPublic == true &&
-                      resource.data.isDraft == false);
+                      isSameGroup(resource.data.groupId));
       // 同グループメンバーなら他のメンバープロフィールIDで代理作成可
       allow create: if isAuthenticated() &&
                        isValidNote(request.resource.data) &&
@@ -123,9 +123,7 @@ service cloud.firestore {
     match /matches/{matchId} {
       allow read: if isOwner(resource.data.userId) ||
                      (resource.data.groupId != null &&
-                      isSameGroup(resource.data.groupId) &&
-                      resource.data.isPublic == true &&
-                      resource.data.isDraft == false);
+                      isSameGroup(resource.data.groupId));
       allow create: if isAuthenticated() &&
                        isValidMatch(request.resource.data) &&
                        request.resource.data.imageUrls.size() <= 5 &&
@@ -172,11 +170,10 @@ service cloud.firestore {
 
     // 試合ジャーナル
     match /matchJournals/{journalId} {
+      // グループメンバー（親）は子の非公開ジャーナルも閲覧可
       allow read: if isOwner(resource.data.userId) ||
                      (resource.data.groupId != null &&
-                      isSameGroup(resource.data.groupId) &&
-                      resource.data.isPublic == true &&
-                      resource.data.isDraft == false);
+                      isSameGroup(resource.data.groupId));
       allow create: if isAuthenticated() &&
                        isValidJournal(request.resource.data) &&
                        (request.resource.data.userId == request.auth.uid ||

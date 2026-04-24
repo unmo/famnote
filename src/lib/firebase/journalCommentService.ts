@@ -103,13 +103,20 @@ export function subscribeJournalComments(
     orderBy('createdAt', 'asc')
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const comments: JournalComment[] = snapshot.docs.map((d) => ({
-      id: d.id,
-      ...(d.data() as Omit<JournalComment, 'id'>),
-    }));
-    callback(comments);
-  });
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const comments: JournalComment[] = snapshot.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<JournalComment, 'id'>),
+      }));
+      callback(comments);
+    },
+    (_error) => {
+      // permission denied などのエラー時は空配列を返してUIをブロックしない
+      callback([]);
+    }
+  );
 }
 
 /**
