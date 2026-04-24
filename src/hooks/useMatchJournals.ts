@@ -10,6 +10,7 @@ import {
   deleteMatchJournal,
   fetchUserJournals,
   fetchUserJournalsPaged,
+  fetchGroupJournals,
 } from '@/lib/firebase/matchJournalService';
 import type { MatchJournal, PreMatchFormData, PostMatchFormData } from '@/types/matchJournal';
 import type { Sport } from '@/types/sport';
@@ -53,6 +54,19 @@ export function useJournal(journalId: string | undefined) {
       const snap = await getDoc(doc(db, 'matchJournals', journalId));
       if (!snap.exists()) return null;
       return { ...(snap.data() as MatchJournal), id: snap.id };
+    },
+  });
+}
+
+// グループ内の最近の試合ジャーナル一覧
+export function useGroupJournals(groupId: string | undefined) {
+  return useQuery({
+    queryKey: ['groupJournals', groupId],
+    enabled: !!groupId,
+    queryFn: async () => {
+      if (!groupId) return [];
+      const { journals } = await fetchGroupJournals(groupId, 10);
+      return journals;
     },
   });
 }

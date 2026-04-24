@@ -3,12 +3,13 @@ import { motion } from 'motion/react';
 import { Plus, BookOpen, NotebookPen, Star, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
+import { useGroupStore } from '@/store/groupStore';
 import { useStreak } from '@/hooks/useStreak';
 import { useGroupNotes } from '@/hooks/useNotes';
-import { Avatar } from '@/components/shared/Avatar';
+import { useGroupJournals } from '@/hooks/useMatchJournals';
 import { formatRelativeTime } from '@/lib/utils/date';
+import type { Timestamp } from 'firebase/firestore';
 
-// ストリーク炎アニメーション
 const flameVariants = {
   animate: {
     rotate: [-3, 3, -3],
@@ -17,7 +18,6 @@ const flameVariants = {
   },
 };
 
-// ショートカットメニュー定義
 const MENU_ITEMS = [
   {
     to: '/journals',
@@ -66,15 +66,44 @@ const itemVariants = {
   animate: { opacity: 1, y: 0 },
 };
 
-// ダッシュボードページ
+// 統合アクティビティアイテム型
+type ActivityItem =
+  | { kind: 'note'; id: string; userId: string; text: string; sortAt: Timestamp }
+  | { kind: 'journal'; id: string; userId: string; opponent: string; sortAt: Timestamp };
+
 export function DashboardPage() {
   const { t } = useTranslation();
   const { userProfile } = useAuthStore();
+  const members = useGroupStore((s) => s.members);
   const { data: streakData } = useStreak(userProfile?.uid);
-  const { data: recentNotes, isLoading } = useGroupNotes(userProfile?.groupId ?? undefined);
+  const { data: recentNotes, isLoading: notesLoading } = useGroupNotes(userProfile?.groupId ?? undefined);
+  const { data: recentJournals, isLoading: journalsLoading } = useGroupJournals(userProfile?.groupId ?? undefined);
 
   const currentStreak = streakData?.currentStreak ?? 0;
   const weeklyStatus = streakData?.weeklyStatus ?? Array(7).fill(false);
+  const isLoading = notesLoading || journalsLoading;
+
+  // 練習ノートと試合ノートを統合して日時降順に並べる
+  const activities: ActivityItem[] = [
+    ...(recentNotes ?? []).map((n) => ({
+      kind: 'note' as const,
+      id: n.id,
+      userId: n.userId,
+      text: n.content,
+      sortAt: n.createdAt,
+    })),
+    ...(recentJournals ?? []).map((j) => ({
+      kind: 'journal' as const,
+      id: j.id,
+      userId: j.userId,
+      opponent: j.opponent,
+      sortAt: j.date,
+    })),
+  ].sort((a, b) => b.sortAt.toMillis() - a.sortAt.toMillis()).slice(0, 8);
+
+  // userId から displayName を引く
+  const getName = (uid: string) =>
+    members.find((m) => m.uid === uid)?.displayName ?? uid.slice(0, 6);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
@@ -109,7 +138,6 @@ export function DashboardPage() {
             <p className="text-orange-300 font-medium mt-1">{t('dashboard.streak')}</p>
           </div>
 
-          {/* 週間ストリークバー */}
           <div className="flex flex-col gap-1">
             <p className="text-zinc-500 text-xs text-right mb-1">{t('dashboard.thisWeek')}</p>
             <div className="flex gap-1.5">
@@ -131,9 +159,6 @@ export function DashboardPage() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-zinc-50">{t('dashboard.recentActivity')}</h2>
-          <Link to="/timeline" className="text-sm text-[var(--color-brand-primary)] hover:underline">
-            {t('dashboard.viewMore')}
-          </Link>
         </div>
 
         {isLoading ? (
@@ -142,20 +167,45 @@ export function DashboardPage() {
               <div key={i} className="h-20 bg-zinc-900 rounded-2xl animate-pulse" />
             ))}
           </div>
-        ) : recentNotes && recentNotes.length > 0 ? (
-          <div className="space-y-3">
-            {recentNotes.slice(0, 5).map((note) => (
-              <Link key={note.id} to={`/notes/${note.id}`}>
+        ) : activities.length > 0 ? (
+          <div className="space-y-2">
+            {activities.map((item) => (
+              <Link
+                key={`${item.kind}-${item.id}`}
+                to={item.kind === 'journal' ? `/journals/${item.id}` : `/notes/${item.id}`}
+              >
                 <motion.div
                   whileHover={{ scale: 1.01 }}
-                  className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-start gap-3 hover:border-zinc-700 transition-colors"
+                  className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center gap-3 hover:border-zinc-700 transition-colors"
                 >
-                  <Avatar size="sm" name={note.userId} />
+                  {/* ノート種別アイコン */}
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    item.kind === 'journal'
+                      ? 'bg-orange-500/15'
+                      : 'bg-blue-500/15'
+                  }`}>
+                    {item.kind === 'journal'
+                      ? <NotebookPen size={16} className="text-orange-400" />
+                      : <BookOpen size={16} className="text-blue-400" />
+                    }
+                  </div>
+
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-zinc-500 text-xs">{formatRelativeTime(note.createdAt)}</span>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      {/* 種別ラベル */}
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                        item.kind === 'journal'
+                          ? 'bg-orange-500/15 text-orange-400'
+                          : 'bg-blue-500/15 text-blue-400'
+                      }`}>
+                        {item.kind === 'journal' ? '試合ノート' : '練習ノート'}
+                      </span>
+                      <span className="text-zinc-600 text-xs">{getName(item.userId)}</span>
+                      <span className="text-zinc-600 text-xs ml-auto">{formatRelativeTime(item.sortAt)}</span>
                     </div>
-                    <p className="text-zinc-300 text-sm line-clamp-2">{note.content}</p>
+                    <p className="text-zinc-300 text-sm truncate">
+                      {item.kind === 'journal' ? `vs ${item.opponent}` : item.text}
+                    </p>
                   </div>
                 </motion.div>
               </Link>
@@ -166,7 +216,7 @@ export function DashboardPage() {
             <p className="text-4xl mb-3">📝</p>
             <p className="text-zinc-400">{t('common.noRecords')}</p>
             <Link
-              to="/notes/new"
+              to="/journals/new"
               className="inline-flex items-center gap-2 mt-4 text-[var(--color-brand-primary)] text-sm hover:underline"
             >
               <Plus size={16} />
