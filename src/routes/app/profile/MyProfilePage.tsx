@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { useAuthStore } from '@/store/authStore';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar } from '@/components/shared/Avatar';
-import { LogOut, Settings, Lock } from 'lucide-react';
+import { LogOut, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
@@ -91,9 +91,6 @@ export function MyProfilePage() {
             <h1 className="text-xl font-bold text-zinc-50">{userProfile?.displayName}</h1>
             <p className="text-zinc-500 text-sm">{userProfile?.email}</p>
           </div>
-          <Link to="/settings" className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors" aria-label="設定">
-            <Settings size={20} />
-          </Link>
         </div>
       </motion.div>
 
