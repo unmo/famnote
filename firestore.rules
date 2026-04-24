@@ -143,6 +143,8 @@ service cloud.firestore {
                        isSameGroup(get(/databases/$(database)/documents/matches/$(matchId)).data.groupId);
         allow create: if isAuthenticated() &&
                          request.resource.data.userId == request.auth.uid &&
+                         request.resource.data.text is string &&
+                         request.resource.data.text.size() > 0 &&
                          request.resource.data.text.size() <= 200;
         allow delete: if isOwner(resource.data.userId);
         allow update: if false;

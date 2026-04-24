@@ -1,41 +1,46 @@
 {
-  "feature": "match-journal-v1",
+  "feature": "Netflixモデル・プロフィール切り替え機能（実装済み・仕様確認から再評価）",
   "phase": "completed",
-  "loop_count": 1,
+  "loop_count": 2,
   "max_loops": 3,
   "stop_requested": false,
   "history": [
     {
       "phase": "planner",
       "status": "completed",
-      "timestamp": "2026-04-18T00:00:00Z",
-      "output": ".claude/specs/match-journal-v1.md"
+      "timestamp": "2026-04-22T00:00:00Z",
+      "output": "docs/spec_profile_switch.md"
     },
     {
       "phase": "designer",
       "status": "completed",
-      "timestamp": "2026-04-18T09:00:00Z",
-      "output": ".claude/specs/match-journal-v1-design.md"
-    },
-    {
-      "phase": "generator",
-      "status": "completed",
-      "timestamp": "2026-04-20T15:50:00Z",
-      "output": "実装完了: 型定義・Firestoreサービス・TanStackQueryフック・UIコンポーネント・ページ・ルーティング・テスト",
-      "build": "success",
-      "tests": "70 passed"
+      "timestamp": "2026-04-22T01:00:00Z",
+      "output": "docs/design_profile_switch.md"
     },
     {
       "phase": "evaluator",
       "status": "passed",
-      "timestamp": "2026-04-20T16:10:00Z",
-      "result": "合格",
-      "build": "success",
-      "audit": "moderate 6件（Vite/esbuild devServer系 → 既知例外許容）",
-      "tests": "70 passed",
-      "any_types": 0,
-      "issues": [
-        "軽微: JournalPrePage.tsx・GoalReviewItem.tsx にハードコード日本語文字列（任意）あり（中優先度）"
+      "timestamp": "2026-04-22T02:00:00Z",
+      "result": "PASS",
+      "notes": [
+        "重大な問題なし。PASS。",
+        "軽微: AuthContext.tsx の onSnapshot(groupRef) のunsubscribeが変数保存されておらず長期セッションでメモリリークの可能性あり（次回対応推奨）",
+        "軽微: AuthContext.tsx の onAuthStateChanged コールバック内 return が有効でなく、再認証時に前のリスナーが蓄積する可能性あり（次回対応推奨）",
+        "軽微: ProfileSelectPage の role=option が role=listbox 親なし（WAI-ARIA の厳密な用法として不正確・機能的問題なし）",
+        "軽微: 仕様書 docs/spec_profile_switch.md の6.3記述と実装の現状が乖離（スケルトン・エラー状態は実装済み）"
+      ]
+    },
+    {
+      "phase": "evaluator",
+      "status": "passed",
+      "timestamp": "2026-04-22T03:00:00Z",
+      "result": "PASS",
+      "notes": [
+        "重大な問題なし。PASS（再評価）。",
+        "軽微（継続）: AuthContext.tsx の onSnapshot(groupRef) のunsubscribeが未保存でメモリリークの可能性あり",
+        "軽微（継続）: onAuthStateChanged コールバック内 return がuseEffectクリーンアップに届かない設計上の問題",
+        "軽微（継続）: ProfileSelectPage の role=option に role=listbox 親要素なし（WAI-ARIA不正確）",
+        "軽微（新規）: matches/comments の create ルールで text.size() > 0 チェックが欠落"
       ]
     }
   ]

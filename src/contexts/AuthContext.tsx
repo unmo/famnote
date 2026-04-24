@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (profile.groupId) {
               const groupRef = doc(db, 'groups', profile.groupId);
-              onSnapshot(groupRef, (groupSnap) => {
+              const unsubscribeGroup = onSnapshot(groupRef, (groupSnap) => {
                 if (groupSnap.exists()) {
                   setGroup({ id: groupSnap.id, ...groupSnap.data() } as Group);
                 }
@@ -59,6 +59,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setMembers(members);
                 restoreFromSession(members);
               });
+
+              // グループリスナーのクリーンアップをメンバーリスナーに統合
+              const prevUnsubscribeMembers = unsubscribeMembers;
+              unsubscribeMembers = () => {
+                prevUnsubscribeMembers();
+                unsubscribeGroup();
+              };
             }
           } else {
             setUserProfile(null);
