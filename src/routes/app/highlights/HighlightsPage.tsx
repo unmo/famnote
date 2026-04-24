@@ -1,12 +1,11 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useHighlights } from '@/hooks/useHighlights';
 import { HighlightCard } from '@/components/highlights/HighlightCard';
-import type { HighlightSourceType } from '@/types/highlight';
-import { clsx } from 'clsx';
+import { format } from 'date-fns';
+import { ja } from 'date-fns/locale';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -14,38 +13,22 @@ const pageVariants = {
   exit: { opacity: 0, y: -10 },
 };
 
-type FilterSourceType = 'all' | 'pre' | 'post' | 'practice';
-
-const SOURCE_FILTERS: Array<{ value: FilterSourceType; label: string }> = [
-  { value: 'all', label: 'すべて' },
-  { value: 'pre', label: '試合前' },
-  { value: 'post', label: '試合後' },
-  { value: 'practice', label: '練習' },
-];
-
-function filterToSourceTypes(filter: FilterSourceType): HighlightSourceType[] | undefined {
-  switch (filter) {
-    case 'pre': return ['journal_pre_goal', 'journal_pre_challenge'];
-    case 'post': return ['journal_post_achievement', 'journal_post_improvement', 'journal_post_exploration'];
-    case 'practice': return ['practice_bullet'];
-    default: return undefined;
-  }
-}
-
 export function HighlightsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { activeProfile } = useActiveProfile();
-  const [sourceFilter, setSourceFilter] = useState<FilterSourceType>('all');
   const { data, isLoading } = useHighlights(activeProfile?.uid);
 
-  const highlights = data?.highlights ?? [];
+  const insights = (data?.highlights ?? []).filter((h) => h.sourceType === 'journal_insight');
 
-  // クライアントサイドフィルタリング
-  const allowedTypes = filterToSourceTypes(sourceFilter);
-  const filtered = allowedTypes
-    ? highlights.filter((h) => allowedTypes.includes(h.sourceType))
-    : highlights;
+  // 日付でグループ化
+  const grouped = insights.reduce<Record<string, typeof insights>>((acc, h) => {
+    const dateKey = format(h.sourceDate.toDate(), 'yyyy-MM-dd');
+    if (!acc[dateKey]) acc[dateKey] = [];
+    acc[dateKey].push(h);
+    return acc;
+  }, {});
+  const dateKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   return (
     <motion.div
@@ -56,30 +39,11 @@ export function HighlightsPage() {
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className="min-h-screen bg-zinc-950 pb-24"
     >
-      {/* ヘッダー */}
       <header className="px-4 py-3 sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-zinc-800/50">
         <h1 className="text-xl font-bold text-zinc-50">{t('highlights.title')}</h1>
+        <p className="text-xs text-zinc-500 mt-0.5">試合後ノートの「気づき」が自動で記録されます</p>
       </header>
 
-      {/* フィルターバー */}
-      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-none border-b border-zinc-800 sticky top-[57px] bg-zinc-950/95 backdrop-blur-md z-10">
-        {SOURCE_FILTERS.map(({ value, label }) => (
-          <button
-            key={value}
-            onClick={() => setSourceFilter(value)}
-            className={clsx(
-              'rounded-full px-3 py-1.5 text-xs font-medium border whitespace-nowrap transition-colors',
-              sourceFilter === value
-                ? 'bg-[var(--color-brand-primary)]/20 text-[var(--color-brand-primary)] border-[var(--color-brand-primary)]/50'
-                : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-zinc-300'
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* コンテンツ */}
       <div className="px-4 pt-4">
         {isLoading ? (
           <div className="space-y-3" role="status" aria-label="読み込み中">
@@ -91,12 +55,12 @@ export function HighlightsPage() {
               </div>
             ))}
           </div>
-        ) : filtered.length === 0 ? (
+        ) : insights.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-6xl opacity-20 mb-4">📌</p>
+            <p className="text-6xl opacity-20 mb-4">💡</p>
             <h2 className="text-lg font-semibold text-zinc-300">{t('highlights.emptyTitle')}</h2>
             <p className="text-sm text-zinc-500 mt-2 max-w-[280px] whitespace-pre-line">
-              {t('highlights.emptyDesc')}
+              試合後ノートの「気づき」欄に記録すると、ここに自動で蓄積されます
             </p>
             <button
               onClick={() => navigate('/journals')}
@@ -106,19 +70,23 @@ export function HighlightsPage() {
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
-            {filtered.map((highlight) => (
-              <HighlightCard
-                key={highlight.id}
-                highlight={highlight}
-                variant="full"
-                onPress={(h) => {
-                  // 元のジャーナルへリンク
-                  if (h.sourceType.startsWith('journal_')) {
-                    navigate(`/journals/${h.sourceId}`);
-                  }
-                }}
-              />
+          <div className="space-y-6">
+            {dateKeys.map((dateKey) => (
+              <div key={dateKey}>
+                <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-2">
+                  {format(new Date(dateKey), 'yyyy年M月d日（EEE）', { locale: ja })}
+                </p>
+                <div className="space-y-2">
+                  {grouped[dateKey].map((highlight) => (
+                    <HighlightCard
+                      key={highlight.id}
+                      highlight={highlight}
+                      variant="full"
+                      onPress={(h) => navigate(`/journals/${h.sourceId}`)}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}

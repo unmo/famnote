@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
@@ -45,6 +45,19 @@ export function JournalDetailPage() {
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+  // isOwner は journal がロード後に確定するが、hooks は早期リターン前に宣言する必要がある
+  const isOwner = user?.uid === journal?.userId;
+  const markedRef = useRef(false);
+
+  useEffect(() => {
+    if (!journalId || !isOwner || !journal) return;
+    if (markedRef.current) return;
+    if ((journal.unreadCommentCount ?? 0) > 0) {
+      markedRef.current = true;
+      markCommentsAsRead(journalId).catch(() => {});
+    }
+  }, [journalId, isOwner, journal]);
+
   const handleDelete = async () => {
     if (!user || !journalId) return;
     try {
@@ -76,20 +89,6 @@ export function JournalDetailPage() {
   }
 
   const dateStr = format(journal.date.toDate(), 'yyyy年M月d日（EEE）', { locale: ja });
-  const isOwner = user?.uid === journal.userId;
-
-  // ジャーナルオーナーが詳細ページを開いたときに未読コメントをリセット
-  // isOwner は journal.userId と user.uid から導出されるため journal を依存に含める
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    if (!journalId || !isOwner || !journal) return;
-    if ((journal.unreadCommentCount ?? 0) > 0) {
-      markCommentsAsRead(journalId).catch(() => {
-        // 既読処理の失敗はサイレントに無視（UXをブロックしない）
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [journalId, isOwner, journal?.unreadCommentCount, journal?.userId]);
 
   return (
     <motion.div
