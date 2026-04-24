@@ -1,6 +1,6 @@
 # FamNote テスト仕様書
 
-最終更新: 2026-04-24
+最終更新: 2026-04-25
 
 ---
 
@@ -11,7 +11,7 @@
 npx vitest run
 ```
 
-### テストファイル一覧（12ファイル / 102テスト）
+### テストファイル一覧（14ファイル / 119テスト）
 
 | ファイル | テスト数 | 対象 |
 |---------|---------|------|
@@ -23,6 +23,8 @@ npx vitest run
 | `tests/unit/auth/LoginPage.test.tsx` | 7 | ログインページ |
 | `tests/unit/auth/useAuth.test.ts` | 6 | useAuthフック |
 | `tests/unit/journals/matchJournalSchema.test.ts` | 12 | 試合ジャーナルバリデーション |
+| `tests/unit/journals/journalCommentService.test.ts` | 10 | コメントサービス関数（addComment・deleteComment・subscribe） |
+| `tests/unit/journals/JournalCommentForm.test.tsx` | 7 | コメント入力フォーム（管理者のみ表示・文字数制限） |
 | `tests/unit/lib/inviteCode.test.ts` | 11 | 招待コード生成・検証 |
 | `tests/unit/lib/streak.test.ts` | 14 | 連続記録計算ロジック |
 | `tests/unit/theme/ThemeContext.test.tsx` | 8 | テーマコンテキスト |
