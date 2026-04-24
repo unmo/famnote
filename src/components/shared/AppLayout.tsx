@@ -14,7 +14,6 @@ import { clsx } from 'clsx';
 import { BottomNav } from './BottomNav';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSelector } from './ThemeSelector';
-import { ProfileSwitcher } from './ProfileSwitcher';
 import { useDarkMode } from '@/theme/DarkModeContext';
 import { useAuthStore } from '@/store/authStore';
 import { logout } from '@/lib/firebase/auth';
@@ -27,7 +26,6 @@ export function AppLayout() {
   const navigate = useNavigate();
   const { theme, setTheme } = useDarkMode();
   const firebaseUser = useAuthStore((s) => s.firebaseUser);
-  // ProfileSwitcherがヘッダーに表示されるため、ユーザー名表示は不要
 
   const handleLogout = async () => {
     try {
@@ -83,11 +81,10 @@ export function AppLayout() {
                 ))}
               </div>
 
-              {/* 右側: プロフィール切り替え・テーマ・ダークモード・ログアウト */}
+              {/* 右側: 言語・テーマ・ダークモード・ログアウト */}
               <div className="flex items-center gap-1 border-l border-zinc-800/60 pl-2 md:pl-3">
-                <ProfileSwitcher />
-                <ThemeSelector />
                 <LanguageSwitcher />
+                <ThemeSelector />
                 <button
                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                   className="p-2 text-zinc-400 hover:text-zinc-50 hover:bg-zinc-800 rounded-full transition-all"
