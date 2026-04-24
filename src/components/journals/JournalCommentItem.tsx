@@ -5,7 +5,6 @@ import type { JournalComment } from '@/types/matchJournal';
 
 interface JournalCommentItemProps {
   comment: JournalComment;
-  /** 自分のコメントか判定するための現在のユーザーID */
   currentUserId: string;
   onDelete: (commentId: string) => void;
   isDeleting?: boolean;
@@ -17,10 +16,6 @@ export const itemVariants = {
   exit: { opacity: 0, x: 8 },
 };
 
-/**
- * コメント1件の表示コンポーネント
- * 管理者（role=parent）には Crown バッジとアンバーアクセントを適用する
- */
 export function JournalCommentItem({
   comment,
   currentUserId,
@@ -30,13 +25,11 @@ export function JournalCommentItem({
   const isParent = comment.role === 'parent';
   const isOwn = currentUserId === comment.userId;
 
-  // createdAt が Timestamp の場合はtoDate()で変換
   const createdDate = comment.createdAt?.toDate?.() ?? new Date();
   const timeStr = isToday(createdDate)
     ? format(createdDate, 'HH:mm')
     : format(createdDate, 'M月d日 HH:mm');
 
-  // イニシャル（日本語・英語両対応）
   const initial = comment.displayName ? Array.from(comment.displayName)[0] : '?';
 
   return (
@@ -47,78 +40,78 @@ export function JournalCommentItem({
       exit="exit"
       transition={{ duration: 0.2 }}
       aria-label={`${comment.displayName}さんのコメント: ${comment.text}（${timeStr}）`}
-      className={`px-4 py-3 flex items-start gap-3 ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
+      className={`px-4 py-3 ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
     >
-      {/* アバター */}
-      <div className="relative flex-shrink-0">
-        {comment.avatarUrl ? (
-          <img
-            src={comment.avatarUrl}
-            alt={comment.displayName}
-            className="w-8 h-8 rounded-full object-cover"
-          />
-        ) : (
-          <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-              isParent
-                ? 'bg-amber-900/40 text-amber-300'
-                : 'bg-zinc-700 text-zinc-300'
-            }`}
-          >
-            {initial}
-          </div>
-        )}
-        {/* 管理者バッジ（Crown アイコン） */}
-        {isParent && (
-          <span className="absolute -top-1 -right-1 bg-amber-400 rounded-full p-0.5">
-            <Crown size={10} className="text-amber-900" />
-          </span>
-        )}
-      </div>
-
-      {/* コンテンツ */}
-      <div className="flex-1 min-w-0">
-        {/* 表示名行 */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-semibold text-zinc-100 truncate">
-            {comment.displayName}
-          </span>
+      {/* 送信者ヘッダー */}
+      <div className="flex items-center gap-2 mb-2">
+        {/* アバター */}
+        <div className="relative flex-shrink-0">
+          {comment.avatarUrl ? (
+            <img
+              src={comment.avatarUrl}
+              alt={comment.displayName}
+              className="w-7 h-7 rounded-full object-cover"
+            />
+          ) : (
+            <div
+              className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                isParent ? 'bg-amber-900/50 text-amber-300' : 'bg-zinc-700 text-zinc-300'
+              }`}
+            >
+              {initial}
+            </div>
+          )}
           {isParent && (
-            <span className="text-[10px] text-amber-500 flex-shrink-0">親</span>
+            <span className="absolute -top-1 -right-1 bg-amber-400 rounded-full p-0.5">
+              <Crown size={8} className="text-amber-900" />
+            </span>
           )}
         </div>
 
-        {/* コメント本文（XSS対策: JSXテキストノードで描画） */}
-        <p
-          className={`mt-1 text-sm leading-relaxed break-all ${
-            isParent ? 'text-zinc-100' : 'text-zinc-200'
-          }`}
-        >
-          {comment.text}
-        </p>
+        {/* 表示名 + 役割バッジ */}
+        <span className={`text-sm font-bold ${isParent ? 'text-amber-300' : 'text-zinc-200'}`}>
+          {comment.displayName}
+        </span>
+        {isParent ? (
+          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-400 border border-amber-800/50 flex items-center gap-0.5">
+            <Crown size={8} />管理者
+          </span>
+        ) : (
+          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-zinc-800 text-zinc-500 border border-zinc-700">
+            メンバー
+          </span>
+        )}
 
-        {/* タイムスタンプ */}
-        <p className="mt-1 text-[11px] text-zinc-600">{timeStr}</p>
+        <span className="text-[11px] text-zinc-600 ml-auto">{timeStr}</span>
+
+        {/* 削除ボタン */}
+        {isOwn && (
+          <button
+            type="button"
+            onClick={() => onDelete(comment.id)}
+            aria-label="コメントを削除"
+            disabled={isDeleting}
+            className="min-w-[32px] min-h-[32px] flex items-center justify-center text-zinc-600 hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {isDeleting ? (
+              <div className="w-3 h-3 border-2 border-zinc-600 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Trash2 size={13} />
+            )}
+          </button>
+        )}
       </div>
 
-      {/* 削除ボタン（自分のコメントのみ） */}
-      {isOwn && (
-        <button
-          type="button"
-          onClick={() => onDelete(comment.id)}
-          aria-label="コメントを削除"
-          disabled={isDeleting}
-          className={`min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-600 hover:text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 ${
-            isDeleting ? 'opacity-40 cursor-not-allowed' : ''
-          }`}
-        >
-          {isDeleting ? (
-            <div className="w-3.5 h-3.5 border-2 border-zinc-600 border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <Trash2 size={14} />
-          )}
-        </button>
-      )}
+      {/* コメント本文 */}
+      <div
+        className={`ml-9 rounded-xl rounded-tl-sm px-3 py-2.5 text-sm leading-relaxed break-all ${
+          isParent
+            ? 'bg-amber-950/40 border border-amber-900/30 text-zinc-100'
+            : 'bg-zinc-800/60 border border-zinc-700/40 text-zinc-200'
+        }`}
+      >
+        {comment.text}
+      </div>
     </motion.article>
   );
 }
