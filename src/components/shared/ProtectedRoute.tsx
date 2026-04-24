@@ -1,6 +1,8 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { useProfileStore } from '@/store/profileStore';
+
+const REDIRECT_KEY = 'famnote_redirect_after_profile';
 
 interface ProtectedRouteProps {
   requireGroup?: boolean;
@@ -11,6 +13,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ requireGroup = false, requireProfile = false }: ProtectedRouteProps) {
   const { firebaseUser, userProfile, isLoading, isInitialized } = useAuthStore();
   const activeProfile = useProfileStore((s) => s.activeProfile);
+  const location = useLocation();
 
   if (!isInitialized || isLoading) {
     return (
@@ -38,6 +41,9 @@ export function ProtectedRoute({ requireGroup = false, requireProfile = false }:
 
   // プロフィール選択が必要なページでプロフィール未選択の場合は選択画面へ
   if (requireProfile && !activeProfile) {
+    try {
+      sessionStorage.setItem(REDIRECT_KEY, location.pathname + location.search);
+    } catch { /* ignore */ }
     return <Navigate to="/select-profile" replace />;
   }
 

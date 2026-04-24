@@ -1,9 +1,23 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Crown, User, AlertCircle } from 'lucide-react';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import type { GroupMember } from '@/types/group';
 import { useAuthStore } from '@/store/authStore';
+
+const REDIRECT_KEY = 'famnote_redirect_after_profile';
+
+function consumeRedirectPath(): string {
+  try {
+    const path = sessionStorage.getItem(REDIRECT_KEY);
+    if (path) {
+      sessionStorage.removeItem(REDIRECT_KEY);
+      return path;
+    }
+  } catch { /* ignore */ }
+  return '/dashboard';
+}
 
 // スケルトンカード（ローディング中に表示）
 function SkeletonProfileCard() {
@@ -37,13 +51,20 @@ function ProfileSelectError({ onRetry }: ProfileSelectErrorProps) {
 
 export function ProfileSelectPage() {
   const navigate = useNavigate();
-  const { members, setActiveProfile } = useActiveProfile();
-  // AuthContextがメンバーをFirestoreからロードするまでの間はisLoadingがtrue
+  const { members, activeProfile, setActiveProfile } = useActiveProfile();
   const isLoading = useAuthStore((s) => s.isLoading);
+
+  // セッション復元でプロフィールが自動設定された場合は保存パスへ遷移
+  useEffect(() => {
+    if (activeProfile) {
+      navigate(consumeRedirectPath(), { replace: true });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProfile]);
 
   const handleSelect = (member: GroupMember) => {
     setActiveProfile(member);
-    navigate('/dashboard');
+    navigate(consumeRedirectPath(), { replace: true });
   };
 
   const handleRetry = () => {
