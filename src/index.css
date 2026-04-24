@@ -1,9 +1,48 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  /* デフォルトブランドカラー（JSによって上書きされる） */
   --color-brand-primary: #E85513;
   --color-brand-secondary: #00133F;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * ライトモード: zincカラースケールを反転
+ * bg-zinc-950(最暗) → 白, text-zinc-50(最明) → 黒 として機能させる
+ * これによりコンポーネント側の変更なしにライト/ダーク両対応になる
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root, :root.light {
+  color-scheme: light;
+  --color-zinc-50:  #09090b;
+  --color-zinc-100: #18181b;
+  --color-zinc-200: #27272a;
+  --color-zinc-300: #3f3f46;
+  --color-zinc-400: #52525b;
+  --color-zinc-500: #71717a;
+  --color-zinc-600: #a1a1aa;
+  --color-zinc-700: #d4d4d8;
+  --color-zinc-800: #e4e4e7;
+  --color-zinc-900: #f4f4f5;
+  --color-zinc-950: #ffffff;
+}
+
+/* ダークモード: Tailwind デフォルトのzincパレット */
+:root.dark {
+  color-scheme: dark;
+  --color-zinc-50:  #fafafa;
+  --color-zinc-100: #f4f4f5;
+  --color-zinc-200: #e4e4e7;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --color-zinc-600: #52525b;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-800: #27272a;
+  --color-zinc-900: #18181b;
+  --color-zinc-950: #09090b;
 }
 
 :root {
@@ -17,33 +56,54 @@
   font-family: 'Inter', 'Noto Sans JP', sans-serif;
 }
 
-/* テキスト選択時のハイライト色 */
+/* テキスト選択色 */
 ::selection {
-  background: color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
+  background-color: color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
+  color: inherit;
 }
 
-/* スクロールバーのカスタマイズ（ダークテーマ対応） */
+/* スクロールバー */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #18181b;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
-  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-brand-primary) 30%, #888);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: var(--color-brand-primary);
+}
+
+/* フォーカスリングの統一 */
+*:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+/* ページ遷移のスムーズ化 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ボディのフォント・ベースカラー */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-zinc-950);
+  color: var(--color-zinc-50);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* 共通カードスタイル */
 .card-base {
-  @apply bg-zinc-900 border border-zinc-800 rounded-2xl;
+  @apply bg-zinc-900 border border-zinc-800 rounded-2xl transition-colors duration-200;
 }
 
 /* 入力フォーム共通スタイル */
@@ -80,6 +140,11 @@
          border border-[var(--color-brand-primary)] rounded-xl px-6 py-3
          transition-all duration-200;
   min-height: 44px;
+}
+
+/* ライトモードでもしっかり区別が出るようにスケルトンを調整 */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* iOSでのズーム防止: フォームフィールドは16px以上 */

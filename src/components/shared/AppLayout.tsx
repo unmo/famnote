@@ -48,15 +48,15 @@ export function AppLayout() {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-white font-sans flex flex-col transition-colors duration-200 w-full overflow-x-hidden relative">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans flex flex-col transition-colors duration-200 w-full overflow-x-hidden relative">
       {/* ヘッダー（SkillSync準拠） */}
-      <header className="bg-white/80 dark:bg-black/40 backdrop-blur-md border-b border-gray-200 dark:border-white/5 sticky top-0 z-50 transition-colors duration-200">
+      <header className="bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/60 sticky top-0 z-50 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* ロゴ */}
           <div className="flex items-center gap-2">
             <Link to="/dashboard" className="flex items-center gap-2 group">
               <img src="/favicon.svg" alt="FamNote" className="w-8 h-8" />
-              <span className="text-xl font-bold text-gray-900 dark:text-white tracking-wider">
+              <span className="text-xl font-bold text-zinc-50 tracking-wider">
                 Fam<span className="text-[var(--color-brand-primary)]">Note</span>
               </span>
             </Link>
@@ -66,10 +66,10 @@ export function AppLayout() {
             <div className="flex items-center gap-1 md:gap-4">
               {/* ユーザー名（デスクトップのみ） */}
               <div className="hidden md:flex flex-col items-end mr-2">
-                <span className="text-[10px] text-gray-400 font-bold tracking-wider uppercase">
+                <span className="text-[10px] text-zinc-500 font-bold tracking-wider uppercase">
                   {t('app.name')}
                 </span>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                <span className="text-sm font-bold text-zinc-50">
                   {firebaseUser.displayName ?? 'User'}
                 </span>
               </div>
@@ -78,13 +78,13 @@ export function AppLayout() {
               <ProfileSwitcher />
 
               {/* テーマ・言語切り替えエリア */}
-              <div className="flex items-center gap-1 md:gap-2 border-l border-gray-200 dark:border-gray-700 pl-2 md:pl-4 h-8">
+              <div className="flex items-center gap-1 md:gap-2 border-l border-zinc-800/60 pl-2 md:pl-4 h-8">
                 <ThemeSelector />
                 <LanguageSwitcher />
               </div>
 
               {/* デスクトップ用ナビリンク */}
-              <div className="hidden md:flex items-center gap-1 border-l border-gray-200 dark:border-gray-700 pl-4 h-8">
+              <div className="hidden md:flex items-center gap-1 border-l border-zinc-800/60 pl-4 h-8">
                 {navItems.map(({ to, icon: Icon, labelKey }) => (
                   <Link
                     key={to}
@@ -93,7 +93,7 @@ export function AppLayout() {
                       'p-2 rounded-lg transition-all',
                       location.pathname === to || location.pathname.startsWith(to + '/')
                         ? 'bg-[color-mix(in_srgb,var(--color-brand-primary)_10%,transparent)] text-[var(--color-brand-primary)]'
-                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800'
+                        : 'text-zinc-400 hover:text-zinc-50 hover:bg-zinc-800'
                     )}
                     title={t(labelKey)}
                   >
@@ -103,10 +103,10 @@ export function AppLayout() {
               </div>
 
               {/* ダーク/ライトモード切り替え + ログアウト */}
-              <div className="flex items-center gap-1 md:gap-2 border-l border-gray-200 dark:border-gray-700 pl-2 md:pl-4">
+              <div className="flex items-center gap-1 md:gap-2 border-l border-zinc-800/60 pl-2 md:pl-4">
                 <button
                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 rounded-full transition-all"
+                  className="p-2 text-zinc-400 hover:text-zinc-50 hover:bg-zinc-800 rounded-full transition-all"
                   title={theme === 'dark' ? 'ライトモード' : 'ダークモード'}
                 >
                   {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
