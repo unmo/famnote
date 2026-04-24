@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ChevronLeft, Pencil } from 'lucide-react';
@@ -6,10 +6,13 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useJournal, useDeleteJournal } from '@/hooks/useMatchJournals';
 import { StatusBadge } from '@/components/journals/StatusBadge';
 import { GoalReviewItem } from '@/components/journals/GoalReviewItem';
+import { JournalCommentSection } from '@/components/journals/JournalCommentSection';
 import { SPORT_LABELS } from '@/types/sport';
+import { markCommentsAsRead } from '@/lib/firebase/journalCommentService';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -32,6 +35,7 @@ export function JournalDetailPage() {
   const navigate = useNavigate();
   const { id: journalId } = useParams<{ id: string }>();
   const user = useAuthStore((s) => s.userProfile);
+  const { isManager } = useActiveProfile();
   const { data: journal, isLoading } = useJournal(journalId);
   const deleteMutation = useDeleteJournal();
 
@@ -69,6 +73,18 @@ export function JournalDetailPage() {
 
   const dateStr = format(journal.date.toDate(), 'yyyy年M月d日（EEE）', { locale: ja });
   const isOwner = user?.uid === journal.userId;
+
+  // ジャーナルオーナーが詳細ページを開いたときに未読コメントをリセット
+  useEffect(() => {
+    if (!journalId || !isOwner || !journal) return;
+    if ((journal.unreadCommentCount ?? 0) > 0) {
+      markCommentsAsRead(journalId).catch(() => {
+        // 既読処理の失敗はサイレントに無視（UXをブロックしない）
+      });
+    }
+  // isOwner は journal.userId と user.uid から導出されるため journal を依存に含める
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [journalId, isOwner, journal?.unreadCommentCount, journal?.userId]);
 
   return (
     <motion.div
@@ -266,6 +282,14 @@ export function JournalDetailPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* コメントセクション */}
+      {journalId && (
+        <JournalCommentSection
+          journalId={journalId}
+          isManager={isManager}
+        />
       )}
 
       {/* 削除確認ダイアログ */}

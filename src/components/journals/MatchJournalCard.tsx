@@ -1,10 +1,12 @@
 import { motion } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { ChevronRight } from 'lucide-react';
 import { SPORT_EMOJIS } from '@/types/sport';
 import type { MatchJournal } from '@/types/matchJournal';
 import { StatusBadge } from './StatusBadge';
+import { UnreadCommentBadge } from './UnreadCommentBadge';
 
 interface MatchJournalCardProps {
   journal: MatchJournal;
@@ -41,10 +43,17 @@ export function MatchJournalCard({ journal, onPress, onPostNotePress }: MatchJou
       aria-label={`${dateStr} ${journal.opponent}戦`}
       whileTap={{ scale: 0.97 }}
       onClick={() => onPress(journal.id)}
-      className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer active:bg-zinc-800/80 transition-colors duration-100"
+      className="relative bg-zinc-900 border border-zinc-800 rounded-2xl overflow-visible cursor-pointer active:bg-zinc-800/80 transition-colors duration-100"
     >
+      {/* 未読コメントバッジ */}
+      <AnimatePresence>
+        {(journal.unreadCommentCount ?? 0) > 0 && (
+          <UnreadCommentBadge count={journal.unreadCommentCount} />
+        )}
+      </AnimatePresence>
+
       {/* カラーバー */}
-      <div className={`h-1 w-full ${theme.bar}`} />
+      <div className={`h-1 w-full rounded-t-2xl ${theme.bar}`} />
 
       <div className={`bg-gradient-to-b ${theme.glow} to-transparent p-3 flex flex-col gap-2`}>
         {/* 日付・スポーツ */}

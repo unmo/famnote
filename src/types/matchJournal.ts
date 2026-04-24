@@ -56,6 +56,7 @@ export interface MatchJournal {
 
   reactionCounts: Record<ReactionType, number>;
   commentCount: number;
+  unreadCommentCount: number;
   pinnedCount: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
