@@ -244,11 +244,12 @@
     "share": "Share",
     "uploadImage": "Upload Image",
     "dragAndDrop": "Drag & drop or click to select",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "notAuthenticated": "You must be logged in"
   },
   "journals": {
-    "title": "Journal",
-    "preTitle": "Pre-Match Note",
+    "title": "Match Notes",
+    "preTitle": "Before Match",
     "postTitle": "Post-Match Review",
     "date": "Match Date",
     "sport": "Sport",

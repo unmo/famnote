@@ -8,19 +8,19 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources: {
-      ja: { translation: ja },
-      en: { translation: en },
-    },
-    fallbackLng: 'ja',
-    defaultNS: 'translation',
+    debug: false,
+    fallbackLng: 'en',
     interpolation: {
       // Reactは自動的にXSSエスケープするため不要
       escapeValue: false,
     },
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
+    resources: {
+      en: {
+        translation: en,
+      },
+      ja: {
+        translation: ja,
+      },
     },
   });
 

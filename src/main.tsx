@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/theme/ThemeContext';
+import { DarkModeProvider } from '@/theme/DarkModeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { queryClient } from '@/lib/queryClient';
 import { router } from '@/routes/index';
@@ -16,7 +17,9 @@ if (!root) throw new Error('ルート要素が見つかりません');
 
 createRoot(root).render(
   <StrictMode>
-    {/* テーマプロバイダー（CSS変数管理） */}
+    {/* ダーク/ライトモードプロバイダー */}
+    <DarkModeProvider>
+    {/* テーマプロバイダー（チームカラーCSS変数管理） */}
     <ThemeProvider>
       {/* TanStack Query プロバイダー */}
       <QueryClientProvider client={queryClient}>
@@ -39,5 +42,6 @@ createRoot(root).render(
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
+    </DarkModeProvider>
   </StrictMode>
 );

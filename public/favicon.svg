@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E85513"/>
+      <stop offset="100%" stop-color="#c73d00"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- 背景 -->
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <rect width="64" height="32" rx="16" fill="url(#shine)"/>
+  <!-- ノートブック本体 -->
+  <rect x="14" y="13" width="30" height="38" rx="3" fill="white" opacity="0.95"/>
+  <!-- 背表紙の影 -->
+  <rect x="14" y="13" width="5" height="38" rx="3" fill="#00133F" opacity="0.15"/>
+  <!-- 罫線 -->
+  <line x1="21" y1="22" x2="40" y2="22" stroke="#E85513" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+  <line x1="21" y1="27" x2="40" y2="27" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+  <line x1="21" y1="32" x2="36" y2="32" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+  <!-- ハート/家族アイコン -->
+  <path d="M34 38 C34 38 28 43.5 28 46.5 C28 48.4 29.6 50 31.5 50 C32.4 50 33.3 49.6 34 49 C34.7 49.6 35.6 50 36.5 50 C38.4 50 40 48.4 40 46.5 C40 43.5 34 38 34 38Z" fill="#E85513" opacity="0.9"/>
+  <!-- スパイン（背表紙ライン） -->
+  <rect x="14" y="13" width="2" height="38" rx="1" fill="#E85513" opacity="0.7"/>
+  <!-- リング -->
+  <circle cx="48" cy="22" r="3.5" fill="none" stroke="#E85513" stroke-width="2"/>
+  <circle cx="48" cy="32" r="3.5" fill="none" stroke="#E85513" stroke-width="2"/>
+  <circle cx="48" cy="42" r="3.5" fill="none" stroke="#E85513" stroke-width="2"/>
+</svg>
