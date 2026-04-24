@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ChevronLeft, Pencil } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
@@ -11,6 +11,8 @@ import { useJournal, useDeleteJournal } from '@/hooks/useMatchJournals';
 import { StatusBadge } from '@/components/journals/StatusBadge';
 import { GoalReviewItem } from '@/components/journals/GoalReviewItem';
 import { JournalCommentSection } from '@/components/journals/JournalCommentSection';
+import { JournalAccordionBlock } from '@/components/journals/JournalAccordionBlock';
+import { JournalStepProgress } from '@/components/journals/JournalStepProgress';
 import { SPORT_LABELS } from '@/types/sport';
 import { markCommentsAsRead } from '@/lib/firebase/journalCommentService';
 
@@ -35,6 +37,8 @@ export function JournalDetailPage() {
   const navigate = useNavigate();
   const { id: journalId } = useParams<{ id: string }>();
   const user = useAuthStore((s) => s.userProfile);
+  // AuthContextでメンバーリストがロードされる前はisManagerが確定しないため、authStore.isLoadingで待機
+  const isAuthLoading = useAuthStore((s) => s.isLoading);
   const { isManager } = useActiveProfile();
   const { data: journal, isLoading } = useJournal(journalId);
   const deleteMutation = useDeleteJournal();
@@ -75,6 +79,8 @@ export function JournalDetailPage() {
   const isOwner = user?.uid === journal.userId;
 
   // ジャーナルオーナーが詳細ページを開いたときに未読コメントをリセット
+  // isOwner は journal.userId と user.uid から導出されるため journal を依存に含める
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (!journalId || !isOwner || !journal) return;
     if ((journal.unreadCommentCount ?? 0) > 0) {
@@ -82,7 +88,6 @@ export function JournalDetailPage() {
         // 既読処理の失敗はサイレントに無視（UXをブロックしない）
       });
     }
-  // isOwner は journal.userId と user.uid から導出されるため journal を依存に含める
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [journalId, isOwner, journal?.unreadCommentCount, journal?.userId]);
 
@@ -93,29 +98,32 @@ export function JournalDetailPage() {
       animate="animate"
       exit="exit"
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="min-h-screen bg-zinc-950 pb-8"
+      className="min-h-screen bg-zinc-950 pb-24"
     >
-      {/* ヘッダー */}
-      <header className="flex items-center justify-between px-4 py-3 sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-zinc-800/50">
+      {/* スティッキーヘッダー */}
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-zinc-800/50 h-[52px]">
         <button
           onClick={() => navigate('/journals')}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-100"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)]"
           aria-label={t('common.back')}
         >
-          <ChevronLeft size={22} />
+          <ChevronLeft size={22} aria-hidden="true" />
         </button>
         <StatusBadge status={journal.status} />
-        {isOwner && (
+        {isOwner ? (
           <button
             onClick={() => setShowDeleteDialog(true)}
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-red-400 text-xs"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-zinc-400 hover:text-red-400 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+            aria-label="このジャーナルを削除する"
           >
             削除
           </button>
+        ) : (
+          <div className="min-w-[44px]" aria-hidden="true" />
         )}
       </header>
 
-      {/* ヘッダーカード */}
+      {/* 試合情報ヘッダーカード */}
       <div className="bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-zinc-800 rounded-xl p-5 mx-4 mt-3">
         <div className="flex justify-between items-start mb-3">
           <div className="text-sm text-zinc-500 space-y-0.5">
@@ -139,47 +147,28 @@ export function JournalDetailPage() {
         )}
       </div>
 
-      {/* 試合後ノート未記入時のCTA */}
-      {journal.status === 'pre' && isOwner && (
-        <div className="mx-4 my-4">
-          <div className="flex items-center mb-3 gap-2">
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[11px] font-bold text-zinc-400">1</div>
-              <span className="text-xs text-zinc-500 line-through">試合前の目標</span>
-            </div>
-            <div className="flex-1 h-px bg-[var(--color-brand-primary)]/40 mx-1" />
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 rounded-full bg-[var(--color-brand-primary)] flex items-center justify-center text-[11px] font-bold text-white animate-pulse">2</div>
-              <span className="text-xs font-medium text-[var(--color-brand-primary)]">試合後の振り返り</span>
-            </div>
-          </div>
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={() => navigate(`/journals/${journal.id}/post`)}
-            className="w-full bg-[var(--color-brand-primary)] text-white rounded-xl px-5 py-4 text-sm font-semibold flex items-center justify-between"
-          >
-            <div className="flex flex-col items-start gap-0.5">
-              <span className="text-base font-bold">試合の振り返りを記録</span>
-              <span className="text-xs text-white/70">気づき・できたこと・課題を入力</span>
-            </div>
-            <span className="text-xl">→</span>
-          </motion.button>
+      {/* ステップ進捗インジケーター（オーナーのみ） */}
+      {isOwner && (
+        <div className="mx-4 my-3">
+          <JournalStepProgress
+            hasPreNote={!!journal.preNote}
+            hasPostNote={!!journal.postNote}
+            isOwner={isOwner}
+            journalId={journal.id}
+            onPostCta={() => navigate(`/journals/${journal.id}/post`)}
+          />
         </div>
       )}
 
-      {/* セクション1: 試合前の目標 */}
+      {/* 試合前ブロック（アコーディオン） */}
       {journal.preNote && (
-        <div className="mx-4 mt-3 bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
-            <span>🎯</span>
-            <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide flex-1">{t('journals.preGoals')}</h2>
-            {isOwner && (
-              <button onClick={() => navigate(`/journals/${journal.id}/edit/pre`)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-zinc-400 bg-zinc-800 border border-zinc-700 hover:text-zinc-200 transition-colors">
-                <Pencil size={11} />編集
-              </button>
-            )}
-          </div>
-          <div className="px-4 py-3 space-y-1">
+        <div className="mx-4 mt-2">
+          <JournalAccordionBlock
+            icon="🎯"
+            title="試合前の目標"
+            defaultOpen={true}
+            onEdit={isOwner ? () => navigate(`/journals/${journal.id}/edit/pre`) : undefined}
+          >
             <BulletList items={journal.preNote.goals} />
             {journal.preNote.challenges.length > 0 && (
               <>
@@ -187,109 +176,100 @@ export function JournalDetailPage() {
                 <BulletList items={journal.preNote.challenges} />
               </>
             )}
-          </div>
+          </JournalAccordionBlock>
         </div>
       )}
 
-      {/* セクション2: 試合後の振り返り */}
+      {/* 試合後ブロック（アコーディオン） */}
       {journal.postNote && (
-        <div className="mx-4 mt-3 space-y-3">
-          {/* 目標達成状況 */}
-          {journal.preNote && journal.preNote.goals.length > 0 && (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
-                <span>📊</span>
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide flex-1">目標の達成状況</h2>
-                {isOwner && (
-                  <button onClick={() => navigate(`/journals/${journal.id}/edit/post`)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-zinc-400 bg-zinc-800 border border-zinc-700 hover:text-zinc-200 transition-colors">
-                    <Pencil size={11} />編集
-                  </button>
-                )}
-              </div>
-              <div className="px-4 py-3">
+        <div className="mx-4 mt-3">
+          <JournalAccordionBlock
+            icon="📊"
+            title="試合後の振り返り"
+            defaultOpen={true}
+            onEdit={isOwner ? () => navigate(`/journals/${journal.id}/edit/post`) : undefined}
+          >
+            {/* 目標達成状況（試合前ゴールがある場合のみ） */}
+            {journal.preNote && journal.preNote.goals.length > 0 && (
+              <div>
+                <p className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wide">
+                  目標の達成状況
+                </p>
                 {journal.preNote.goals.map((goal) => (
-                  <GoalReviewItem key={goal.id} goal={goal} review={journal.postNote?.goalReviews.find((r) => r.goalItemId === goal.id)} readonly />
+                  <GoalReviewItem
+                    key={goal.id}
+                    goal={goal}
+                    review={journal.postNote?.goalReviews.find((r) => r.goalItemId === goal.id)}
+                    readonly
+                  />
                 ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* 気づき */}
-          {(journal.postNote.insights ?? []).length > 0 && (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
-                <span>💡</span>
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">気づき</h2>
-              </div>
-              <div className="px-4 py-3 space-y-1">
+            {/* 気づき */}
+            {(journal.postNote.insights ?? []).length > 0 && (
+              <div className="border-t border-zinc-800/60 pt-3 mt-3">
+                <p className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wide">
+                  💡 気づき
+                </p>
                 <BulletList items={journal.postNote.insights ?? []} />
               </div>
-            </div>
-          )}
+            )}
 
-          {/* できたこと */}
-          {journal.postNote.achievements.length > 0 && (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
-                <span>✅</span>
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">できたこと</h2>
-              </div>
-              <div className="px-4 py-3 space-y-1">
+            {/* できたこと */}
+            {journal.postNote.achievements.length > 0 && (
+              <div className="border-t border-zinc-800/60 pt-3 mt-3">
+                <p className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wide">
+                  ✅ できたこと
+                </p>
                 <BulletList items={journal.postNote.achievements} />
               </div>
-            </div>
-          )}
+            )}
 
-          {/* できなかったこと */}
-          {journal.postNote.improvements.length > 0 && (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
-                <span>📈</span>
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">できなかったこと / 課題</h2>
-              </div>
-              <div className="px-4 py-3 space-y-1">
+            {/* 課題 */}
+            {journal.postNote.improvements.length > 0 && (
+              <div className="border-t border-zinc-800/60 pt-3 mt-3">
+                <p className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wide">
+                  📈 課題
+                </p>
                 <BulletList items={journal.postNote.improvements} />
               </div>
-            </div>
-          )}
+            )}
 
-          {/* 探求したいこと */}
-          {journal.postNote.explorations.length > 0 && (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
-                <span>🔍</span>
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">もっと探求したいこと</h2>
-              </div>
-              <div className="px-4 py-3 space-y-1">
+            {/* 探求したいこと */}
+            {journal.postNote.explorations.length > 0 && (
+              <div className="border-t border-zinc-800/60 pt-3 mt-3">
+                <p className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wide">
+                  🔍 もっと探求したいこと
+                </p>
                 <BulletList items={journal.postNote.explorations} />
               </div>
-            </div>
-          )}
+            )}
 
-          {/* 自己評価 */}
-          {journal.postNote.performance && (
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800/60">
-                <span>⭐</span>
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">自己評価</h2>
-              </div>
-              <div className="px-4 py-3">
-                <p className="text-xl text-amber-400">
+            {/* 自己評価 */}
+            {journal.postNote.performance && (
+              <div className="border-t border-zinc-800/60 pt-3 mt-3">
+                <p className="flex items-center gap-1.5 mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wide">
+                  ⭐ 自己評価
+                </p>
+                <p className="text-xl text-amber-400" aria-label={`自己評価 ${journal.postNote.performance}点`}>
                   {'★'.repeat(journal.postNote.performance)}
-                  <span className="text-zinc-700">{'★'.repeat(5 - journal.postNote.performance)}</span>
+                  <span className="text-zinc-700" aria-hidden="true">{'★'.repeat(5 - journal.postNote.performance)}</span>
                 </p>
               </div>
-            </div>
-          )}
+            )}
+          </JournalAccordionBlock>
         </div>
       )}
 
-      {/* コメントセクション */}
-      {journalId && (
-        <JournalCommentSection
-          journalId={journalId}
-          isManager={isManager}
-        />
+      {/* コメントセクション（プロファイルロード完了後に描画） */}
+      {journalId && !isAuthLoading && (
+        <div className="mx-4 mt-4">
+          <JournalCommentSection
+            journalId={journalId}
+            isManager={isManager}
+          />
+        </div>
       )}
 
       {/* 削除確認ダイアログ */}

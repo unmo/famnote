@@ -10,14 +10,16 @@ interface HighlightCardProps {
 }
 
 const SOURCE_TYPE_LABELS: Record<HighlightSourceType, { label: string; badge: string }> = {
-  journal_pre_goal: { label: '試合前 / 目標', badge: 'bg-blue-500/20 text-blue-400' },
-  journal_pre_challenge: { label: '試合前 / チャレンジ', badge: 'bg-blue-500/20 text-blue-400' },
-  journal_post_achievement: { label: '試合後 / できたこと', badge: 'bg-green-500/20 text-green-400' },
-  journal_post_improvement: { label: '試合後 / 課題', badge: 'bg-red-500/20 text-red-400' },
-  journal_post_exploration: { label: '試合後 / 探求', badge: 'bg-purple-500/20 text-purple-400' },
-  journal_insight: { label: '試合 / 気づき', badge: 'bg-amber-500/20 text-amber-400' },
-  note_insight: { label: '練習 / 気づき', badge: 'bg-amber-500/20 text-amber-400' },
+  // アクティブなsourceType（鮮やかバッジ）
+  journal_insight: { label: '試合の気づき', badge: 'bg-amber-500/20 text-amber-400' },
+  note_insight: { label: '練習の気づき', badge: 'bg-amber-500/20 text-amber-400' },
   practice_bullet: { label: '練習メモ', badge: 'bg-purple-500/20 text-purple-400' },
+  // 過去データ互換（薄いグレーバッジ）
+  journal_pre_goal: { label: '試合メモ（過去データ）', badge: 'bg-zinc-700/50 text-zinc-500' },
+  journal_pre_challenge: { label: '試合メモ（過去データ）', badge: 'bg-zinc-700/50 text-zinc-500' },
+  journal_post_achievement: { label: '試合メモ（過去データ）', badge: 'bg-zinc-700/50 text-zinc-500' },
+  journal_post_improvement: { label: '試合メモ（過去データ）', badge: 'bg-zinc-700/50 text-zinc-500' },
+  journal_post_exploration: { label: '試合メモ（過去データ）', badge: 'bg-zinc-700/50 text-zinc-500' },
 };
 
 export function HighlightCard({ highlight, onPress, variant = 'full' }: HighlightCardProps) {
@@ -56,15 +58,17 @@ export function HighlightCard({ highlight, onPress, variant = 'full' }: Highligh
       </div>
 
       {/* テキスト本体 */}
-      <p className="text-base font-medium text-zinc-50 leading-relaxed line-clamp-3">
+      <p className="text-[15px] font-medium text-zinc-50 leading-relaxed line-clamp-3">
         {highlight.text}
       </p>
 
-      {/* 出典行 */}
-      <p className="mt-2.5 text-xs text-zinc-500 flex items-center gap-1">
-        <span>→</span>
-        <span>{dateStr} · {sourceInfo.label}</span>
-      </p>
+      {/* 出典行: sourceIdがある場合のみ元のジャーナルへの参照を表示 */}
+      {highlight.sourceId && (
+        <p className="mt-2 text-xs text-zinc-500 flex items-center gap-1">
+          <span className="text-zinc-600" aria-hidden="true">→</span>
+          <span>元のジャーナルを見る</span>
+        </p>
+      )}
     </div>
   );
 }

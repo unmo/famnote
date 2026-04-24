@@ -207,7 +207,7 @@ export async function createPostMatchOnly(
   const sourceDate = Timestamp.fromDate(new Date(baseData.date));
   await replaceInsightHighlights(
     userId, groupId ?? '', baseData.sport,
-    'journal_post_improvement', ref.id, postData.insights, sourceDate
+    'journal_insight', ref.id, postData.insights, sourceDate
   );
   return { journalId: ref.id };
 }
