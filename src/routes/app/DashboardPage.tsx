@@ -127,41 +127,6 @@ export function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* クイック記録ボタン */}
-      <div className="grid grid-cols-2 gap-3">
-        <Link to="/notes/new">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center gap-3 hover:border-[var(--color-brand-primary)] transition-colors"
-          >
-            <div className="w-10 h-10 rounded-xl bg-[color-mix(in_srgb,var(--color-brand-primary)_15%,transparent)] flex items-center justify-center">
-              <BookOpen size={20} className="text-[var(--color-brand-primary)]" />
-            </div>
-            <div>
-              <p className="text-zinc-50 font-medium text-sm">{t('dashboard.practiceNote')}</p>
-              <p className="text-zinc-500 text-xs">{t('dashboard.practiceSubtext')}</p>
-            </div>
-          </motion.div>
-        </Link>
-
-        <Link to="/journals/new">
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center gap-3 hover:border-[var(--color-brand-primary)] transition-colors"
-          >
-            <div className="w-10 h-10 rounded-xl bg-[color-mix(in_srgb,var(--color-brand-primary)_15%,transparent)] flex items-center justify-center">
-              <NotebookPen size={20} className="text-[var(--color-brand-primary)]" />
-            </div>
-            <div>
-              <p className="text-zinc-50 font-medium text-sm">{t('dashboard.matchRecord')}</p>
-              <p className="text-zinc-500 text-xs">{t('dashboard.matchSubtext')}</p>
-            </div>
-          </motion.div>
-        </Link>
-      </div>
-
       {/* 最近のアクティビティ */}
       <div>
         <div className="flex items-center justify-between mb-4">

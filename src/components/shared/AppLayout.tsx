@@ -63,28 +63,9 @@ export function AppLayout() {
           </div>
 
           {firebaseUser && (
-            <div className="flex items-center gap-1 md:gap-4">
-              {/* ユーザー名（デスクトップのみ） */}
-              <div className="hidden md:flex flex-col items-end mr-2">
-                <span className="text-[10px] text-zinc-500 font-bold tracking-wider uppercase">
-                  {t('app.name')}
-                </span>
-                <span className="text-sm font-bold text-zinc-50">
-                  {firebaseUser.displayName ?? 'User'}
-                </span>
-              </div>
-
-              {/* プロフィール切り替え */}
-              <ProfileSwitcher />
-
-              {/* テーマ・言語切り替えエリア */}
-              <div className="flex items-center gap-1 md:gap-2 border-l border-zinc-800/60 pl-2 md:pl-4 h-8">
-                <ThemeSelector />
-                <LanguageSwitcher />
-              </div>
-
-              {/* デスクトップ用ナビリンク */}
-              <div className="hidden md:flex items-center gap-1 border-l border-zinc-800/60 pl-4 h-8">
+            <div className="flex items-center gap-1 md:gap-2 flex-1 justify-end">
+              {/* デスクトップ用ナビリンク（左寄り） */}
+              <div className="hidden md:flex items-center gap-1 mr-2">
                 {navItems.map(({ to, icon: Icon, labelKey }) => (
                   <Link
                     key={to}
@@ -102,8 +83,11 @@ export function AppLayout() {
                 ))}
               </div>
 
-              {/* ダーク/ライトモード切り替え + ログアウト */}
-              <div className="flex items-center gap-1 md:gap-2 border-l border-zinc-800/60 pl-2 md:pl-4">
+              {/* 右側: プロフィール切り替え・テーマ・ダークモード・ログアウト */}
+              <div className="flex items-center gap-1 border-l border-zinc-800/60 pl-2 md:pl-3">
+                <ProfileSwitcher />
+                <ThemeSelector />
+                <LanguageSwitcher />
                 <button
                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                   className="p-2 text-zinc-400 hover:text-zinc-50 hover:bg-zinc-800 rounded-full transition-all"
@@ -111,7 +95,6 @@ export function AppLayout() {
                 >
                   {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
-
                 <button
                   onClick={handleLogout}
                   className="p-1.5 md:p-2 text-[var(--color-brand-primary)] hover:text-[var(--color-brand-primary)] hover:bg-[color-mix(in_srgb,var(--color-brand-primary)_10%,transparent)] rounded-full transition-all border border-[color-mix(in_srgb,var(--color-brand-primary)_20%,transparent)]"
