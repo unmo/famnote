@@ -12,6 +12,7 @@ import {
   limit,
   startAfter,
   serverTimestamp,
+  increment,
   onSnapshot,
   writeBatch,
   runTransaction,
@@ -31,10 +32,13 @@ import { replaceInsightHighlights } from './highlightService';
 // ===================== グループ関連 =====================
 
 // グループ作成
+// ownerDisplayName と ownerAvatarUrl を渡すことで、オーナーの member ドキュメントに名前が正しく保存される
 export async function createGroup(
   ownerUid: string,
   groupName: string,
-  iconUrl: string | null
+  iconUrl: string | null,
+  ownerDisplayName: string,
+  ownerAvatarUrl: string | null
 ): Promise<{ groupId: string; inviteCode: string }> {
   // 招待コードを生成（重複チェック付き）
   let inviteCode = generateInviteCode();
@@ -61,12 +65,12 @@ export async function createGroup(
   };
   batch.set(groupRef, { ...groupData, id: groupRef.id });
 
-  // オーナーをメンバーとして追加
+  // オーナーをメンバーとして追加（displayName・avatarUrl を引数から設定）
   const memberRef = doc(db, 'groups', groupRef.id, 'members', ownerUid);
   const memberData: Omit<GroupMember, 'uid'> & { uid: string } = {
     uid: ownerUid,
-    displayName: '', // 呼び出し元でプロフィールから取得済みのため後で更新
-    avatarUrl: null,
+    displayName: ownerDisplayName,
+    avatarUrl: ownerAvatarUrl,
     sports: [],
     joinedAt: serverTimestamp() as GroupMember['joinedAt'],
     role: 'owner',
@@ -94,9 +98,12 @@ export async function createGroup(
 }
 
 // グループ参加
+// displayName と avatarUrl を渡すことで、参加時から名前が正しく保存される
 export async function joinGroup(
   uid: string,
-  inviteCode: string
+  inviteCode: string,
+  displayName: string,
+  avatarUrl: string | null
 ): Promise<{ groupId: string; groupName: string }> {
   const codeSnap = await getDoc(doc(db, 'inviteCodes', inviteCode.toUpperCase()));
   if (!codeSnap.exists()) {
@@ -122,8 +129,8 @@ export async function joinGroup(
 
     const memberData: Omit<GroupMember, 'uid'> & { uid: string } = {
       uid,
-      displayName: '',
-      avatarUrl: null,
+      displayName,
+      avatarUrl,
       sports: [],
       joinedAt: serverTimestamp() as GroupMember['joinedAt'],
       role: 'member',
@@ -444,4 +451,72 @@ export async function fetchUserGoals(userId: string): Promise<Goal[]> {
   );
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ ...(d.data() as Goal), id: d.id }));
+}
+
+// ===================== プロフィール管理関連 =====================
+
+// メンバーの表示名を更新する
+// isChildProfile が false の場合は users/{memberUid} も同時に更新する（オーナー・通常メンバー）
+export async function updateMemberDisplayName(
+  groupId: string,
+  memberUid: string,
+  displayName: string,
+  isChildProfile: boolean
+): Promise<void> {
+  const memberRef = doc(db, 'groups', groupId, 'members', memberUid);
+  await updateDoc(memberRef, { displayName });
+
+  // 子プロフィールは users ドキュメントを持たないため更新しない
+  if (!isChildProfile) {
+    const userRef = doc(db, 'users', memberUid);
+    await updateDoc(userRef, { displayName });
+  }
+}
+
+// 子プロフィールを追加する（Firebase Auth アカウントなしの仮想プロフィール）
+// uid は 'child_' + ランダム文字列で生成し、通常の Auth UID と区別できるようにする
+export async function addChildProfile(
+  groupId: string,
+  displayName: string
+): Promise<string> {
+  // crypto.randomUUID() を使って一意な ID を生成し、child_ プレフィックスを付ける
+  const childUid = `child_${crypto.randomUUID().replace(/-/g, '').slice(0, 10)}`;
+
+  const memberRef = doc(db, 'groups', groupId, 'members', childUid);
+  const memberData: GroupMember & { isChildProfile: true } = {
+    uid: childUid,
+    displayName,
+    avatarUrl: null,
+    sports: [],
+    joinedAt: serverTimestamp() as GroupMember['joinedAt'],
+    role: 'member',
+    lastActiveAt: null,
+    isChildProfile: true,
+  };
+
+  const groupRef = doc(db, 'groups', groupId);
+
+  const batch = writeBatch(db);
+  batch.set(memberRef, memberData);
+  // memberCount をインクリメント
+  batch.update(groupRef, { memberCount: increment(1) });
+  await batch.commit();
+
+  return childUid;
+}
+
+// 子プロフィールを削除する
+// グループの memberCount もデクリメントする
+export async function deleteChildProfile(
+  groupId: string,
+  memberUid: string
+): Promise<void> {
+  const memberRef = doc(db, 'groups', groupId, 'members', memberUid);
+  const groupRef = doc(db, 'groups', groupId);
+
+  const batch = writeBatch(db);
+  batch.delete(memberRef);
+  // memberCount をデクリメント（最小値は 1 を保証するためクライアント側でも確認する）
+  batch.update(groupRef, { memberCount: increment(-1) });
+  await batch.commit();
 }

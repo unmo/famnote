@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 export function CreateGroupPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { firebaseUser } = useAuthStore();
+  const { firebaseUser, userProfile } = useAuthStore();
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
 
@@ -28,8 +28,12 @@ export function CreateGroupPage() {
 
   const onSubmit = async (data: CreateGroupSchema) => {
     if (!firebaseUser) return;
+    // userProfile から displayName と avatarUrl を取得して createGroup に渡す
+    // これにより、グループ作成直後からオーナーの名前が正しく表示される
+    const displayName = userProfile?.displayName ?? firebaseUser.displayName ?? '';
+    const avatarUrl = userProfile?.avatarUrl ?? null;
     try {
-      const result = await createGroup(firebaseUser.uid, data.groupName, null);
+      const result = await createGroup(firebaseUser.uid, data.groupName, null, displayName, avatarUrl);
       setInviteCode(result.inviteCode);
     } catch (err) {
       console.error('グループ作成エラー:', err);

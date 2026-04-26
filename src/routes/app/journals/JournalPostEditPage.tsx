@@ -29,7 +29,6 @@ export function JournalPostEditPage() {
   const [explorations, setExplorations] = useState<string[]>(['']);
   const [insights, setInsights] = useState<string[]>(['']);
   const [performance, setPerformance] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
-  const [isPublic, setIsPublic] = useState(true);
 
   useEffect(() => {
     if (!journal?.postNote) return;
@@ -41,7 +40,6 @@ export function JournalPostEditPage() {
     setExplorations(p.explorations.map((e) => e.text) || ['']);
     setInsights((p.insights ?? []).map((i) => i.text) || ['']);
     setPerformance(p.performance as 1 | 2 | 3 | 4 | 5 | null);
-    setIsPublic(journal.isPublic);
   }, [journal]);
 
   const handleGoalReviewChange = (review: GoalReview) => {
@@ -75,7 +73,7 @@ export function JournalPostEditPage() {
           explorations: explorations.filter((e) => e.trim()),
           insights: insights.filter((i) => i.trim()),
           performance,
-          isPublic,
+          isPublic: true,
         },
       });
       navigate(`/journals/${journalId}`);
@@ -198,24 +196,6 @@ export function JournalPostEditPage() {
           </div>
         </div>
 
-        {/* 公開設定 */}
-        <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50">
-          <div>
-            <p className="text-sm font-medium text-zinc-200 flex items-center gap-2">
-              <span>🌏</span> 家族に公開する
-            </p>
-            <p className="text-xs text-zinc-500 mt-0.5">家族グループのメンバーが見られます</p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isPublic}
-            onClick={() => setIsPublic(!isPublic)}
-            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${isPublic ? 'bg-[var(--color-brand-primary)]' : 'bg-zinc-700'}`}
-          >
-            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 ${isPublic ? 'translate-x-5' : 'translate-x-0'}`} />
-          </button>
-        </div>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 px-4 py-3 flex gap-3">

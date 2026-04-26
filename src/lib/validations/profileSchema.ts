@@ -14,3 +14,25 @@ export const profileSchema = z.object({
 
 export type ProfileSchema = z.infer<typeof profileSchema>;
 
+// プロフィール名前編集フォームのバリデーション（スポーツ選択なし版）
+export const profileEditSchema = z.object({
+  displayName: z
+    .string()
+    .min(1, '名前は必須です')
+    .max(20, '名前は20文字以内で入力してください')
+    .trim(),
+});
+
+export type ProfileEditSchema = z.infer<typeof profileEditSchema>;
+
+// 子プロフィール追加フォームのバリデーション
+export const addChildProfileSchema = z.object({
+  displayName: z
+    .string()
+    .min(1, '名前は必須です')
+    .max(20, '名前は20文字以内で入力してください')
+    .trim(),
+});
+
+export type AddChildProfileSchema = z.infer<typeof addChildProfileSchema>;
+

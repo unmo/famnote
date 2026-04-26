@@ -1,10 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { Crown, User, AlertCircle } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Crown, User, AlertCircle, Pencil } from 'lucide-react';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import type { GroupMember } from '@/types/group';
 import { useAuthStore } from '@/store/authStore';
+import { useGroupStore } from '@/store/groupStore';
+import { updateMemberDisplayName } from '@/lib/firebase/firestore';
+import { toast } from 'sonner';
+import { profileEditSchema } from '@/lib/validations/profileSchema';
 
 const REDIRECT_KEY = 'famnote_redirect_after_profile';
 
@@ -49,10 +53,151 @@ function ProfileSelectError({ onRetry }: ProfileSelectErrorProps) {
   );
 }
 
+// プロフィールカードの編集ボタン（インライン編集フォーム付き）
+interface ProfileSelectEditButtonProps {
+  member: GroupMember;
+  groupId: string;
+}
+
+function ProfileSelectEditButton({ member, groupId }: ProfileSelectEditButtonProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [value, setValue] = useState(member.displayName);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 外部からの名前変更を反映
+  useEffect(() => {
+    if (!isEditing) {
+      setValue(member.displayName);
+    }
+  }, [member.displayName, isEditing]);
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+    }
+  }, [isEditing]);
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    // プロフィール選択の onClick を妨げないよう伝播を止める
+    e.stopPropagation();
+    setValue(member.displayName);
+    setError(null);
+    setIsEditing(true);
+  };
+
+  const handleCancel = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(false);
+    setError(null);
+  };
+
+  const handleSave = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const result = profileEditSchema.safeParse({ displayName: value });
+    if (!result.success) {
+      setError(result.error.errors[0]?.message ?? '入力内容を確認してください');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      await updateMemberDisplayName(groupId, member.uid, result.data.displayName, member.isChildProfile ?? false);
+      toast.success('プロフィールを更新しました');
+      setIsEditing(false);
+    } catch {
+      toast.error('保存に失敗しました。もう一度お試しください');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <>
+      {/* 鉛筆ボタン（常時表示 on モバイル、hover 時のみ on デスクトップ） */}
+      {!isEditing && (
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={handleEditClick}
+          aria-label={`${member.displayName}の名前を編集`}
+          className="absolute bottom-1 right-1 w-7 h-7 rounded-full
+                     bg-zinc-900/90 backdrop-blur-sm border border-zinc-700
+                     flex items-center justify-center text-zinc-300
+                     hover:text-white hover:border-[var(--color-brand-primary)] hover:bg-zinc-800
+                     transition-all z-10
+                     opacity-100 sm:opacity-0 sm:group-hover:opacity-100
+                     focus-visible:opacity-100 focus-visible:outline-none
+                     focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)]"
+        >
+          <Pencil className="w-3 h-3" />
+        </motion.button>
+      )}
+
+      {/* インライン編集フォーム */}
+      <AnimatePresence>
+        {isEditing && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.15 }}
+            onClick={(e) => e.stopPropagation()}
+            className="absolute inset-x-0 -bottom-[90px] z-20 flex flex-col items-center gap-2 w-[96px]"
+          >
+            <input
+              ref={inputRef}
+              type="text"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') setIsEditing(false);
+              }}
+              maxLength={20}
+              disabled={isSaving}
+              placeholder="名前"
+              aria-label="名前"
+              aria-invalid={!!error}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full text-center bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1
+                         text-zinc-50 text-xs
+                         focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-primary)]
+                         placeholder:text-zinc-500"
+            />
+            {error && <p className="text-red-400 text-[10px]">{error}</p>}
+            <div className="flex gap-1.5">
+              <button
+                onClick={handleCancel}
+                disabled={isSaving}
+                className="p-1.5 rounded-md text-xs text-zinc-400 hover:bg-zinc-800 min-h-[32px] px-2"
+              >
+                ✕
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving || value.trim().length === 0}
+                className="p-1.5 rounded-md text-xs bg-[var(--color-brand-primary)] text-white hover:opacity-90 min-h-[32px] px-2 disabled:opacity-50"
+              >
+                {isSaving ? '...' : '保存'}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
 export function ProfileSelectPage() {
   const navigate = useNavigate();
   const { members, activeProfile, setActiveProfile } = useActiveProfile();
   const isLoading = useAuthStore((s) => s.isLoading);
+  const { group } = useGroupStore();
+  const { firebaseUser } = useAuthStore();
+
+  // ログインユーザーがオーナーかどうかを確認
+  const selfMember = members.find((m) => m.uid === firebaseUser?.uid);
+  const isOwner = selfMember?.role === 'owner';
 
   // セッション復元でプロフィールが自動設定された場合は保存パスへ遷移
   useEffect(() => {
@@ -160,6 +305,10 @@ export function ProfileSelectPage() {
                   <div className="absolute -top-2 -right-2 bg-amber-400 rounded-full p-1 shadow-md shadow-amber-900/30">
                     <Crown className="w-3 h-3 text-amber-900" />
                   </div>
+                )}
+                {/* 編集ボタン（オーナーのみ表示） */}
+                {isOwner && group && (
+                  <ProfileSelectEditButton member={member} groupId={group.id} />
                 )}
               </div>
               {/* 名前 */}

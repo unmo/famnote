@@ -29,7 +29,6 @@ export function JournalPreEditPage() {
   const [venue, setVenue] = useState('');
   const [goals, setGoals] = useState<string[]>(['']);
   const [challenges, setChallenges] = useState<string[]>(['']);
-  const [isPublic, setIsPublic] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // ジャーナルデータを初期値に設定
@@ -39,7 +38,6 @@ export function JournalPreEditPage() {
     setSport(journal.sport);
     setOpponent(journal.opponent);
     setVenue(journal.venue ?? '');
-    setIsPublic(journal.isPublic);
     if (journal.preNote) {
       setGoals(journal.preNote.goals.map((g) => g.text) || ['']);
       setChallenges(journal.preNote.challenges.map((c) => c.text) || ['']);
@@ -54,7 +52,7 @@ export function JournalPreEditPage() {
       venue: venue.trim() || null,
       goals: goals.filter((g) => g.trim()),
       challenges: challenges.filter((c) => c.trim()),
-      isPublic,
+      isPublic: true,
     };
 
     const result = preMatchSchema.safeParse(formData);
@@ -169,24 +167,6 @@ export function JournalPreEditPage() {
           />
         </div>
 
-        {/* 公開設定 */}
-        <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50">
-          <div>
-            <p className="text-sm font-medium text-zinc-200 flex items-center gap-2">
-              <span>🌏</span> 家族に公開する
-            </p>
-            <p className="text-xs text-zinc-500 mt-0.5">家族グループのメンバーが見られます</p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isPublic}
-            onClick={() => setIsPublic(!isPublic)}
-            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${isPublic ? 'bg-[var(--color-brand-primary)]' : 'bg-zinc-700'}`}
-          >
-            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 ${isPublic ? 'translate-x-5' : 'translate-x-0'}`} />
-          </button>
-        </div>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 px-4 py-3 flex gap-3">

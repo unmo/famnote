@@ -32,7 +32,6 @@ export function JournalPostPage() {
   const [explorations, setExplorations] = useState<string[]>(['']);
   const [insights, setInsights] = useState<string[]>(['']);
   const [performance, setPerformance] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
-  const [isPublic, setIsPublic] = useState(true);
 
   const handleGoalReviewChange = (review: GoalReview) => {
     setGoalReviews((prev) => {
@@ -66,7 +65,7 @@ export function JournalPostPage() {
           explorations: explorations.filter((e) => e.trim()),
           insights: insights.filter((i) => i.trim()),
           performance,
-          isPublic,
+          isPublic: true,
         },
       });
       navigate(`/journals/${journalId}`);
@@ -218,27 +217,6 @@ export function JournalPostPage() {
           </div>
         </div>
 
-        {/* 公開設定 */}
-        <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50">
-          <div>
-            <p className="text-sm font-medium text-zinc-200 flex items-center gap-2">
-              <span>🌏</span> {t('notes.isPublic')}
-            </p>
-            <p className="text-xs text-zinc-500 mt-0.5">家族グループのメンバーが見られます</p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isPublic}
-            aria-label="家族に公開する"
-            onClick={() => setIsPublic(!isPublic)}
-            className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${isPublic ? 'bg-[var(--color-brand-primary)]' : 'bg-zinc-700'}`}
-          >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 ${isPublic ? 'translate-x-5' : 'translate-x-0'}`}
-            />
-          </button>
-        </div>
       </div>
 
       {/* 固定フッター */}

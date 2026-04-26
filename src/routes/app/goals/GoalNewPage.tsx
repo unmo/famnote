@@ -32,7 +32,6 @@ export function GoalNewPage() {
     defaultValues: {
       sport: userProfile?.sports?.[0] ?? 'soccer',
       goalType: 'practice_count',
-      isPublic: true,
     },
   });
 
@@ -48,7 +47,7 @@ export function GoalNewPage() {
       goalType: data.goalType as GoalType,
       targetValue: data.targetValue ?? null,
       deadline: Timestamp.fromDate(new Date(data.deadline)),
-      isPublic: data.isPublic,
+      isPublic: true,
     });
 
     navigate('/goals');

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'motion/react';
-import { ChevronLeft, Globe, Lock } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { noteSchema, type NoteSchema } from '@/lib/validations/noteSchema';
 import { useAuthStore } from '@/store/authStore';
@@ -45,7 +45,6 @@ export function NoteNewPage() {
       content: '',
       reflection: null,
       condition: null,
-      isPublic: true,
     },
   });
 
@@ -70,7 +69,7 @@ export function NoteNewPage() {
       condition: data.condition ?? null,
       imageUrls: [],
       isDraft,
-      isPublic: data.isPublic,
+      isPublic: true,
     });
 
     navigate('/notes');
@@ -220,41 +219,6 @@ export function NoteNewPage() {
           />
         </div>
 
-        {/* 公開設定 */}
-        <Controller
-          name="isPublic"
-          control={control}
-          render={({ field }) => (
-            <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl border border-zinc-700/50">
-              <div className="flex items-center gap-3">
-                {field.value ? (
-                  <Globe size={20} className="text-[var(--color-brand-primary)]" />
-                ) : (
-                  <Lock size={20} className="text-zinc-400" />
-                )}
-                <div>
-                  <p className="text-sm font-medium text-zinc-200">
-                    {field.value ? t('notes.isPublic') : t('notes.isPrivate')}
-                  </p>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    {field.value ? t('notes.visibility.public') : t('notes.visibility.private')}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={field.value}
-                onClick={() => field.onChange(!field.value)}
-                className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${field.value ? 'bg-[var(--color-brand-primary)]' : 'bg-zinc-700'}`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 ${field.value ? 'translate-x-5' : 'translate-x-0'}`}
-                />
-              </button>
-            </div>
-          )}
-        />
       </form>
 
       {/* 固定フッター（JournalPrePageと同構造） */}

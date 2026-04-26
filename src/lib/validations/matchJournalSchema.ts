@@ -13,7 +13,6 @@ export const preMatchSchema = z.object({
     .min(1, '目標を1件以上入力してください')
     .max(10, '目標は最大10件まで入力できます'),
   challenges: z.array(z.string().max(100)).max(5, 'チャレンジしたいことは最大5件まで入力できます'),
-  isPublic: z.boolean(),
 });
 
 export const goalReviewSchema = z.object({
@@ -31,7 +30,6 @@ export const postMatchSchema = z.object({
   improvements: z.array(z.string().max(100)).max(10),
   explorations: z.array(z.string().max(100)).max(5),
   performance: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]).nullable(),
-  isPublic: z.boolean(),
 });
 
 export type PreMatchSchemaType = z.infer<typeof preMatchSchema>;

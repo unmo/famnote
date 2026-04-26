@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, collection } from 'firebase/firestore';
+import { doc, onSnapshot, collection, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/config';
 import { useAuthStore } from '@/store/authStore';
 import { useGroupStore } from '@/store/groupStore';
@@ -58,6 +58,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 const members = membersSnap.docs.map((d) => ({ uid: d.id, ...d.data() } as GroupMember));
                 setMembers(members);
                 restoreFromSession(members);
+
+                // 既存オーナーの displayName 空文字マイグレーション処理
+                // onSnapshot 受信時に自分の member ドキュメントの displayName が空の場合、
+                // userProfile.displayName で自動補完する（バックグラウンドで実行・エラーは握りつぶす）
+                const selfMember = members.find((m) => m.uid === fbUser.uid);
+                if (selfMember && selfMember.displayName === '' && profile.displayName) {
+                  updateDoc(
+                    doc(db, 'groups', profile.groupId!, 'members', fbUser.uid),
+                    { displayName: profile.displayName }
+                  ).catch((err) => {
+                    console.warn('[AuthContext] displayName マイグレーション失敗:', err);
+                  });
+                }
               });
 
               // グループリスナーのクリーンアップをメンバーリスナーに統合

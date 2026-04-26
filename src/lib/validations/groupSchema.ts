@@ -37,7 +37,6 @@ export const goalSchema = z.object({
     .nullable()
     .optional(),
   deadline: z.string().min(1, '期限を設定してください'),
-  isPublic: z.boolean(),
 });
 
 export type GoalSchema = z.infer<typeof goalSchema>;

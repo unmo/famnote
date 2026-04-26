@@ -37,7 +37,6 @@ export const matchSchema = z.object({
   performance: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]).nullable().optional(),
   highlight: z.string().max(500, '500文字以内で入力してください').nullable().optional(),
   improvements: z.string().max(500, '500文字以内で入力してください').nullable().optional(),
-  isPublic: z.boolean(),
 });
 
 export type MatchSchema = z.infer<typeof matchSchema>;

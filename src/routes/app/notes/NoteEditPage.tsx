@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'motion/react';
-import { ChevronLeft, Globe, Lock } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { noteSchema, type NoteSchema } from '@/lib/validations/noteSchema';
 import { useNote, useUpdateNote } from '@/hooks/useNotes';
@@ -25,7 +25,6 @@ export function NoteEditPage() {
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors, isSubmitting },
   } = useForm<NoteSchema>({
     resolver: zodResolver(noteSchema),
@@ -39,7 +38,6 @@ export function NoteEditPage() {
           content: note.content,
           reflection: note.reflection,
           condition: note.condition,
-          isPublic: note.isPublic,
         }
       : undefined,
   });
@@ -74,7 +72,7 @@ export function NoteEditPage() {
         content: data.content,
         reflection: data.reflection ?? null,
         condition: data.condition ?? null,
-        isPublic: data.isPublic,
+        isPublic: true,
       },
     });
     navigate(`/notes/${note.id}`);
@@ -137,41 +135,6 @@ export function NoteEditPage() {
             maxLength={500}
           />
         </div>
-
-        {/* 公開設定 */}
-        <Controller
-          name="isPublic"
-          control={control}
-          render={({ field }) => (
-            <div className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                {field.value ? (
-                  <Globe size={20} className="text-[var(--color-brand-primary)]" />
-                ) : (
-                  <Lock size={20} className="text-zinc-400" />
-                )}
-                <span className="text-zinc-200 text-sm font-medium">
-                  {field.value ? t('notes.isPublic') : t('notes.isPrivate')}
-                </span>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={field.value}
-                onClick={() => field.onChange(!field.value)}
-                className={`w-12 h-6 rounded-full transition-colors relative ${
-                  field.value ? 'bg-[var(--color-brand-primary)]' : 'bg-zinc-700'
-                }`}
-              >
-                <span
-                  className={`absolute top-[3px] left-[3px] w-[18px] h-[18px] rounded-full bg-white transition-transform ${
-                    field.value ? 'translate-x-[22px]' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-            </div>
-          )}
-        />
 
         <motion.button
           whileTap={{ scale: 0.98 }}

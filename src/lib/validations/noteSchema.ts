@@ -26,7 +26,6 @@ export const noteSchema = z.object({
     .max(1000, '1000文字以内で入力してください'),
   reflection: z.string().max(500, '500文字以内で入力してください').nullable().optional(),
   condition: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]).nullable().optional(),
-  isPublic: z.boolean(),
 });
 
 export type NoteSchema = z.infer<typeof noteSchema>;

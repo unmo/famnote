@@ -13,7 +13,7 @@ import { normalizeInviteCode } from '@/lib/utils/inviteCode';
 export function JoinGroupPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { firebaseUser } = useAuthStore();
+  const { firebaseUser, userProfile } = useAuthStore();
   const [codes, setCodes] = useState<string[]>(Array(6).fill(''));
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -61,8 +61,12 @@ export function JoinGroupPage() {
     if (!firebaseUser) return;
 
     setIsLoading(true);
+    // userProfile から displayName と avatarUrl を取得して joinGroup に渡す
+    // これにより、グループ参加直後から名前が正しく表示される
+    const displayName = userProfile?.displayName ?? firebaseUser.displayName ?? '';
+    const avatarUrl = userProfile?.avatarUrl ?? null;
     try {
-      await joinGroup(firebaseUser.uid, code);
+      await joinGroup(firebaseUser.uid, code, displayName, avatarUrl);
       toast.success('グループに参加しました！');
       navigate('/dashboard');
     } catch (error) {

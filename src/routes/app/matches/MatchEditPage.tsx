@@ -43,7 +43,6 @@ export function MatchEditPage() {
           performance: match.performance,
           highlight: match.highlight,
           improvements: match.improvements,
-          isPublic: match.isPublic,
         }
       : undefined,
   });
@@ -82,7 +81,7 @@ export function MatchEditPage() {
         performance: data.performance ?? null,
         highlight: data.highlight ?? null,
         improvements: data.improvements ?? null,
-        isPublic: data.isPublic,
+        isPublic: true,
       },
     });
     navigate(`/matches/${match.id}`);

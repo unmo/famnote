@@ -43,7 +43,6 @@ export function MatchNewPage() {
       performance: null,
       highlight: null,
       improvements: null,
-      isPublic: true,
     },
   });
 
@@ -81,7 +80,7 @@ export function MatchNewPage() {
       improvements: data.improvements ?? null,
       imageUrls: [],
       isDraft: false,
-      isPublic: data.isPublic,
+      isPublic: true,
     });
 
     navigate('/matches');

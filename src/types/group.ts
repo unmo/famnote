@@ -23,6 +23,8 @@ export interface GroupMember {
   joinedAt: Timestamp;
   role: 'owner' | 'member';
   lastActiveAt: Timestamp | null;
+  // Firebase Auth アカウントを持たない仮想プロフィール（子供など）かどうかを示すフラグ
+  isChildProfile?: boolean;
 }
 
 // 招待コード型

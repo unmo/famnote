@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Check, Lock } from 'lucide-react';
 import { useThemeContext } from '@/theme/ThemeContext';
 import { useAuthStore } from '@/store/authStore';
+import { ProfileManagementSection } from '@/components/settings/ProfileManagementSection';
 
 function ThemeSelector() {
   const { t } = useTranslation();
@@ -109,6 +110,9 @@ export function SettingsPage() {
         </h2>
         <ThemeSelector />
       </motion.div>
+
+      {/* プロフィール管理セクション */}
+      <ProfileManagementSection />
     </div>
   );
 }
