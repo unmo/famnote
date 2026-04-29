@@ -45,10 +45,64 @@ jobs:
       - name: ユニットテストの実行
         run: npm run test
 
+      - name: ビルド成果物をアップロード
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-prod
+          path: dist/
+          retention-days: 1
+
+  e2e:
+    name: E2Eテスト
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: ソースコードをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js 22 をセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 依存関係のインストール
+        run: npm ci --frozen-lockfile
+
+      - name: Playwright ブラウザをインストール
+        run: npx playwright install --with-deps chromium
+
+      - name: ビルド成果物をダウンロード
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-prod
+          path: dist/
+
+      - name: E2Eテストの実行
+        run: npm run test:e2e -- --project=chromium
+        env:
+          CI: true
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+
+      - name: E2Eテストレポートをアップロード
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-prod
+          path: playwright-report/
+          retention-days: 7
+
   deploy:
     name: 本番環境デプロイ
     runs-on: ubuntu-latest
-    needs: test
+    needs: e2e
     if: github.event_name == 'push'
 
     steps:

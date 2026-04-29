@@ -30,9 +30,9 @@ export default defineConfig({
       use: { ...devices['Pixel 5'] },
     },
   ],
-  // E2Eテスト実行前にアプリを起動
+  // E2Eテスト実行前にアプリを起動（CI環境ではビルド済みアセットをpreviewで配信）
   webServer: {
-    command: 'npm run dev',
+    command: process.env.CI ? 'npm run preview -- --port 3000' : 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
