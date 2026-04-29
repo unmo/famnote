@@ -37,3 +37,6 @@ test-results/
 
 # 個人メモ
 memo.txt
+
+# Claude Code設定（ローカル環境依存）
+.claude/settings.json
