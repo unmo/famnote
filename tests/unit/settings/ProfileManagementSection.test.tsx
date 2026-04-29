@@ -29,11 +29,13 @@ vi.mock('motion/react', () => {
 
 // Firestore 操作のモック
 const mockUpdateMemberDisplayName = vi.fn();
+const mockUpdateMemberProfile = vi.fn();
 const mockAddChildProfile = vi.fn();
 const mockDeleteChildProfile = vi.fn();
 
 vi.mock('@/lib/firebase/firestore', () => ({
   updateMemberDisplayName: (...args: unknown[]) => mockUpdateMemberDisplayName(...args),
+  updateMemberProfile: (...args: unknown[]) => mockUpdateMemberProfile(...args),
   addChildProfile: (...args: unknown[]) => mockAddChildProfile(...args),
   deleteChildProfile: (...args: unknown[]) => mockDeleteChildProfile(...args),
 }));

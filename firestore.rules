@@ -71,11 +71,11 @@ service cloud.firestore {
 
       match /members/{memberId} {
         allow read: if isGroupMember(groupId);
-        // 自分自身の参加 または グループオーナーによる子プロフィール追加
+        // 自分自身の参加 または 同グループメンバーによる子プロフィール追加
         allow create: if isAuthenticated() &&
-                         (memberId == request.auth.uid || isGroupOwner(groupId));
-        allow update: if isOwner(memberId) || isGroupOwner(groupId);
-        allow delete: if isOwner(memberId) || isGroupOwner(groupId);
+                         (memberId == request.auth.uid || isGroupMember(groupId));
+        allow update: if isOwner(memberId) || isGroupMember(groupId);
+        allow delete: if isOwner(memberId) || isGroupMember(groupId);
       }
     }
 
@@ -191,8 +191,8 @@ service cloud.firestore {
         allow create: if isAuthenticated() &&
                          request.resource.data.userId == request.auth.uid &&
                          request.resource.data.text is string &&
-                         request.resource.data.text.size() > 0 &&
                          request.resource.data.text.size() <= 200 &&
+                         (request.resource.data.text.size() > 0 || request.resource.data.stampId is string) &&
                          request.resource.data.role in ['parent', 'child', 'member'] &&
                          (
                            request.resource.data.role != 'parent' ||

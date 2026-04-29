@@ -1,6 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 import { Sport } from './sport';
 import { ReactionType } from './reaction';
+import type { ParentRole } from './group';
 
 export type JournalStatus = 'pre' | 'completed' | 'post_only';
 export type GoalAchievement = 'achieved' | 'partial' | 'not_achieved';
@@ -70,7 +71,11 @@ export interface JournalComment {
   displayName: string;
   avatarUrl: string | null;
   role: 'parent' | 'child' | 'member';
+  // コメント投稿時のアクティブプロフィールの保護者役割
+  parentRole?: ParentRole;
   text: string;
+  // スタンプID（テキストなしでスタンプのみ送信可）
+  stampId?: string;
   parentCommentId: string | null;
   replyCount: number;
   createdAt: Timestamp;

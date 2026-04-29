@@ -1,22 +1,26 @@
 import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Pencil } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/components/shared/Avatar';
+import { RoleSelector } from '@/components/shared/RoleSelector';
 import { profileEditSchema } from '@/lib/validations/profileSchema';
-import type { GroupMember } from '@/types/group';
+import type { GroupMember, ParentRole } from '@/types/group';
 
 interface ProfileEditFormProps {
   member: GroupMember;
   isChildProfile: boolean;
-  onSave: (displayName: string) => Promise<void>;
+  onSave: (displayName: string, parentRole: ParentRole) => Promise<void>;
   className?: string;
 }
 
 // プロフィール名前インライン編集フォーム
 // 鉛筆ボタンで編集状態に切り替わり、保存・キャンセルが可能
-export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSave, className }: ProfileEditFormProps) {
+export function ProfileEditForm({ member, isChildProfile, onSave, className }: ProfileEditFormProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(member.displayName);
+  const [parentRole, setParentRole] = useState<ParentRole>(member.parentRole ?? null);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,8 +29,9 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
   useEffect(() => {
     if (!isEditing) {
       setValue(member.displayName);
+      setParentRole(member.parentRole ?? null);
     }
-  }, [member.displayName, isEditing]);
+  }, [member.displayName, member.parentRole, isEditing]);
 
   // 編集開始時に入力フィールドに自動フォーカス
   useEffect(() => {
@@ -37,6 +42,7 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
 
   const handleEdit = () => {
     setValue(member.displayName);
+    setParentRole(member.parentRole ?? null);
     setError(null);
     setIsEditing(true);
   };
@@ -44,6 +50,7 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
   const handleCancel = () => {
     setIsEditing(false);
     setValue(member.displayName);
+    setParentRole(member.parentRole ?? null);
     setError(null);
   };
 
@@ -51,17 +58,17 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
     // Zod バリデーション
     const result = profileEditSchema.safeParse({ displayName: value });
     if (!result.success) {
-      setError(result.error.errors[0]?.message ?? '入力内容を確認してください');
+      setError(result.error.errors[0]?.message ?? t('profile.validationError'));
       return;
     }
 
     setIsSaving(true);
     setError(null);
     try {
-      await onSave(result.data.displayName);
+      await onSave(result.data.displayName, parentRole);
       setIsEditing(false);
     } catch {
-      setError('保存に失敗しました。もう一度お試しください');
+      setError(t('profile.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -92,14 +99,14 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <Avatar src={member.avatarUrl} name={member.displayName} size="md" />
               <span className="text-zinc-50 font-medium text-sm flex-1 truncate">
-                {member.displayName || '（名前未設定）'}
+                {member.displayName || t('profile.noName')}
               </span>
             </div>
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleEdit}
-              aria-label={`${member.displayName}の名前を編集`}
+              aria-label={t('profile.editNameAriaLabel', { name: member.displayName })}
               aria-expanded={isEditing}
               className="p-2 rounded-md text-zinc-400 hover:text-zinc-50 hover:bg-zinc-700 transition-colors
                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)]
@@ -123,7 +130,7 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
               {/* アバター行 */}
               <div className="flex items-center gap-3">
                 <Avatar src={member.avatarUrl} name={member.displayName} size="md" />
-                <span className="text-zinc-400 text-xs">名前を変更</span>
+                <span className="text-zinc-400 text-xs">{t('profile.changeName')}</span>
               </div>
 
               {/* 入力フィールド */}
@@ -136,8 +143,8 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
                   onKeyDown={handleKeyDown}
                   maxLength={20}
                   disabled={isSaving}
-                  placeholder="名前を入力"
-                  aria-label="名前"
+                  placeholder={t('profile.namePlaceholder')}
+                  aria-label={t('profile.nameLabel')}
                   aria-invalid={!!error}
                   className={`w-full bg-zinc-900 border rounded-lg px-3 py-2
                               text-zinc-50 text-sm
@@ -157,11 +164,24 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
                   ) : (
                     <span />
                   )}
-                  <span className="text-zinc-500 text-xs" aria-label="文字数">
+                  <span className="text-zinc-500 text-xs" aria-label={t('profile.characterCount')}>
                     {value.length}/20
                   </span>
                 </div>
               </div>
+
+              {/* 役割選択セクション（子プロフィールには非表示） */}
+              {!isChildProfile && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm font-medium text-zinc-300">{t('profile.parentRole')}</p>
+                  <p className="text-xs text-zinc-500">{t('profile.parentRoleHint')}</p>
+                  <RoleSelector
+                    value={parentRole}
+                    onChange={setParentRole}
+                    disabled={isSaving}
+                  />
+                </div>
+              )}
 
               {/* ボタン行 */}
               <div className="flex justify-end gap-2">
@@ -173,7 +193,7 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
                              min-h-[36px] disabled:opacity-50 disabled:cursor-not-allowed
                              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)]"
                 >
-                  キャンセル
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={handleSave}
@@ -198,10 +218,10 @@ export function ProfileEditForm({ member, isChildProfile: _isChildProfile, onSav
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
-                      保存中...
+                      {t('common.saving')}
                     </span>
                   ) : (
-                    '保存'
+                    t('common.save')
                   )}
                 </button>
               </div>

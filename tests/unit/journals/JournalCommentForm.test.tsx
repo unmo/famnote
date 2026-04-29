@@ -42,6 +42,7 @@ const managerProfile = {
   displayName: '田中パパ',
   avatarUrl: null,
   role: 'owner' as const,
+  parentRole: 'father' as const,
 };
 
 describe('JournalCommentForm', () => {
@@ -56,8 +57,8 @@ describe('JournalCommentForm', () => {
     });
     render(<JournalCommentForm journalId="journal-1" />);
     // フォームはテキストエリアと送信ボタンで確認
-    expect(screen.getByRole('textbox', { name: 'コメントを入力' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /送信/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'journals.commentInput' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /(common.send|送信)/i })).toBeInTheDocument();
   });
 
   it('isManager=false のとき入力フォームが表示されない', () => {
@@ -66,7 +67,7 @@ describe('JournalCommentForm', () => {
       isManager: false,
     });
     render(<JournalCommentForm journalId="journal-1" />);
-    expect(screen.queryByRole('textbox', { name: 'コメントを入力' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: 'journals.commentInput' })).not.toBeInTheDocument();
   });
 
   it('activeProfile が null の場合はフォームが表示されない', () => {
@@ -75,7 +76,7 @@ describe('JournalCommentForm', () => {
       isManager: false,
     });
     render(<JournalCommentForm journalId="journal-1" />);
-    expect(screen.queryByRole('textbox', { name: 'コメントを入力' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: 'journals.commentInput' })).not.toBeInTheDocument();
   });
 
   it('テキストが空の時は送信ボタンが disabled', () => {
@@ -84,7 +85,7 @@ describe('JournalCommentForm', () => {
       isManager: true,
     });
     render(<JournalCommentForm journalId="journal-1" />);
-    const button = screen.getByRole('button', { name: /送信/i });
+    const button = screen.getByRole('button', { name: /(common.send|送信)/i });
     expect(button).toBeDisabled();
   });
 
@@ -95,10 +96,10 @@ describe('JournalCommentForm', () => {
     });
     render(<JournalCommentForm journalId="journal-1" />);
 
-    const textarea = screen.getByRole('textbox', { name: 'コメントを入力' });
+    const textarea = screen.getByRole('textbox', { name: 'journals.commentInput' });
     fireEvent.change(textarea, { target: { value: 'よくがんばったね！' } });
 
-    const button = screen.getByRole('button', { name: /送信/i });
+    const button = screen.getByRole('button', { name: /(common.send|送信)/i });
     expect(button).not.toBeDisabled();
   });
 
@@ -109,10 +110,10 @@ describe('JournalCommentForm', () => {
     });
     render(<JournalCommentForm journalId="journal-1" />);
 
-    const textarea = screen.getByRole('textbox', { name: 'コメントを入力' });
+    const textarea = screen.getByRole('textbox', { name: 'journals.commentInput' });
     fireEvent.change(textarea, { target: { value: 'a'.repeat(201) } });
 
-    const button = screen.getByRole('button', { name: /送信/i });
+    const button = screen.getByRole('button', { name: /(common.send|送信)/i });
     expect(button).toBeDisabled();
   });
 
@@ -123,7 +124,7 @@ describe('JournalCommentForm', () => {
     });
     render(<JournalCommentForm journalId="journal-1" />);
 
-    const textarea = screen.getByRole('textbox', { name: 'コメントを入力' });
+    const textarea = screen.getByRole('textbox', { name: 'journals.commentInput' });
     fireEvent.change(textarea, { target: { value: 'テスト' } });
 
     expect(screen.getByText('3/200')).toBeInTheDocument();

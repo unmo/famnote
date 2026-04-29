@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Users, ClipboardList, Share2, Heart, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 
-const FEATURE_BADGES = [
-  { icon: ClipboardList, label: '成長記録' },
-  { icon: Share2, label: '家族共有' },
-  { icon: Heart, label: '応援機能' },
+const FEATURE_BADGE_CONFIGS = [
+  { icon: ClipboardList, key: 'auth.featureBadgeGrowth' },
+  { icon: Share2, key: 'auth.featureBadgeFamily' },
+  { icon: Heart, key: 'auth.featureBadgeCheer' },
 ] as const;
 
 // ログインページ（Googleログインのみ・1画面完結）
@@ -40,7 +40,7 @@ export function LoginPage() {
         setIsLoading(false);
         return;
       }
-      const message = t('auth.loginFailed', 'Googleログインに失敗しました。再度お試しください。');
+      const message = t('auth.loginFailed');
       setError(message);
       toast.error(message);
     } finally {
@@ -51,7 +51,7 @@ export function LoginPage() {
   return (
     <motion.main
       role="main"
-      aria-label="FamNoteログインページ"
+      aria-label={t('auth.loginPageAriaLabel')}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -179,13 +179,13 @@ export function LoginPage() {
 
           {/* 機能バッジ行 */}
           <div className="flex items-center gap-2 flex-wrap mb-8">
-            {FEATURE_BADGES.map(({ icon: Icon, label }) => (
+            {FEATURE_BADGE_CONFIGS.map(({ icon: Icon, key }) => (
               <div
-                key={label}
+                key={key}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.08] text-zinc-400 text-xs font-medium"
               >
                 <Icon className="w-3 h-3" aria-hidden="true" />
-                {label}
+                {t(key)}
               </div>
             ))}
           </div>
@@ -217,7 +217,7 @@ export function LoginPage() {
             onClick={handleLogin}
             disabled={isLoading}
             aria-busy={isLoading}
-            aria-label={isLoading ? 'ログイン処理中' : 'Googleでログイン / 登録'}
+            aria-label={isLoading ? t('auth.loginProcessing') : t('auth.loginWithGoogle')}
             className="relative w-full flex items-center justify-center py-4 px-6 rounded-2xl font-semibold text-white text-base bg-white/[0.06] border border-white/[0.12] hover:bg-white/[0.10] hover:border-white/[0.22] transition-all duration-300 overflow-hidden group/btn hover:shadow-[0_0_40px_-8px_rgba(232,85,19,0.3)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
           >
             {/* シマーエフェクト */}
@@ -265,27 +265,9 @@ export function LoginPage() {
                 />
               </svg>
             )}
-            <span>{isLoading ? 'ログイン中...' : t('auth.loginWithGoogle', 'Googleでログイン / 登録')}</span>
+            <span>{isLoading ? t('auth.loggingIn') : t('auth.loginWithGoogle')}</span>
           </motion.button>
 
-          {/* 利用規約テキスト */}
-          <p className="text-center text-xs text-zinc-600 leading-relaxed mt-5">
-            ご利用により
-            <Link
-              to="/privacy"
-              className="text-zinc-400 hover:text-white underline underline-offset-2 transition-colors duration-200 mx-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 focus-visible:rounded-sm"
-            >
-              プライバシーポリシー
-            </Link>
-            と
-            <Link
-              to="/terms"
-              className="text-zinc-400 hover:text-white underline underline-offset-2 transition-colors duration-200 mx-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 focus-visible:rounded-sm"
-            >
-              利用規約
-            </Link>
-            に同意したものとみなします
-          </p>
         </div>
 
         {/* フッター */}

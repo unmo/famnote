@@ -1,18 +1,20 @@
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useGroupStore } from '@/store/groupStore';
 import { useProfileStore } from '@/store/profileStore';
-import { updateMemberDisplayName, addChildProfile, deleteChildProfile } from '@/lib/firebase/firestore';
+import { updateMemberProfile, updateMemberDisplayName, addChildProfile, deleteChildProfile } from '@/lib/firebase/firestore';
 import { ProfileEditForm } from './ProfileEditForm';
 import { ChildProfileList } from './ChildProfileList';
 import { AddChildProfileForm } from './AddChildProfileForm';
-import type { GroupMember } from '@/types/group';
+import type { GroupMember, ParentRole } from '@/types/group';
 
 // プロフィール管理セクション（SettingsPage に追加するセクション全体）
 // オーナーは自分のプロフィール編集・子プロフィールの追加/編集/削除が可能
 // メンバーは自分のプロフィール名の編集のみ可能
 export function ProfileManagementSection() {
+  const { t } = useTranslation();
   const { firebaseUser, userProfile } = useAuthStore();
   const { group, members } = useGroupStore();
   const { activeProfile, clearActiveProfile } = useProfileStore();
@@ -32,18 +34,18 @@ export function ProfileManagementSection() {
   const childMembers = members.filter((m) => m.isChildProfile === true);
   const isLoadingMembers = false; // onSnapshot でリアルタイム更新されるため常に false
 
-  // 自分のプロフィール名前を保存する
-  const handleSaveSelf = async (displayName: string) => {
+  // 自分のプロフィール（名前・役割）を保存する
+  const handleSaveSelf = async (displayName: string, parentRole: ParentRole) => {
     if (!group.id) return;
-    await updateMemberDisplayName(group.id, firebaseUser.uid, displayName, false);
-    toast.success('プロフィールを更新しました');
+    await updateMemberProfile(group.id, firebaseUser.uid, { displayName, parentRole }, false);
+    toast.success(t('profile.updateSuccess'));
   };
 
   // 子プロフィールの名前を編集する
   const handleEditChild = async (member: GroupMember, newName: string) => {
     if (!group.id) return;
     await updateMemberDisplayName(group.id, member.uid, newName, true);
-    toast.success('プロフィールを更新しました');
+    toast.success(t('profile.updateSuccess'));
   };
 
   // 子プロフィールを削除する
@@ -56,21 +58,20 @@ export function ProfileManagementSection() {
       clearActiveProfile();
     }
 
-    toast.success('メンバーを削除しました');
+    toast.success(t('profile.memberDeleted'));
   };
 
   // 子プロフィールを追加する
-  const handleAddChild = async (displayName: string) => {
-    if (!group.id) return;
+  const handleAddChild = async (displayName: string, parentRole: import('@/types/group').ParentRole) => {
+    if (!group.id) throw new Error('NO_GROUP_ID');
 
-    // グループ上限チェック
-    if (group.memberCount >= group.maxMembers) {
-      toast.error('メンバーは最大10名までです');
+    if (members.length >= group.maxMembers) {
+      toast.error(t('profile.memberLimit', { max: group.maxMembers }));
       throw new Error('MEMBER_LIMIT_REACHED');
     }
 
-    await addChildProfile(group.id, displayName);
-    toast.success('メンバーを追加しました');
+    await addChildProfile(group.id, displayName, parentRole);
+    toast.success(t('profile.memberAdded'));
   };
 
   return (
@@ -83,11 +84,11 @@ export function ProfileManagementSection() {
       {/* カードヘッダー */}
       <h2 className="text-zinc-50 font-semibold mb-4 flex items-center gap-2">
         <span className="text-lg">👤</span>
-        プロフィール管理
+        {t('profile.management')}
       </h2>
 
       {/* 自分のプロフィール */}
-      <h3 className="text-zinc-300 font-medium text-sm mb-3">あなたのプロフィール</h3>
+      <h3 className="text-zinc-300 font-medium text-sm mb-3">{t('profile.yourProfile')}</h3>
       <ProfileEditForm
         member={selfMember}
         isChildProfile={false}
@@ -97,7 +98,7 @@ export function ProfileManagementSection() {
       {/* 子プロフィール管理（オーナーのみ表示） */}
       {isOwner && (
         <>
-          <h3 className="text-zinc-300 font-medium text-sm mb-3 mt-5">メンバー</h3>
+          <h3 className="text-zinc-300 font-medium text-sm mb-3 mt-5">{t('profile.membersSection')}</h3>
           <ChildProfileList
             members={childMembers}
             isLoading={isLoadingMembers}
@@ -106,7 +107,7 @@ export function ProfileManagementSection() {
           />
           <AddChildProfileForm
             onAdd={handleAddChild}
-            isAtMemberLimit={group.memberCount >= group.maxMembers}
+            isAtMemberLimit={members.length >= group.maxMembers}
             maxMembers={group.maxMembers}
           />
         </>

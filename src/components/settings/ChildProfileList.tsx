@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Avatar } from '@/components/shared/Avatar';
+import { RoleBadge } from '@/components/shared/RoleBadge';
 import { profileEditSchema } from '@/lib/validations/profileSchema';
 import type { GroupMember } from '@/types/group';
 
@@ -129,6 +130,7 @@ function ChildProfileCard({ member, onEdit, onDelete }: ChildProfileCardProps) {
           <span className="text-zinc-50 text-sm font-medium flex-1 truncate">
             {member.displayName || '（名前未設定）'}
           </span>
+          <RoleBadge parentRole={member.parentRole} />
           <div className="flex items-center gap-1">
             <motion.button
               whileHover={{ scale: 1.1 }}

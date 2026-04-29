@@ -1,117 +1,85 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'motion/react';
-import { useState } from 'react';
-import { Check, Lock } from 'lucide-react';
-import { useThemeContext } from '@/theme/ThemeContext';
+import { useQuery } from '@tanstack/react-query';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { useAuthStore } from '@/store/authStore';
+import { useStreak } from '@/hooks/useStreak';
+import { calculateStreak } from '@/lib/utils/streak';
+import { db } from '@/lib/firebase/config';
+import { Avatar } from '@/components/shared/Avatar';
 import { ProfileManagementSection } from '@/components/settings/ProfileManagementSection';
+import type { Note } from '@/types/note';
 
-function ThemeSelector() {
-  const { t } = useTranslation();
-  const { currentTheme, setTheme, themes } = useThemeContext();
-  const { userProfile } = useAuthStore();
-  const isPremium = userProfile?.subscriptionStatus !== 'free';
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-
-  const handleThemeClick = (themeId: string, isPremiumTheme: boolean) => {
-    if (isPremiumTheme && !isPremium) {
-      setShowUpgradeModal(true);
-      return;
-    }
-    setTheme(themeId);
-  };
-
-  return (
-    <div>
-      <h3 className="text-zinc-300 font-medium mb-3">{t('settings.themeSelect')}</h3>
-      <div className="grid grid-cols-5 gap-3">
-        {themes.map((theme) => {
-          const isSelected = currentTheme.id === theme.id;
-          const isLocked = theme.isPremium && !isPremium;
-          return (
-            <motion.button
-              key={theme.id}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => handleThemeClick(theme.id, theme.isPremium)}
-              title={theme.name}
-              aria-label={`テーマ: ${theme.name}${isLocked ? '（プレミアム）' : ''}`}
-              className="relative flex flex-col items-center gap-1.5"
-            >
-              <div
-                className={`w-10 h-10 rounded-full transition-all ${
-                  isSelected ? 'ring-2 ring-offset-2 ring-offset-zinc-900 ring-white scale-110' : ''
-                }`}
-                style={{ backgroundColor: theme.primary }}
-              >
-                {isSelected && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Check size={16} className="text-white drop-shadow" />
-                  </div>
-                )}
-                {isLocked && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
-                    <Lock size={12} className="text-white" />
-                  </div>
-                )}
-              </div>
-              <span className="text-[9px] text-zinc-500 truncate w-full text-center">
-                {theme.name}
-              </span>
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {showUpgradeModal && (
-        <div
-          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
-          onClick={() => setShowUpgradeModal(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 max-w-sm w-full"
-            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-          >
-            <p className="text-2xl text-center mb-3">🔒</p>
-            <h3 className="text-zinc-50 font-bold text-center mb-2">{t('settings.premiumRequired')}</h3>
-            <p className="text-zinc-400 text-sm text-center mb-6">
-              プレミアムプランにアップグレードすると全20種類のテーマが使えます
-            </p>
-            <button
-              onClick={() => setShowUpgradeModal(false)}
-              className="btn-secondary w-full"
-            >
-              {t('common.close')}
-            </button>
-          </motion.div>
-        </div>
-      )}
-    </div>
-  );
+// ─── プロフィール統計フック ───────────────────────────────
+function useProfileStats(userId: string | undefined) {
+  return useQuery({
+    queryKey: ['profileStats', userId],
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000,
+    queryFn: async () => {
+      if (!userId) return { totalNotes: 0, totalJournals: 0, recordDates: [] as Date[] };
+      const [notesSnap, journalsSnap] = await Promise.all([
+        getDocs(query(collection(db, 'notes'), where('userId', '==', userId), where('isDraft', '==', false), limit(200))),
+        getDocs(query(collection(db, 'matchJournals'), where('userId', '==', userId), limit(200))),
+      ]);
+      const recordDates = notesSnap.docs
+        .map((d) => (d.data() as Note).createdAt?.toDate() ?? new Date(0))
+        .filter((d) => d.getTime() > 0);
+      return { totalNotes: notesSnap.size, totalJournals: journalsSnap.size, recordDates };
+    },
+  });
 }
 
+// ─── メインページ ──────────────────────────────────────────
 export function SettingsPage() {
   const { t } = useTranslation();
+  const { userProfile } = useAuthStore();
+  const { data: stats } = useProfileStats(userProfile?.uid);
+  const { data: streakData } = useStreak(userProfile?.uid);
+
+  const totalNotes    = stats?.totalNotes ?? 0;
+  const totalJournals = stats?.totalJournals ?? 0;
+  const currentStreak = streakData?.currentStreak ?? 0;
+  const longestStreak = stats?.recordDates ? calculateStreak(stats.recordDates) : 0;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-      <h1 className="text-2xl font-bold text-zinc-50">{t('settings.title')}</h1>
 
+      {/* ── プロフィールヘッダー ── */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6"
       >
-        <h2 className="text-zinc-50 font-semibold mb-4 flex items-center gap-2">
-          <span className="text-lg">🎨</span>
-          {t('settings.theme')}
-        </h2>
-        <ThemeSelector />
+        <div className="flex items-center gap-4">
+          <Avatar size="lg" name={userProfile?.displayName ?? ''} src={userProfile?.avatarUrl ?? undefined} />
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl font-bold text-zinc-50 truncate">{userProfile?.displayName}</h1>
+            <p className="text-zinc-500 text-sm truncate">{userProfile?.email}</p>
+          </div>
+        </div>
       </motion.div>
 
-      {/* プロフィール管理セクション */}
+      {/* ── 統計 ── */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <h2 className="text-base font-semibold text-zinc-50 mb-3">{t('profile.stats')}</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { labelKey: 'profile.totalNotes',   value: totalNotes,    emoji: '📝' },
+            { labelKey: 'profile.totalMatches',  value: totalJournals, emoji: '⚽' },
+            { labelKey: 'profile.currentStreak', value: `${currentStreak}${t('profile.streakDayUnit')}`, emoji: '🔥' },
+            { labelKey: 'profile.longestStreak', value: `${longestStreak}${t('profile.streakDayUnit')}`, emoji: '🏆' },
+          ].map(({ labelKey, value, emoji }) => (
+            <motion.div key={labelKey} whileHover={{ scale: 1.02 }} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+              <p className="text-2xl mb-1">{emoji}</p>
+              <p className="text-2xl font-bold text-zinc-50">{value}</p>
+              <p className="text-zinc-500 text-xs">{t(labelKey)}</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* ── プロフィール・メンバー管理 ── */}
       <ProfileManagementSection />
     </div>
   );

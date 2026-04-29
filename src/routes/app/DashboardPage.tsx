@@ -1,14 +1,95 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Plus, BookOpen, NotebookPen, Star, User } from 'lucide-react';
+import { Plus, BookOpen, NotebookPen, Star, Palette, Lock } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { useAuthStore } from '@/store/authStore';
 import { useGroupStore } from '@/store/groupStore';
 import { useStreak } from '@/hooks/useStreak';
 import { useGroupNotes } from '@/hooks/useNotes';
 import { useGroupJournals } from '@/hooks/useMatchJournals';
+import { calculateStreak } from '@/lib/utils/streak';
 import { formatRelativeTime } from '@/lib/utils/date';
+import { db } from '@/lib/firebase/config';
 import type { Timestamp } from 'firebase/firestore';
+import type { Note } from '@/types/note';
+
+const BADGE_DEFS = [
+  // 行1: 連続記録
+  { id: 'first_record', emoji: '👟' },
+  { id: 'streak_3',     emoji: '🔥' },
+  { id: 'streak_7',     emoji: '⚔️' },
+  { id: 'streak_30',    emoji: '🏆' },
+  // 行2: 練習ノート
+  { id: 'notes_1',      emoji: '📝' },
+  { id: 'notes_10',     emoji: '📓' },
+  { id: 'notes_50',     emoji: '📚' },
+  { id: 'notes_100',    emoji: '🗒️' },
+  // 行3: 試合ノート
+  { id: 'journals_1',   emoji: '⚽' },
+  { id: 'journals_10',  emoji: '🏅' },
+  { id: 'journals_50',  emoji: '🏟️' },
+  { id: 'journals_100', emoji: '🥇' },
+] as const;
+
+function useProfileStats(userId: string | undefined) {
+  return useQuery({
+    queryKey: ['profileStats', userId],
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000,
+    queryFn: async () => {
+      if (!userId) return { totalNotes: 0, totalJournals: 0, recordDates: [] as Date[] };
+      const [notesSnap, journalsSnap] = await Promise.all([
+        getDocs(query(collection(db, 'notes'), where('userId', '==', userId), where('isDraft', '==', false), limit(200))),
+        getDocs(query(collection(db, 'matchJournals'), where('userId', '==', userId), limit(200))),
+      ]);
+      const recordDates = notesSnap.docs
+        .map((d) => (d.data() as Note).createdAt?.toDate() ?? new Date(0))
+        .filter((d) => d.getTime() > 0);
+      return { totalNotes: notesSnap.size, totalJournals: journalsSnap.size, recordDates };
+    },
+  });
+}
+
+function BadgeItem({ badge, earned, label }: {
+  badge: { id: string; emoji: string };
+  earned: boolean;
+  label: string | undefined;
+}) {
+  const { t } = useTranslation();
+  const [showTip, setShowTip] = useState(false);
+
+  return (
+    <div className="relative">
+      <motion.div
+        whileHover={earned ? { scale: 1.05 } : { scale: 1.03 }}
+        onHoverStart={() => !earned && setShowTip(true)}
+        onHoverEnd={() => setShowTip(false)}
+        onTap={() => !earned && setShowTip((v) => !v)}
+        className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all cursor-default ${
+          earned ? 'bg-zinc-900 border-zinc-700' : 'bg-zinc-950 border-zinc-800/50'
+        }`}
+      >
+        <span className={`text-2xl ${!earned ? 'grayscale opacity-25' : ''}`}>{badge.emoji}</span>
+        <p className={`text-[9px] font-semibold text-center leading-tight ${earned ? 'text-zinc-300' : 'text-zinc-700'}`}>
+          {earned ? label : <Lock size={8} className="mx-auto" />}
+        </p>
+      </motion.div>
+      {!earned && showTip && (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 w-max max-w-[120px] bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-[10px] text-zinc-300 text-center leading-snug shadow-lg pointer-events-none"
+        >
+          {t(`badges.cond_${badge.id}`)}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-zinc-800" />
+        </motion.div>
+      )}
+    </div>
+  );
+}
 
 const flameVariants = {
   animate: {
@@ -47,10 +128,10 @@ const MENU_ITEMS = [
     borderColor: 'border-amber-500/20',
   },
   {
-    to: '/profile',
-    icon: User,
-    label: 'プロフィール',
-    sub: '設定・実績',
+    to: '/theme',
+    icon: Palette,
+    label: 'テーマ',
+    sub: 'チームカラーを変える',
     color: 'from-purple-500/20 to-purple-600/5',
     iconColor: 'text-purple-400',
     borderColor: 'border-purple-500/20',
@@ -76,12 +157,30 @@ export function DashboardPage() {
   const { userProfile } = useAuthStore();
   const members = useGroupStore((s) => s.members);
   const { data: streakData } = useStreak(userProfile?.uid);
+  const { data: stats } = useProfileStats(userProfile?.uid);
   const { data: recentNotes, isLoading: notesLoading } = useGroupNotes(userProfile?.groupId ?? undefined);
   const { data: recentJournals, isLoading: journalsLoading } = useGroupJournals(userProfile?.groupId ?? undefined);
 
   const currentStreak = streakData?.currentStreak ?? 0;
+  const longestStreak = stats?.recordDates ? calculateStreak(stats.recordDates) : 0;
+  const totalNotes    = stats?.totalNotes ?? 0;
+  const totalJournals = stats?.totalJournals ?? 0;
   const weeklyStatus = streakData?.weeklyStatus ?? Array(7).fill(false);
   const isLoading = notesLoading || journalsLoading;
+
+  const earnedBadgeIds = new Set<string>();
+  if (totalNotes > 0 || totalJournals > 0) earnedBadgeIds.add('first_record');
+  if (currentStreak >= 3)     earnedBadgeIds.add('streak_3');
+  if (currentStreak >= 7)     earnedBadgeIds.add('streak_7');
+  if (longestStreak >= 30)    earnedBadgeIds.add('streak_30');
+  if (totalNotes >= 1)        earnedBadgeIds.add('notes_1');
+  if (totalNotes >= 10)       earnedBadgeIds.add('notes_10');
+  if (totalNotes >= 50)       earnedBadgeIds.add('notes_50');
+  if (totalNotes >= 100)      earnedBadgeIds.add('notes_100');
+  if (totalJournals >= 1)     earnedBadgeIds.add('journals_1');
+  if (totalJournals >= 10)    earnedBadgeIds.add('journals_10');
+  if (totalJournals >= 50)    earnedBadgeIds.add('journals_50');
+  if (totalJournals >= 100)   earnedBadgeIds.add('journals_100');
 
   // 練習ノートと試合ノートを統合して日時降順に並べる
   const activities: ActivityItem[] = [
@@ -99,7 +198,7 @@ export function DashboardPage() {
       opponent: j.opponent,
       sortAt: j.date,
     })),
-  ].sort((a, b) => b.sortAt.toMillis() - a.sortAt.toMillis()).slice(0, 8);
+  ].sort((a, b) => b.sortAt.toMillis() - a.sortAt.toMillis()).slice(0, 5);
 
   // userId から displayName を引く
   const getName = (uid: string) =>
@@ -154,6 +253,19 @@ export function DashboardPage() {
           </div>
         </div>
       </motion.div>
+
+      {/* バッジ */}
+      <div>
+        <h2 className="text-lg font-semibold text-zinc-50 mb-3">{t('profile.badges')}</h2>
+        <div className="grid grid-cols-4 gap-2">
+          {BADGE_DEFS.map((badge) => {
+            const earned = earnedBadgeIds.has(badge.id);
+            return (
+              <BadgeItem key={badge.id} badge={badge} earned={earned} label={earned ? t(`badges.${badge.id}`) : undefined} />
+            );
+          })}
+        </div>
+      </div>
 
       {/* 最近のアクティビティ */}
       <div>

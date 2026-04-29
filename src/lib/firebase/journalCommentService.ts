@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 import type { JournalComment } from '@/types/matchJournal';
+import type { ParentRole } from '@/types/group';
 
 /** コメント投稿パラメータ（idとcreatedAt以外） */
 interface AddCommentParams {
@@ -21,22 +22,23 @@ interface AddCommentParams {
   displayName: string;
   avatarUrl: string | null;
   role: 'parent' | 'child' | 'member';
+  parentRole?: ParentRole;
   text: string;
+  stampId?: string;
 }
 
 /**
  * コメントを追加し、ジャーナルのcommentCount/unreadCommentCountをインクリメントする
+ * テキストとスタンプのどちらか一方、または両方が必要
  */
 export async function addJournalComment(
   journalId: string,
   comment: AddCommentParams
 ): Promise<void> {
-  if (comment.text.trim().length === 0) {
-    throw new Error('EMPTY_TEXT');
-  }
-  if (comment.text.length > 200) {
-    throw new Error('TEXT_TOO_LONG');
-  }
+  const hasText = comment.text.trim().length > 0;
+  const hasStamp = !!comment.stampId;
+  if (!hasText && !hasStamp) throw new Error('EMPTY_COMMENT');
+  if (comment.text.length > 200) throw new Error('TEXT_TOO_LONG');
 
   const commentsRef = collection(db, 'matchJournals', journalId, 'comments');
   await addDoc(commentsRef, {
@@ -45,7 +47,9 @@ export async function addJournalComment(
     displayName: comment.displayName,
     avatarUrl: comment.avatarUrl,
     role: comment.role,
+    parentRole: comment.parentRole ?? null,
     text: comment.text,
+    stampId: comment.stampId ?? null,
     parentCommentId: null,
     replyCount: 0,
     createdAt: serverTimestamp(),

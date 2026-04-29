@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'motion/react';
 import { Crown, User, AlertCircle, Pencil } from 'lucide-react';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
+import { RoleBadge } from '@/components/shared/RoleBadge';
 import type { GroupMember } from '@/types/group';
 import { useAuthStore } from '@/store/authStore';
 import { useGroupStore } from '@/store/groupStore';
@@ -29,6 +31,7 @@ function SkeletonProfileCard() {
     <div className="flex flex-col items-center gap-3">
       <div className="w-24 h-24 rounded-xl bg-zinc-800 animate-pulse" />
       <div className="w-16 h-3 rounded-full bg-zinc-800 animate-pulse" />
+      <div className="w-10 h-3 rounded-full bg-zinc-800 animate-pulse" />
     </div>
   );
 }
@@ -38,16 +41,17 @@ interface ProfileSelectErrorProps {
   onRetry: () => void;
 }
 function ProfileSelectError({ onRetry }: ProfileSelectErrorProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center gap-4 py-8">
       <AlertCircle className="w-12 h-12 text-red-400" />
-      <p className="text-zinc-300 text-base font-medium">メンバー情報の取得に失敗しました</p>
-      <p className="text-zinc-500 text-sm">ネットワーク接続を確認して、もう一度お試しください</p>
+      <p className="text-zinc-300 text-base font-medium">{t('profileSelect.memberFetchFailed')}</p>
+      <p className="text-zinc-500 text-sm">{t('profileSelect.networkError')}</p>
       <button
         onClick={onRetry}
         className="px-6 py-2.5 rounded-lg bg-[var(--color-brand-primary)] text-white text-sm font-medium hover:opacity-90 active:opacity-80 transition-opacity"
       >
-        再読み込み
+        {t('profileSelect.reload')}
       </button>
     </div>
   );
@@ -60,6 +64,7 @@ interface ProfileSelectEditButtonProps {
 }
 
 function ProfileSelectEditButton({ member, groupId }: ProfileSelectEditButtonProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(member.displayName);
   const [isSaving, setIsSaving] = useState(false);
@@ -97,16 +102,16 @@ function ProfileSelectEditButton({ member, groupId }: ProfileSelectEditButtonPro
     e.stopPropagation();
     const result = profileEditSchema.safeParse({ displayName: value });
     if (!result.success) {
-      setError(result.error.errors[0]?.message ?? '入力内容を確認してください');
+      setError(result.error.errors[0]?.message ?? t('profile.validationError'));
       return;
     }
     setIsSaving(true);
     try {
       await updateMemberDisplayName(groupId, member.uid, result.data.displayName, member.isChildProfile ?? false);
-      toast.success('プロフィールを更新しました');
+      toast.success(t('profile.updateSuccess'));
       setIsEditing(false);
     } catch {
-      toast.error('保存に失敗しました。もう一度お試しください');
+      toast.error(t('profile.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -155,8 +160,8 @@ function ProfileSelectEditButton({ member, groupId }: ProfileSelectEditButtonPro
               }}
               maxLength={20}
               disabled={isSaving}
-              placeholder="名前"
-              aria-label="名前"
+              placeholder={t('profile.namePlaceholder')}
+              aria-label={t('profile.nameLabel')}
               aria-invalid={!!error}
               onClick={(e) => e.stopPropagation()}
               className="w-full text-center bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1
@@ -178,7 +183,7 @@ function ProfileSelectEditButton({ member, groupId }: ProfileSelectEditButtonPro
                 disabled={isSaving || value.trim().length === 0}
                 className="p-1.5 rounded-md text-xs bg-[var(--color-brand-primary)] text-white hover:opacity-90 min-h-[32px] px-2 disabled:opacity-50"
               >
-                {isSaving ? '...' : '保存'}
+                {isSaving ? '...' : t('common.save')}
               </button>
             </div>
           </motion.div>
@@ -189,6 +194,7 @@ function ProfileSelectEditButton({ member, groupId }: ProfileSelectEditButtonPro
 }
 
 export function ProfileSelectPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { members, activeProfile, setActiveProfile } = useActiveProfile();
   const isLoading = useAuthStore((s) => s.isLoading);
@@ -242,7 +248,7 @@ export function ProfileSelectPage() {
         transition={{ delay: 0.1, duration: 0.4 }}
         className="text-2xl md:text-3xl font-bold text-white mb-2 text-center"
       >
-        だれが使いますか？
+        {t('profileSelect.whoUsing')}
       </motion.h1>
       <motion.p
         initial={{ opacity: 0 }}
@@ -250,7 +256,7 @@ export function ProfileSelectPage() {
         transition={{ delay: 0.2, duration: 0.4 }}
         className="text-zinc-400 mb-10 text-center text-sm"
       >
-        プロフィールを選んでください
+        {t('profileSelect.selectProfile')}
       </motion.p>
 
       {/* スケルトンローディング */}
@@ -274,16 +280,19 @@ export function ProfileSelectPage() {
           className="flex flex-wrap justify-center gap-6 max-w-2xl w-full"
         >
           {members.map((member, i) => (
-            <motion.button
+            <motion.div
               key={member.uid}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 + i * 0.05, duration: 0.3, ease: 'easeOut' }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.96 }}
+              role="button"
+              tabIndex={0}
               onClick={() => handleSelect(member)}
-              aria-label={`${member.displayName}${member.role === 'owner' ? '（管理者）' : ''}として使う`}
-              className="flex flex-col items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 min-w-[80px]"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelect(member); } }}
+              aria-label={`${member.displayName}${member.role === 'owner' ? ` (${t('profile.admin')})` : ''}`}
+              className="flex flex-col items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 min-w-[80px] cursor-pointer"
             >
               {/* アバター */}
               <div className="relative">
@@ -315,10 +324,17 @@ export function ProfileSelectPage() {
               <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors duration-200 text-center max-w-[96px] truncate">
                 {member.displayName}
               </span>
-              {member.role === 'owner' && (
-                <span className="text-[10px] font-medium text-amber-400 -mt-2 tracking-wide">管理者</span>
-              )}
-            </motion.button>
+              {/* バッジエリア: 役割バッジ・管理者バッジ */}
+              <div className="flex items-center justify-center gap-1 flex-wrap -mt-2">
+                <RoleBadge
+                  parentRole={member.parentRole}
+                  aria-label={member.parentRole ? `役割: ${member.parentRole === 'father' ? t('profile.parentRoleFather') : t('profile.parentRoleMother')}` : undefined}
+                />
+                {member.role === 'owner' && (
+                  <span className="text-[10px] font-medium text-amber-400 tracking-wide">{t('profile.admin')}</span>
+                )}
+              </div>
+            </motion.div>
           ))}
         </motion.div>
       )}

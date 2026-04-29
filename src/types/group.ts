@@ -14,6 +14,9 @@ export interface Group {
   updatedAt: Timestamp;
 }
 
+// 保護者の役割（父・母・未設定）
+export type ParentRole = 'father' | 'mother' | null;
+
 // グループメンバー型
 export interface GroupMember {
   uid: string;
@@ -25,6 +28,8 @@ export interface GroupMember {
   lastActiveAt: Timestamp | null;
   // Firebase Auth アカウントを持たない仮想プロフィール（子供など）かどうかを示すフラグ
   isChildProfile?: boolean;
+  // 保護者の役割（子プロフィールは常に null）
+  parentRole?: ParentRole;
 }
 
 // 招待コード型

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Star, User, NotebookPen } from 'lucide-react';
+import { Home, BookOpen, Star, NotebookPen, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { clsx } from 'clsx';
 
@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { path: '/journals', icon: NotebookPen, labelKey: 'journals.title' },
   { path: '/highlights', icon: Star, labelKey: 'highlights.title' },
   { path: '/notes', icon: BookOpen, labelKey: 'nav.notes' },
-  { path: '/profile', icon: User, labelKey: 'nav.profile' },
+  { path: '/settings', icon: Settings, labelKey: 'nav.settings' },
 ] as const;
 
 // モバイル用ボトムナビゲーション（SkillSync準拠）
@@ -22,7 +22,9 @@ export function BottomNav() {
       <div className="flex items-center justify-around h-16 px-2 max-w-lg mx-auto">
         {NAV_ITEMS.map(({ path, icon: Icon, labelKey }) => {
           const isActive =
-            location.pathname === path || location.pathname.startsWith(path + '/');
+            location.pathname === path ||
+            location.pathname.startsWith(path + '/') ||
+            (path === '/settings' && location.pathname === '/theme');
           return (
             <Link
               key={path}

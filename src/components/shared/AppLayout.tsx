@@ -5,7 +5,7 @@ import {
   BookOpen,
   Star,
   Home,
-  User,
+  Settings,
   Sun,
   Moon,
   NotebookPen,
@@ -42,7 +42,7 @@ export function AppLayout() {
     { to: '/journals', icon: NotebookPen, labelKey: 'journals.title' },
     { to: '/highlights', icon: Star, labelKey: 'highlights.title' },
     { to: '/notes', icon: BookOpen, labelKey: 'nav.notes' },
-    { to: '/profile', icon: User, labelKey: 'nav.profile' },
+    { to: '/settings', icon: Settings, labelKey: 'nav.settings' },
   ] as const;
 
   return (

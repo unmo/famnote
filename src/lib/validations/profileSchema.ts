@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { SPORTS } from '@/types/sport';
 
+// 保護者役割のバリデーション
+// 不正な値が Firestore に存在する場合は null として扱う
+export const parentRoleSchema = z.enum(['father', 'mother']).nullable().optional();
+
 // プロフィール設定フォームのバリデーション
 export const profileSchema = z.object({
   displayName: z
