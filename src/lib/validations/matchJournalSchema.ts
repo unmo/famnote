@@ -13,6 +13,7 @@ export const preMatchSchema = z.object({
     .min(1, '目標を1件以上入力してください')
     .max(10, '目標は最大10件まで入力できます'),
   challenges: z.array(z.string().max(100)).max(5, 'チャレンジしたいことは最大5件まで入力できます'),
+  isPublic: z.boolean(),
 });
 
 export const goalReviewSchema = z.object({

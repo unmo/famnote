@@ -7,6 +7,7 @@ import {
   deleteJournalComment,
 } from '@/lib/firebase/journalCommentService';
 import type { JournalComment } from '@/types/matchJournal';
+import type { ParentRole } from '@/types/group';
 
 interface UseJournalCommentsResult {
   comments: JournalComment[];
@@ -48,7 +49,9 @@ interface AddCommentVariables {
   displayName: string;
   avatarUrl: string | null;
   role: 'parent' | 'child' | 'member';
+  parentRole?: ParentRole;
   text: string;
+  stampId?: string;
 }
 
 /**

@@ -5,7 +5,6 @@ import { LandingPage } from '@/routes/app/LandingPage';
 import { LoginPage } from '@/routes/auth/LoginPage';
 import { ProfileSetupPage } from '@/routes/onboarding/ProfileSetupPage';
 import { CreateGroupPage } from '@/routes/onboarding/CreateGroupPage';
-import { JoinGroupPage } from '@/routes/onboarding/JoinGroupPage';
 import { DashboardPage } from '@/routes/app/DashboardPage';
 import { NotesListPage } from '@/routes/app/notes/NotesListPage';
 import { NoteNewPage } from '@/routes/app/notes/NoteNewPage';
@@ -18,7 +17,6 @@ import { MatchEditPage } from '@/routes/app/matches/MatchEditPage';
 import { TimelinePage } from '@/routes/app/TimelinePage';
 import { GoalsListPage } from '@/routes/app/goals/GoalsListPage';
 import { GoalNewPage } from '@/routes/app/goals/GoalNewPage';
-import { MyProfilePage } from '@/routes/app/profile/MyProfilePage';
 import { MemberProfilePage } from '@/routes/app/profile/MemberProfilePage';
 import { SettingsPage } from '@/routes/app/SettingsPage';
 import { JournalListPage } from '@/routes/app/journals/JournalListPage';
@@ -29,6 +27,7 @@ import { JournalPostEditPage } from '@/routes/app/journals/JournalPostEditPage';
 import { JournalDetailPage } from '@/routes/app/journals/JournalDetailPage';
 import { HighlightsPage } from '@/routes/app/highlights/HighlightsPage';
 import { ProfileSelectPage } from '@/routes/app/ProfileSelectPage';
+import { ThemePage } from '@/routes/app/ThemePage';
 
 export const router = createBrowserRouter([
   {
@@ -56,7 +55,6 @@ export const router = createBrowserRouter([
     children: [
       { path: 'profile', element: <ProfileSetupPage /> },
       { path: 'create-group', element: <CreateGroupPage /> },
-      { path: 'join-group', element: <JoinGroupPage /> },
     ],
   },
   {
@@ -86,9 +84,10 @@ export const router = createBrowserRouter([
           { path: '/timeline', element: <TimelinePage /> },
           { path: '/goals', element: <GoalsListPage /> },
           { path: '/goals/new', element: <GoalNewPage /> },
-          { path: '/profile', element: <MyProfilePage /> },
+          { path: '/profile', element: <Navigate to="/settings" replace /> },
           { path: '/profile/:userId', element: <MemberProfilePage /> },
           { path: '/settings', element: <SettingsPage /> },
+          { path: '/theme', element: <ThemePage /> },
           // 試合ジャーナル
           { path: '/journals', element: <JournalListPage /> },
           { path: '/journals/new', element: <JournalPrePage /> },

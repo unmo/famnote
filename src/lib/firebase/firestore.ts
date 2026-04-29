@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  setDoc,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -12,7 +13,6 @@ import {
   limit,
   startAfter,
   serverTimestamp,
-  increment,
   onSnapshot,
   writeBatch,
   runTransaction,
@@ -21,7 +21,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from './config';
-import type { Group, GroupMember, InviteCode } from '@/types/group';
+import type { Group, GroupMember, InviteCode, ParentRole } from '@/types/group';
 import type { Note, NoteComment } from '@/types/note';
 import type { Match, MatchComment } from '@/types/match';
 import type { Goal } from '@/types/goal';
@@ -99,11 +99,13 @@ export async function createGroup(
 
 // グループ参加
 // displayName と avatarUrl を渡すことで、参加時から名前が正しく保存される
+// parentRole を渡すことで参加直後から役割バッジが表示される
 export async function joinGroup(
   uid: string,
   inviteCode: string,
   displayName: string,
-  avatarUrl: string | null
+  avatarUrl: string | null,
+  parentRole?: ParentRole
 ): Promise<{ groupId: string; groupName: string }> {
   const codeSnap = await getDoc(doc(db, 'inviteCodes', inviteCode.toUpperCase()));
   if (!codeSnap.exists()) {
@@ -135,6 +137,7 @@ export async function joinGroup(
       joinedAt: serverTimestamp() as GroupMember['joinedAt'],
       role: 'member',
       lastActiveAt: serverTimestamp() as GroupMember['lastActiveAt'],
+      parentRole: parentRole ?? null,
     };
 
     tx.set(memberRef, memberData);
@@ -455,6 +458,44 @@ export async function fetchUserGoals(userId: string): Promise<Goal[]> {
 
 // ===================== プロフィール管理関連 =====================
 
+// メンバーの parentRole を更新する
+export async function updateMemberParentRole(
+  groupId: string,
+  memberUid: string,
+  parentRole: ParentRole
+): Promise<void> {
+  const memberRef = doc(db, 'groups', groupId, 'members', memberUid);
+  await updateDoc(memberRef, { parentRole, updatedAt: serverTimestamp() });
+}
+
+// メンバーのプロフィール（displayName と parentRole）を一括更新する
+// isChildProfile が true の場合は parentRole の書き込みをスキップする
+export async function updateMemberProfile(
+  groupId: string,
+  memberUid: string,
+  data: { displayName?: string; parentRole?: ParentRole },
+  isChildProfile: boolean
+): Promise<void> {
+  const memberRef = doc(db, 'groups', groupId, 'members', memberUid);
+
+  // 更新データを構築（子プロフィールは parentRole を書き込まない）
+  const updateData: Record<string, unknown> = { updatedAt: serverTimestamp() };
+  if (data.displayName !== undefined) {
+    updateData['displayName'] = data.displayName;
+  }
+  if (!isChildProfile && data.parentRole !== undefined) {
+    updateData['parentRole'] = data.parentRole;
+  }
+
+  await updateDoc(memberRef, updateData);
+
+  // 子プロフィールは users ドキュメントを持たないため更新しない
+  if (!isChildProfile && data.displayName !== undefined) {
+    const userRef = doc(db, 'users', memberUid);
+    await updateDoc(userRef, { displayName: data.displayName });
+  }
+}
+
 // メンバーの表示名を更新する
 // isChildProfile が false の場合は users/{memberUid} も同時に更新する（オーナー・通常メンバー）
 export async function updateMemberDisplayName(
@@ -477,13 +518,13 @@ export async function updateMemberDisplayName(
 // uid は 'child_' + ランダム文字列で生成し、通常の Auth UID と区別できるようにする
 export async function addChildProfile(
   groupId: string,
-  displayName: string
+  displayName: string,
+  parentRole: import('./../../types/group').ParentRole = null
 ): Promise<string> {
-  // crypto.randomUUID() を使って一意な ID を生成し、child_ プレフィックスを付ける
   const childUid = `child_${crypto.randomUUID().replace(/-/g, '').slice(0, 10)}`;
 
   const memberRef = doc(db, 'groups', groupId, 'members', childUid);
-  const memberData: GroupMember & { isChildProfile: true } = {
+  const memberData: GroupMember = {
     uid: childUid,
     displayName,
     avatarUrl: null,
@@ -492,31 +533,18 @@ export async function addChildProfile(
     role: 'member',
     lastActiveAt: null,
     isChildProfile: true,
+    parentRole,
   };
 
-  const groupRef = doc(db, 'groups', groupId);
-
-  const batch = writeBatch(db);
-  batch.set(memberRef, memberData);
-  // memberCount をインクリメント
-  batch.update(groupRef, { memberCount: increment(1) });
-  await batch.commit();
-
+  await setDoc(memberRef, memberData);
   return childUid;
 }
 
 // 子プロフィールを削除する
-// グループの memberCount もデクリメントする
 export async function deleteChildProfile(
   groupId: string,
   memberUid: string
 ): Promise<void> {
   const memberRef = doc(db, 'groups', groupId, 'members', memberUid);
-  const groupRef = doc(db, 'groups', groupId);
-
-  const batch = writeBatch(db);
-  batch.delete(memberRef);
-  // memberCount をデクリメント（最小値は 1 を保証するためクライアント側でも確認する）
-  batch.update(groupRef, { memberCount: increment(-1) });
-  await batch.commit();
+  await deleteDoc(memberRef);
 }
