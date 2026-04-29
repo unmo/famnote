@@ -3,6 +3,8 @@ name: 本番環境デプロイ (main)
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 env:
@@ -12,8 +14,8 @@ env:
   IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/famnote
 
 jobs:
-  build-and-deploy:
-    name: 本番環境ビルド・テスト・デプロイ
+  test:
+    name: 型チェック・ユニットテスト
     runs-on: ubuntu-latest
 
     steps:
@@ -29,10 +31,40 @@ jobs:
       - name: 依存関係のインストール
         run: npm ci --frozen-lockfile
 
+      - name: TypeScript 型チェック・ビルド（本番環境）
+        run: npm run build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+
       - name: ユニットテストの実行
         run: npm run test
 
-      - name: TypeScript 型チェック・ビルド（本番環境）
+  deploy:
+    name: 本番環境デプロイ
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+
+    steps:
+      - name: ソースコードをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js 22 をセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 依存関係のインストール
+        run: npm ci --frozen-lockfile
+
+      - name: ビルド（本番環境）
         run: npm run build
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}

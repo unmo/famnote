@@ -1,8 +1,6 @@
 name: CI（継続的インテグレーション）
 
 on:
-  push:
-    branches: [main, develop]
   pull_request:
     branches: [main]
 
