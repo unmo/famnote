@@ -1,21 +1,8 @@
 {
-  "feature": "プロフィール管理UX修正",
-  "phase": "generator",
+  "feature": "",
+  "phase": "",
   "loop_count": 0,
   "max_loops": 3,
   "stop_requested": false,
-  "history": [
-    {
-      "phase": "planner",
-      "status": "completed",
-      "timestamp": "2026-04-25T00:00:00.000Z",
-      "spec": "docs/spec_profile_management.md"
-    },
-    {
-      "phase": "designer",
-      "status": "completed",
-      "timestamp": "2026-04-25T01:00:00.000Z",
-      "design": "docs/design_profile_management.md"
-    }
-  ]
+  "history": []
 }
