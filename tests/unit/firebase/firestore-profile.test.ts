@@ -78,39 +78,33 @@ describe('addChildProfile', () => {
     expect(uid).toMatch(/^child_/);
   });
 
-  it('正常系: writeBatch の set が 1 回呼ばれる', async () => {
+  it('正常系: setDoc が 1 回呼ばれる', async () => {
     const { addChildProfile } = await import('@/lib/firebase/firestore');
-    const { writeBatch } = await import('firebase/firestore');
-    vi.mocked(writeBatch).mockClear();
+    const { setDoc } = await import('firebase/firestore');
 
     await addChildProfile('group-1', '太郎');
 
-    const batch = vi.mocked(writeBatch).mock.results[0]?.value;
-    expect(batch?.set).toHaveBeenCalledTimes(1);
+    expect(setDoc).toHaveBeenCalledTimes(1);
   });
 
-  it('正常系: memberCount のインクリメントが batch.update で呼ばれる', async () => {
+  it('正常系: setDoc に isChildProfile: true が含まれる', async () => {
     const { addChildProfile } = await import('@/lib/firebase/firestore');
-    const { writeBatch, increment } = await import('firebase/firestore');
-    vi.mocked(writeBatch).mockClear();
+    const { setDoc } = await import('firebase/firestore');
 
     await addChildProfile('group-1', '太郎');
 
-    const batch = vi.mocked(writeBatch).mock.results[0]?.value;
-    expect(batch?.update).toHaveBeenCalledTimes(1);
-    expect(increment).toHaveBeenCalledWith(1);
+    const setDocCall = vi.mocked(setDoc).mock.calls[0];
+    expect(setDocCall?.[1]).toMatchObject({ isChildProfile: true });
   });
 
-  it('正常系: batch.set に isChildProfile: true が含まれる', async () => {
+  it('正常系: parentRole が null の場合は null で保存される', async () => {
     const { addChildProfile } = await import('@/lib/firebase/firestore');
-    const { writeBatch } = await import('firebase/firestore');
-    vi.mocked(writeBatch).mockClear();
+    const { setDoc } = await import('firebase/firestore');
 
-    await addChildProfile('group-1', '太郎');
+    await addChildProfile('group-1', '太郎', null);
 
-    const batch = vi.mocked(writeBatch).mock.results[0]?.value;
-    const setCall = vi.mocked(batch?.set).mock.calls[0];
-    expect(setCall?.[1]).toMatchObject({ isChildProfile: true });
+    const setDocCall = vi.mocked(setDoc).mock.calls[0];
+    expect(setDocCall?.[1]).toMatchObject({ parentRole: null });
   });
 });
 
@@ -119,26 +113,22 @@ describe('deleteChildProfile', () => {
     vi.clearAllMocks();
   });
 
-  it('正常系: batch.delete が 1 回呼ばれる', async () => {
+  it('正常系: deleteDoc が 1 回呼ばれる', async () => {
     const { deleteChildProfile } = await import('@/lib/firebase/firestore');
-    const { writeBatch } = await import('firebase/firestore');
-    vi.mocked(writeBatch).mockClear();
+    const { deleteDoc } = await import('firebase/firestore');
 
     await deleteChildProfile('group-1', 'child_abc123');
 
-    const batch = vi.mocked(writeBatch).mock.results[0]?.value;
-    expect(batch?.delete).toHaveBeenCalledTimes(1);
+    expect(deleteDoc).toHaveBeenCalledTimes(1);
   });
 
-  it('正常系: memberCount のデクリメントが batch.update で呼ばれる', async () => {
+  it('正常系: 正しいパスの doc が削除される', async () => {
     const { deleteChildProfile } = await import('@/lib/firebase/firestore');
-    const { writeBatch, increment } = await import('firebase/firestore');
-    vi.mocked(writeBatch).mockClear();
+    const { deleteDoc, doc } = await import('firebase/firestore');
 
     await deleteChildProfile('group-1', 'child_abc123');
 
-    const batch = vi.mocked(writeBatch).mock.results[0]?.value;
-    expect(batch?.update).toHaveBeenCalledTimes(1);
-    expect(increment).toHaveBeenCalledWith(-1);
+    expect(doc).toHaveBeenCalledWith(expect.anything(), 'groups', 'group-1', 'members', 'child_abc123');
+    expect(deleteDoc).toHaveBeenCalledTimes(1);
   });
 });

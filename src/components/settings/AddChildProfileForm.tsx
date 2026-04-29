@@ -176,7 +176,7 @@ export function AddChildProfileForm({ onAdd, isAtMemberLimit, maxMembers }: AddC
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={isSubmitting || value.trim().length === 0}
+                  disabled={isSubmitting}
                   aria-busy={isSubmitting}
                   className="px-4 py-1.5 rounded-md text-white text-sm font-medium bg-[var(--color-brand-primary)] hover:opacity-90 transition-opacity min-h-[36px] disabled:opacity-50"
                 >

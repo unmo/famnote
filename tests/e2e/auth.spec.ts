@@ -33,7 +33,7 @@ test.describe('認証フロー', () => {
 
   test('正常系: ログインページにFamNoteブランドが表示される', async ({ page }) => {
     await page.goto('/login');
-    await expect(page.getByText('FamNote')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'FamNote' })).toBeVisible();
     await expect(page.getByText('家族の記録を、')).toBeVisible();
     await expect(page.getByText('ひとつの場所に。')).toBeVisible();
   });
@@ -51,7 +51,9 @@ test.describe('認証フロー', () => {
     await expect(page.getByRole('button', { name: /Googleでログイン/i })).toBeVisible();
     // ボタンが全幅になっている（モバイル対応）
     const button = page.getByRole('button', { name: /Googleでログイン/i });
+    await expect(button).toBeVisible();
     const buttonBox = await button.boundingBox();
-    expect(buttonBox?.width).toBeGreaterThan(300);
+    // モバイル（390px幅）では全幅ボタンが表示されることを確認（余白を除いた幅）
+    expect(buttonBox?.width).toBeGreaterThan(250);
   });
 });

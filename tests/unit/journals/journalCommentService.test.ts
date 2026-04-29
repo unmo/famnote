@@ -91,17 +91,17 @@ describe('addJournalComment', () => {
     expect(updateArgs[1].unreadCommentCount).toMatchObject({ _increment: 1 });
   });
 
-  it('異常系: text が空文字列の場合は EMPTY_TEXT エラーをスロー', async () => {
+  it('異常系: text が空文字列の場合は EMPTY_COMMENT エラーをスロー', async () => {
     await expect(
       addJournalComment(JOURNAL_ID, { ...baseComment, text: '' })
-    ).rejects.toThrow('EMPTY_TEXT');
+    ).rejects.toThrow('EMPTY_COMMENT');
     expect(mockAddDoc).not.toHaveBeenCalled();
   });
 
-  it('異常系: text がスペースのみの場合は EMPTY_TEXT エラーをスロー', async () => {
+  it('異常系: text がスペースのみの場合は EMPTY_COMMENT エラーをスロー', async () => {
     await expect(
       addJournalComment(JOURNAL_ID, { ...baseComment, text: '   ' })
-    ).rejects.toThrow('EMPTY_TEXT');
+    ).rejects.toThrow('EMPTY_COMMENT');
     expect(mockAddDoc).not.toHaveBeenCalled();
   });
 

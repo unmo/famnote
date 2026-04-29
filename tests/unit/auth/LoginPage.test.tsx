@@ -3,6 +3,28 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { LoginPage } from '@/routes/auth/LoginPage';
 
+// i18n モック：テスト内で日本語テキストが正しく検索できるよう実際の翻訳値を返す
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'auth.loginWithGoogle': 'Googleでログイン',
+        'auth.loggingIn': 'ログイン中...',
+        'auth.loginProcessing': 'ログイン処理中',
+        'auth.loginPageAriaLabel': 'ログインページ',
+        'auth.loginFailed': 'ログインに失敗しました。もう一度お試しください。',
+        'auth.featureBadgeGrowth': '成長記録',
+        'auth.featureBadgeFamily': '家族共有',
+        'auth.featureBadgeCheer': '応援機能',
+      };
+      return translations[key] ?? key;
+    },
+    i18n: { language: 'ja', changeLanguage: vi.fn() },
+  }),
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
+  Trans: ({ children }: { children: unknown }) => children,
+}));
+
 // useAuthのモック
 const mockLoginWithGoogle = vi.fn();
 const mockNavigate = vi.fn();

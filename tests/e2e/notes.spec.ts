@@ -18,6 +18,6 @@ test.describe('練習ノート機能', () => {
   test('正常系: ログインページが正常に表示される', async ({ page }) => {
     await page.goto('/login');
     // FamNoteのブランドが表示されていることを確認
-    await expect(page.locator('text=FamNote')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'FamNote' })).toBeVisible();
   });
 });

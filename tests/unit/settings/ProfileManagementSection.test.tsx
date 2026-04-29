@@ -2,6 +2,40 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ProfileManagementSection } from '@/components/settings/ProfileManagementSection';
 
+// i18n モック：テスト内で日本語テキストが正しく検索できるよう実際の翻訳値を返す
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'profile.management': 'プロフィール管理',
+        'profile.yourProfile': 'あなたのプロフィール',
+        'profile.membersSection': 'メンバー',
+        'profile.updateSuccess': 'プロフィールを更新しました',
+        'profile.memberDeleted': 'メンバーを削除しました',
+        'profile.memberAdded': 'メンバーを追加しました',
+        'profile.memberLimit': 'メンバーは最大{{max}}名までです',
+        'profile.addMember': 'メンバーを追加',
+        'profile.namePlaceholder': '名前を入力',
+        'profile.nameLabel': '名前',
+        'profile.memberType': '種別',
+        'profile.memberTypeChild': '子供',
+        'profile.memberTypeParent': '大人（父・母）',
+        'profile.parentRole': '保護者の役割',
+        'profile.roleRequired': '父または母を選択してください',
+        'profile.addFailed': '追加に失敗しました。もう一度お試しください',
+        'common.add': '追加する',
+        'common.cancel': 'キャンセル',
+        'common.saving': '保存中...',
+        'common.validationError': '入力内容を確認してください',
+      };
+      return translations[key] ?? key;
+    },
+    i18n: { language: 'ja', changeLanguage: vi.fn() },
+  }),
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
+  Trans: ({ children }: { children: unknown }) => children,
+}));
+
 // Framer Motion をモック（アニメーションをスキップ）
 // whileHover / whileTap などの Framer 独自 props を除去して標準 DOM 要素に渡す
 vi.mock('motion/react', () => {
@@ -154,7 +188,7 @@ describe('ProfileManagementSection', () => {
 
     it('プロフィール追加ボタンが表示される', () => {
       render(<ProfileManagementSection />);
-      expect(screen.getByRole('button', { name: /子プロフィールを追加/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /メンバーを追加/ })).toBeInTheDocument();
     });
   });
 
@@ -176,7 +210,7 @@ describe('ProfileManagementSection', () => {
 
     it('プロフィール追加ボタンが表示されない', () => {
       render(<ProfileManagementSection />);
-      expect(screen.queryByRole('button', { name: /子プロフィールを追加/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /メンバーを追加/ })).not.toBeInTheDocument();
     });
 
     it('自分のプロフィール名は表示される', () => {
@@ -190,7 +224,7 @@ describe('ProfileManagementSection', () => {
       render(<ProfileManagementSection />);
 
       // フォームを開く（テキスト内容で特定、SVGとテキストが混在するため regex を使用）
-      const addButton = screen.getByRole('button', { name: /プロフィールを追加/ });
+      const addButton = screen.getByRole('button', { name: /メンバーを追加/ });
       fireEvent.click(addButton);
 
       // 追加するボタンをクリック（名前が空のまま）
@@ -207,10 +241,10 @@ describe('ProfileManagementSection', () => {
     it('21文字以上の名前でエラーが表示される', async () => {
       render(<ProfileManagementSection />);
 
-      const addButton = screen.getByRole('button', { name: /プロフィールを追加/ });
+      const addButton = screen.getByRole('button', { name: /メンバーを追加/ });
       fireEvent.click(addButton);
 
-      const input = screen.getByPlaceholderText('例: 太郎');
+      const input = screen.getByPlaceholderText('名前を入力');
       fireEvent.change(input, { target: { value: 'あいうえおかきくけこさしすせそたちつてなに' } }); // 21文字
 
       const submitButton = screen.getByText('追加する');
@@ -226,17 +260,17 @@ describe('ProfileManagementSection', () => {
       mockAddChildProfile.mockResolvedValue('child_new123');
       render(<ProfileManagementSection />);
 
-      const addButton = screen.getByRole('button', { name: /プロフィールを追加/ });
+      const addButton = screen.getByRole('button', { name: /メンバーを追加/ });
       fireEvent.click(addButton);
 
-      const input = screen.getByPlaceholderText('例: 太郎');
+      const input = screen.getByPlaceholderText('名前を入力');
       fireEvent.change(input, { target: { value: '新メンバー' } });
 
       const submitButton = screen.getByText('追加する');
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(mockAddChildProfile).toHaveBeenCalledWith('group-1', '新メンバー');
+        expect(mockAddChildProfile).toHaveBeenCalledWith('group-1', '新メンバー', null);
       });
     });
   });
@@ -245,10 +279,10 @@ describe('ProfileManagementSection', () => {
     it('メンバーが最大人数の時、追加ボタンが disabled になる', () => {
       mockGroupState.current = {
         ...mockGroupState.current,
-        group: { ...mockGroupState.current.group!, memberCount: 10 },
+        group: { ...mockGroupState.current.group!, maxMembers: 2 },
       };
       render(<ProfileManagementSection />);
-      const addButton = screen.getByRole('button', { name: /プロフィールを追加/ });
+      const addButton = screen.getByRole('button', { name: /メンバーを追加/ });
       expect(addButton).toBeDisabled();
     });
   });

@@ -19,6 +19,8 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     // トレース設定
     trace: 'on-first-retry',
+    // ブラウザのロケールを日本語に固定（i18next の LanguageDetector が日本語を選択するよう）
+    locale: 'ja-JP',
   },
   projects: [
     {
