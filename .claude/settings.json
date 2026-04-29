@@ -51,6 +51,17 @@
     }
   },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "以下はユーザーのメッセージです。このメッセージが「新機能の追加」「大きな改修」「複数画面にまたがる変更」「4ファイル以上を変更しそうな実装依頼」に該当するか判断してください。\n\nユーザーメッセージ: $ARGUMENTS\n\n該当する場合のみ、以下のJSONを出力してください（それ以外は何も出力しない）:\n{\"systemMessage\": \"⚠️ この変更は大きくなりそうです。agentループ（planner→designer→generator→evaluator）の使用を検討してください。CLAUDE.mdのセクション6を参照。\"}",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
