@@ -49,5 +49,30 @@
       "enabled": true,
       "mode": "strict"
     }
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "count=$(git -C \"$CLAUDE_PROJECT_DIR\" status --short 2>/dev/null | grep -cE '^.M|^ M|^M |^\\?\\?' 2>/dev/null || echo 0); [ \"$count\" -gt 0 ] && printf '{\"systemMessage\": \"\\u26a0\\ufe0f 未コミットの変更が%sファイルあります。/commit スキルを使用してください。\"}' \"$count\" || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "count=$(git -C \"$CLAUDE_PROJECT_DIR\" status --short 2>/dev/null | grep -cE '^.M|^ M|^M |^\\?\\?' 2>/dev/null || echo 0); [ \"$count\" -ge 4 ] && printf '{\"systemMessage\": \"\\u26a0\\ufe0f %sファイルが変更されています。4ファイル以上の大きな変更はagentループ（planner\\u2192designer\\u2192generator\\u2192evaluator）の使用を検討してください。\"}' \"$count\" || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }
