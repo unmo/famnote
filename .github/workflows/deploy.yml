@@ -28,7 +28,16 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: node_modules キャッシュ
+        uses: actions/cache@v4
+        id: node-modules-cache
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: node-modules-${{ runner.os }}-
+
       - name: 依存関係のインストール
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci --frozen-lockfile
 
       - name: TypeScript 型チェック・ビルド（本番環境）
@@ -67,11 +76,32 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: node_modules キャッシュ
+        uses: actions/cache@v4
+        id: node-modules-cache
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: node-modules-${{ runner.os }}-
+
       - name: 依存関係のインストール
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci --frozen-lockfile
 
+      - name: Playwright ブラウザキャッシュ
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
       - name: Playwright ブラウザをインストール
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+
+      - name: Playwright システム依存関係のインストール（キャッシュヒット時）
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
 
       - name: ビルド成果物をダウンロード
         uses: actions/download-artifact@v4
@@ -109,26 +139,6 @@ jobs:
       - name: ソースコードをチェックアウト
         uses: actions/checkout@v4
 
-      - name: Node.js 22 をセットアップ
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: 依存関係のインストール
-        run: npm ci --frozen-lockfile
-
-      - name: ビルド（本番環境）
-        run: npm run build
-        env:
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
-
       - name: GCP認証
         uses: google-github-actions/auth@v2
         with:
@@ -136,6 +146,12 @@ jobs:
 
       - name: gcloudのセットアップ
         uses: google-github-actions/setup-gcloud@v2
+
+      - name: ビルド成果物をダウンロード
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-prod
+          path: dist/
 
       - name: Dockerイメージをビルドしてプッシュ
         run: gcloud builds submit --tag $IMAGE .
