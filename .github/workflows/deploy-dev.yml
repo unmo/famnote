@@ -6,15 +6,14 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   SERVICE_NAME: famnote-dev
   REGION: asia-northeast1
-  IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/famnote-dev
 
 jobs:
   test:
     name: 型チェック・ユニットテスト
     runs-on: ubuntu-latest
+    environment: develop
 
     steps:
       - name: ソースコードをチェックアウト
@@ -41,13 +40,14 @@ jobs:
       - name: TypeScript 型チェック・ビルド（開発環境）
         run: npm run build
         env:
-          VITE_FIREBASE_API_KEY: ${{ secrets.DEV_VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.DEV_VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.DEV_VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.DEV_VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.DEV_VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.DEV_VITE_FIREBASE_APP_ID }}
-          VITE_APP_URL: ${{ secrets.DEV_VITE_APP_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: ユニットテストの実行
         run: npm run test
@@ -63,6 +63,7 @@ jobs:
     name: 開発環境デプロイ
     runs-on: ubuntu-latest
     needs: test
+    environment: develop
 
     steps:
       - name: ソースコードをチェックアウト
@@ -83,12 +84,12 @@ jobs:
           path: dist/
 
       - name: Dockerイメージをビルドしてプッシュ
-        run: gcloud builds submit --tag $IMAGE .
+        run: gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/$SERVICE_NAME .
 
       - name: Cloud Run（開発環境）にデプロイ
         run: |
           gcloud run deploy $SERVICE_NAME \
-            --image $IMAGE \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/$SERVICE_NAME \
             --platform managed \
             --region $REGION \
             --allow-unauthenticated \
