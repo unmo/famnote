@@ -84,7 +84,7 @@ jobs:
           path: dist/
 
       - name: Dockerイメージをビルドしてプッシュ
-        run: gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/$SERVICE_NAME --suppress-logs .
+        run: gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/$SERVICE_NAME .
 
       - name: Cloud Run（開発環境）にデプロイ
         run: |
