@@ -21,7 +21,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { restoreFromSession, clearActiveProfile } = useProfileStore();
 
   useEffect(() => {
+    // Firebase初期化タイムアウト: onAuthStateChangedが一定時間内に呼ばれない場合（CI環境等）
+    // 未認証として扱いフォールバックする
+    const initTimeoutId = setTimeout(() => {
+      reset();
+      resetGroup();
+      clearActiveProfile();
+    }, 8000);
+
     const unsubscribeAuth = onAuthStateChanged(auth, (fbUser) => {
+      clearTimeout(initTimeoutId);
       setFirebaseUser(fbUser);
 
       if (!fbUser) {
@@ -99,7 +108,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
     });
 
-    return unsubscribeAuth;
+    return () => {
+      clearTimeout(initTimeoutId);
+      unsubscribeAuth();
+    };
   }, [setFirebaseUser, setUserProfile, setLoading, setInitialized, reset, setGroup, setMembers, resetGroup, restoreFromSession, clearActiveProfile]);
 
   const value: AuthContextValue = {

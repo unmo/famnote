@@ -21,6 +21,12 @@ export default defineConfig({
     trace: 'on-first-retry',
     // ブラウザのロケールを日本語に固定（i18next の LanguageDetector が日本語を選択するよう）
     locale: 'ja-JP',
+    // CI環境でアニメーションを無効化（Framer Motionのinitial opacity:0でtoBeVisibleが失敗するのを防ぐ）
+    reducedMotion: 'reduce',
+  },
+  // CI環境でのアサーションタイムアウトを延長（Firebase初期化待ち）
+  expect: {
+    timeout: process.env.CI ? 15000 : 5000,
   },
   projects: [
     {
