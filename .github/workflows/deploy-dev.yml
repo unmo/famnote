@@ -108,7 +108,7 @@ jobs:
           path: dist/
 
       - name: E2Eテストの実行
-        run: npm run test:e2e -- --project=chromium
+        run: npm run test:e2e -- --project=chromium --project="Mobile Chrome"
         env:
           CI: true
           VITE_FIREBASE_API_KEY: ${{ secrets.DEV_VITE_FIREBASE_API_KEY }}
