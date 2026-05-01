@@ -28,11 +28,21 @@ import { JournalDetailPage } from '@/routes/app/journals/JournalDetailPage';
 import { HighlightsPage } from '@/routes/app/highlights/HighlightsPage';
 import { ProfileSelectPage } from '@/routes/app/ProfileSelectPage';
 import { ThemePage } from '@/routes/app/ThemePage';
+import { LegalPage } from '@/routes/app/LegalPage';
+import { HelpPage } from '@/routes/app/HelpPage';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+  },
+  {
+    path: '/legal',
+    element: <LegalPage />,
+  },
+  {
+    path: '/help',
+    element: <HelpPage />,
   },
   {
     path: '/login',

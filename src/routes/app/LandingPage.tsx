@@ -697,18 +697,26 @@ function LandingFooter() {
 
           {/* リンク群 */}
           <div className="flex items-center gap-4 flex-wrap justify-center order-1 md:order-2">
+            <Link
+              to="/legal"
+              className="text-sm text-zinc-400 hover:text-zinc-50 transition-colors duration-200"
+            >
+              特定商取引法に基づく表示
+            </Link>
+            <Link
+              to="/help"
+              className="text-sm text-zinc-400 hover:text-zinc-50 transition-colors duration-200"
+            >
+              ヘルプ
+            </Link>
             <a
               href="/terms"
-              target="_blank"
-              rel="noopener noreferrer"
               className="text-sm text-zinc-400 hover:text-zinc-50 transition-colors duration-200"
             >
               {t('landing.footerTerms')}
             </a>
             <a
               href="/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
               className="text-sm text-zinc-400 hover:text-zinc-50 transition-colors duration-200"
             >
               {t('landing.footerPrivacy')}
