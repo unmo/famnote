@@ -1,4 +1,4 @@
-name: 開発環境デプロイ (develop)
+﻿name: 開発環境デプロイ (develop)
 
 on:
   push:
@@ -17,16 +17,16 @@ jobs:
 
     steps:
       - name: ソースコードをチェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Node.js 22 をセットアップ
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: 'npm'
 
       - name: node_modules キャッシュ
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: node-modules-cache
         with:
           path: node_modules
@@ -59,7 +59,7 @@ jobs:
 
     steps:
       - name: ソースコードをチェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: GCP認証
         id: auth

@@ -1,4 +1,4 @@
-name: 本番環境デプロイ (main)
+﻿name: 本番環境デプロイ (main)
 
 on:
   push:
@@ -19,16 +19,16 @@ jobs:
 
     steps:
       - name: ソースコードをチェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Node.js 22 をセットアップ
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: 'npm'
 
       - name: node_modules キャッシュ
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: node-modules-cache
         with:
           path: node_modules
@@ -61,16 +61,16 @@ jobs:
 
     steps:
       - name: ソースコードをチェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Node.js 22 をセットアップ
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: 'npm'
 
       - name: node_modules キャッシュ
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: node-modules-cache
         with:
           path: node_modules
@@ -82,7 +82,7 @@ jobs:
         run: npm ci --frozen-lockfile
 
       - name: Playwright ブラウザキャッシュ
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
@@ -114,7 +114,7 @@ jobs:
 
       - name: E2Eテストレポートをアップロード
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-report-prod
           path: playwright-report/
@@ -129,7 +129,7 @@ jobs:
 
     steps:
       - name: ソースコードをチェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: GCP認証
         id: auth
