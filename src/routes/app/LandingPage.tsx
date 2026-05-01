@@ -20,8 +20,8 @@ import type { LucideIcon } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 
 // ブランドカラーCSS変数（フォールバック付き）
-const brandPrimary = 'var(--color-brand-primary, #E85513)';
-const brandGradient = `linear-gradient(135deg, var(--color-brand-primary, #E85513), #f59e0b)`;
+const brandPrimary = 'var(--color-brand-primary, #0EA5E9)';
+const brandGradient = `linear-gradient(135deg, var(--color-brand-primary, #0EA5E9), #38bdf8)`;
 
 // ---- LandingHeader --------------------------------------------------------
 
@@ -109,7 +109,7 @@ function LandingHero() {
           {t('landing.heroTitle')}
           <br />
           <span
-            className="bg-clip-text text-transparent bg-gradient-to-r from-[var(--color-brand-primary,#E85513)] to-amber-400"
+            className="bg-clip-text text-transparent bg-gradient-to-r from-[var(--color-brand-primary,#0EA5E9)] to-sky-300"
           >
             {t('landing.heroTitleAccent')}
           </span>
@@ -135,7 +135,7 @@ function LandingHero() {
           <Link
             to="/signup"
             className="btn-primary px-8 py-4 text-base font-semibold min-h-[52px] min-w-[200px] flex items-center justify-center rounded-xl shadow-lg"
-            style={{ boxShadow: '0 0 30px color-mix(in srgb, var(--color-brand-primary, #E85513) 40%, transparent)' }}
+            style={{ boxShadow: '0 0 30px color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 40%, transparent)' }}
           >
             {t('landing.startFree')}
           </Link>
@@ -283,7 +283,7 @@ function FeatureCard({ icon: Icon, title, description, badge, badgeLabel }: Feat
 
   return (
     <motion.div
-      className="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex flex-col gap-4 cursor-default transition-colors duration-200 hover:border-[color:var(--color-brand-primary,#E85513)]"
+      className="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex flex-col gap-4 cursor-default transition-colors duration-200 hover:border-[color:var(--color-brand-primary,#0EA5E9)]"
       variants={{
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
@@ -295,7 +295,7 @@ function FeatureCard({ icon: Icon, title, description, badge, badgeLabel }: Feat
       {/* バッジ（右上） */}
       <div className="absolute top-4 right-4">
         {isPremium ? (
-          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-sky-500/20 text-sky-400 border border-sky-500/30">
             {badgeLabel}
           </span>
         ) : (
@@ -308,7 +308,7 @@ function FeatureCard({ icon: Icon, title, description, badge, badgeLabel }: Feat
       {/* アイコン */}
       <div
         className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-        style={{ backgroundColor: 'color-mix(in srgb, var(--color-brand-primary, #E85513) 15%, transparent)' }}
+        style={{ backgroundColor: 'color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 15%, transparent)' }}
       >
         <Icon className="w-6 h-6" style={{ color: brandPrimary }} />
       </div>
@@ -414,8 +414,8 @@ function StepItem({ step, index }: { step: Step; index: number }) {
         <div
           className="w-16 h-16 rounded-2xl flex items-center justify-center"
           style={{
-            backgroundColor: 'color-mix(in srgb, var(--color-brand-primary, #E85513) 15%, transparent)',
-            border: '1px solid color-mix(in srgb, var(--color-brand-primary, #E85513) 30%, transparent)',
+            backgroundColor: 'color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 15%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 30%, transparent)',
           }}
         >
           <step.icon className="w-8 h-8" style={{ color: brandPrimary }} />
@@ -521,7 +521,7 @@ function PricingCard({ plan }: PricingCardProps) {
       ].join(' ')}
       style={isPremium ? {
         borderColor: brandPrimary,
-        boxShadow: '0 0 40px color-mix(in srgb, var(--color-brand-primary, #E85513) 20%, transparent)',
+        boxShadow: '0 0 40px color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 20%, transparent)',
       } : {}}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -615,7 +615,7 @@ function LandingPricing() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-sky-400 bg-sky-500/10 border border-sky-500/20">
             <Sparkles className="w-4 h-4" />
             {t('landing.annualDiscount')}
           </span>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 法的ページ共通レイアウトコンポーネント
  * 特定商取引法・ヘルプなどの法的ページで共用する
  */
@@ -46,12 +46,12 @@ function FamNoteLogo() {
     <div className="flex items-center gap-2">
       <div
         className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-        style={{ backgroundColor: "var(--color-brand-primary, #E85513)" }}
+        style={{ backgroundColor: "var(--color-brand-primary, #0EA5E9)" }}
       >
         <span className="text-white font-bold text-sm leading-none">F</span>
       </div>
       <span className="text-base font-bold text-white tracking-wide">
-        Fam<span style={{ color: "var(--color-brand-primary, #E85513)" }}>Note</span>
+        Fam<span style={{ color: "var(--color-brand-primary, #0EA5E9)" }}>Note</span>
       </span>
     </div>
   );
@@ -227,7 +227,7 @@ export function LegalPageLayout({
         <div className="absolute inset-0 pointer-events-none">
           <div
             className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl"
-            style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 10%, transparent)" }}
+            style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 10%, transparent)" }}
           />
           <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl" />
         </div>
@@ -246,7 +246,7 @@ export function LegalPageLayout({
           <div className="flex items-center gap-4">
             <div
               className="p-3 rounded-2xl"
-              style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 20%, transparent)", color: "var(--color-brand-primary, #E85513)" }}
+              style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 20%, transparent)", color: "var(--color-brand-primary, #0EA5E9)" }}
             >
               {icon}
             </div>
@@ -282,8 +282,8 @@ export function LegalPageLayout({
                     style={
                       activeSection === item.id
                         ? {
-                            backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 10%, transparent)",
-                            color: "var(--color-brand-primary, #E85513)",
+                            backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 10%, transparent)",
+                            color: "var(--color-brand-primary, #0EA5E9)",
                           }
                         : undefined
                     }
@@ -338,7 +338,7 @@ export function LegalSection({ id, title, children }: LegalSectionProps) {
         </h2>
         <a
           href={`#${id}`}
-          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-zinc-400 dark:text-zinc-500 hover:text-[var(--color-brand-primary,#E85513)]"
+          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-zinc-400 dark:text-zinc-500 hover:text-[var(--color-brand-primary,#0EA5E9)]"
           aria-label={`${title}へのリンク`}
         >
           <Link2 className="w-4 h-4" />

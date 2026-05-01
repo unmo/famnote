@@ -3,7 +3,7 @@ export type { Theme };
 
 // 20種類のテーマカラー定義（Jリーグクラブカラーをモチーフ）
 export const THEMES: Theme[] = [
-  { id: 'shimizu', name: 'Shimizu', primary: '#E85513', secondary: '#00133F', isPremium: false },
+  { id: 'default', name: 'FamNote', primary: '#0EA5E9', secondary: '#1E3A5F', isPremium: false },
   { id: 'kashima', name: 'Kashima', primary: '#B30024', secondary: '#002244', isPremium: true },
   { id: 'urawa', name: 'Urawa', primary: '#E60012', secondary: '#000000', isPremium: true },
   { id: 'kashiwa', name: 'Kashiwa', primary: '#FFE500', secondary: '#000000', isPremium: true },

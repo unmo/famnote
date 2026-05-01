@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ヘルプページ
  * FamNoteのすべての機能を説明するマニュアルページ
  * 認証不要でアクセス可能
@@ -95,7 +95,7 @@ function HelpHero() {
       <div className="absolute inset-0 pointer-events-none">
         <div
           className="absolute top-10 left-1/4 w-72 h-72 rounded-full blur-3xl"
-          style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 15%, transparent)" }}
+          style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 15%, transparent)" }}
         />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl" />
       </div>
@@ -115,8 +115,8 @@ function HelpHero() {
           <div
             className="p-3 rounded-2xl"
             style={{
-              backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 20%, transparent)",
-              color: "var(--color-brand-primary, #E85513)",
+              backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 20%, transparent)",
+              color: "var(--color-brand-primary, #0EA5E9)",
             }}
           >
             <BookOpen className="w-7 h-7" />
@@ -170,13 +170,13 @@ function MockBottomNav({ active }: { active: number }) {
   return (
     <div
       className="flex items-center justify-around py-2 mt-auto"
-      style={{ backgroundColor: "var(--color-brand-secondary, #00133F)" }}
+      style={{ backgroundColor: "var(--color-brand-secondary, #1E3A5F)" }}
     >
       {icons.map((Icon, i) => (
         <Icon
           key={i}
           className="w-4 h-4"
-          style={i === active ? { color: "var(--color-brand-primary, #E85513)" } : { color: "#52525b" }}
+          style={i === active ? { color: "var(--color-brand-primary, #0EA5E9)" } : { color: "#52525b" }}
         />
       ))}
     </div>
@@ -195,17 +195,17 @@ function LoginMockup() {
         {/* FamNoteロゴ */}
         <div
           className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-          style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 20%, transparent)" }}
+          style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 20%, transparent)" }}
         >
           <span
             className="text-2xl font-bold"
-            style={{ color: "var(--color-brand-primary, #E85513)" }}
+            style={{ color: "var(--color-brand-primary, #0EA5E9)" }}
           >
             F
           </span>
         </div>
         <p className="text-white text-sm font-bold tracking-wide mb-1">
-          Fam<span style={{ color: "var(--color-brand-primary, #E85513)" }}>Note</span>
+          Fam<span style={{ color: "var(--color-brand-primary, #0EA5E9)" }}>Note</span>
         </p>
         <p className="text-zinc-400 text-[9px] text-center mb-6">
           {t("help.mock.login.tagline", "家族の成長を一緒に記録しよう")}
@@ -215,8 +215,8 @@ function LoginMockup() {
         <button
           className="w-full rounded-xl py-2.5 text-white text-[10px] font-bold flex items-center justify-center gap-2"
           style={{
-            backgroundColor: "var(--color-brand-primary, #E85513)",
-            boxShadow: "0 0 12px color-mix(in srgb, var(--color-brand-primary, #E85513) 40%, transparent)",
+            backgroundColor: "var(--color-brand-primary, #0EA5E9)",
+            boxShadow: "0 0 12px color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 40%, transparent)",
           }}
         >
           <svg viewBox="0 0 24 24" className="w-3 h-3" fill="currentColor">
@@ -250,7 +250,7 @@ function NotesMockup() {
     <PhoneMockup label={t("help.mock.notes.ariaLabel", "練習ノート一覧のモックアップ")}>
       <div
         className="px-3 py-2 flex items-center justify-between"
-        style={{ backgroundColor: "var(--color-brand-secondary, #00133F)" }}
+        style={{ backgroundColor: "var(--color-brand-secondary, #1E3A5F)" }}
       >
         <span className="text-white text-xs font-bold">{t("help.mock.notes.header", "練習ノート")}</span>
         <div className="w-5 h-5 rounded-full bg-zinc-600" />
@@ -266,8 +266,8 @@ function NotesMockup() {
               <span
                 className="text-[8px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0"
                 style={{
-                  backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 20%, transparent)",
-                  color: "var(--color-brand-primary, #E85513)",
+                  backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 20%, transparent)",
+                  color: "var(--color-brand-primary, #0EA5E9)",
                 }}
               >
                 {t(item.tagKey, "サッカー")}
@@ -280,7 +280,7 @@ function NotesMockup() {
         {/* 記録追加ボタン */}
         <button
           className="w-full rounded-xl py-2 text-white text-[10px] font-bold text-center mt-1"
-          style={{ backgroundColor: "var(--color-brand-primary, #E85513)" }}
+          style={{ backgroundColor: "var(--color-brand-primary, #0EA5E9)" }}
         >
           {t("help.mock.notes.addButton", "+ 練習を記録する")}
         </button>
@@ -301,7 +301,7 @@ function MatchMockup() {
     <PhoneMockup label={t("help.mock.matches.ariaLabel", "試合記録のモックアップ")}>
       <div
         className="px-3 py-2"
-        style={{ backgroundColor: "var(--color-brand-secondary, #00133F)" }}
+        style={{ backgroundColor: "var(--color-brand-secondary, #1E3A5F)" }}
       >
         <span className="text-white text-xs font-bold">{t("help.mock.matches.header", "試合ノート")}</span>
       </div>
@@ -317,7 +317,7 @@ function MatchMockup() {
           <div className="flex items-center gap-3 mb-2">
             <span
               className="text-lg font-bold"
-              style={{ color: "var(--color-brand-primary, #E85513)" }}
+              style={{ color: "var(--color-brand-primary, #0EA5E9)" }}
             >
               3
             </span>
@@ -356,7 +356,7 @@ function TimelineMockup() {
     <PhoneMockup label={t("help.mock.timeline.ariaLabel", "家族タイムラインのモックアップ")}>
       <div
         className="px-3 py-2"
-        style={{ backgroundColor: "var(--color-brand-secondary, #00133F)" }}
+        style={{ backgroundColor: "var(--color-brand-secondary, #1E3A5F)" }}
       >
         <span className="text-white text-xs font-bold">{t("help.mock.timeline.header", "家族タイムライン")}</span>
       </div>
@@ -400,7 +400,7 @@ function ThemeMockup() {
   const { t } = useTranslation();
 
   const themes = [
-    { name: t("help.mock.theme.theme1", "オレンジ × ネイビー"), primary: "#E85513", secondary: "#00133F", selected: true },
+    { name: t("help.mock.theme.theme1", "スカイブルー × ネイビー"), primary: "#0EA5E9", secondary: "#1E3A5F", selected: true },
     { name: t("help.mock.theme.theme2", "ダークレッド × ネイビー"), primary: "#B30024", secondary: "#002244", selected: false },
     { name: t("help.mock.theme.theme3", "レッド × ブラック"), primary: "#E60012", secondary: "#000000", selected: false },
     { name: t("help.mock.theme.theme4", "イエロー × ブラック"), primary: "#FFE500", secondary: "#000000", selected: false },
@@ -411,9 +411,9 @@ function ThemeMockup() {
     <PhoneMockup label={t("help.mock.theme.ariaLabel", "カラーテーマ選択のモックアップ")}>
       <div
         className="px-3 py-2 flex items-center gap-2"
-        style={{ backgroundColor: "var(--color-brand-secondary, #00133F)" }}
+        style={{ backgroundColor: "var(--color-brand-secondary, #1E3A5F)" }}
       >
-        <Palette className="w-3 h-3" style={{ color: "var(--color-brand-primary, #E85513)" }} />
+        <Palette className="w-3 h-3" style={{ color: "var(--color-brand-primary, #0EA5E9)" }} />
         <span className="text-white text-xs font-bold">{t("help.mock.theme.header", "カラーテーマ")}</span>
       </div>
 
@@ -427,7 +427,7 @@ function ThemeMockup() {
           <div
             key={i}
             className="flex items-center justify-between px-3 py-1.5"
-            style={theme.selected ? { backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 10%, transparent)" } : undefined}
+            style={theme.selected ? { backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 10%, transparent)" } : undefined}
           >
             <div className="flex items-center gap-2">
               <div className="flex gap-0.5">
@@ -436,13 +436,13 @@ function ThemeMockup() {
               </div>
               <span
                 className="text-[8px]"
-                style={theme.selected ? { color: "var(--color-brand-primary, #E85513)", fontWeight: "bold" } : { color: "#a1a1aa" }}
+                style={theme.selected ? { color: "var(--color-brand-primary, #0EA5E9)", fontWeight: "bold" } : { color: "#a1a1aa" }}
               >
                 {theme.name}
               </span>
             </div>
             {theme.selected && (
-              <Check className="w-2.5 h-2.5" style={{ color: "var(--color-brand-primary, #E85513)" }} />
+              <Check className="w-2.5 h-2.5" style={{ color: "var(--color-brand-primary, #0EA5E9)" }} />
             )}
           </div>
         ))}
@@ -467,9 +467,9 @@ function InstallMockup() {
         {/* 背景（アプリ画面風） */}
         <div
           className="w-full flex-1 flex items-center justify-center opacity-50"
-          style={{ backgroundColor: "var(--color-brand-secondary, #00133F)" }}
+          style={{ backgroundColor: "var(--color-brand-secondary, #1E3A5F)" }}
         >
-          <span className="text-4xl font-bold" style={{ color: "var(--color-brand-primary, #E85513)" }}>F</span>
+          <span className="text-4xl font-bold" style={{ color: "var(--color-brand-primary, #0EA5E9)" }}>F</span>
         </div>
 
         {/* ボトムシート（インストールダイアログ） */}
@@ -477,9 +477,9 @@ function InstallMockup() {
           <div className="flex items-center gap-3 mb-3">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 20%, transparent)" }}
+              style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 20%, transparent)" }}
             >
-              <span className="text-lg font-bold" style={{ color: "var(--color-brand-primary, #E85513)" }}>F</span>
+              <span className="text-lg font-bold" style={{ color: "var(--color-brand-primary, #0EA5E9)" }}>F</span>
             </div>
             <div>
               <p className="text-sm font-bold text-white">{t("help.mock.install.appName", "FamNote")}</p>
@@ -490,7 +490,7 @@ function InstallMockup() {
           <div className="flex gap-2">
             <button
               className="flex-1 py-2 rounded-xl text-white text-[10px] font-bold"
-              style={{ backgroundColor: "var(--color-brand-primary, #E85513)" }}
+              style={{ backgroundColor: "var(--color-brand-primary, #0EA5E9)" }}
             >
               {t("help.mock.install.installButton", "追加する")}
             </button>
@@ -519,8 +519,8 @@ function StepList({ steps }: { steps: HelpStep[] }) {
           <div
             className="w-8 h-8 rounded-full text-white flex items-center justify-center font-bold flex-shrink-0 text-sm"
             style={{
-              backgroundColor: "var(--color-brand-primary, #E85513)",
-              boxShadow: "0 0 10px color-mix(in srgb, var(--color-brand-primary, #E85513) 30%, transparent)",
+              backgroundColor: "var(--color-brand-primary, #0EA5E9)",
+              boxShadow: "0 0 10px color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 30%, transparent)",
             }}
           >
             {step.step}
@@ -571,8 +571,8 @@ function HelpSection({
         <div
           className="p-2.5 rounded-xl"
           style={{
-            backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 10%, transparent)",
-            color: "var(--color-brand-primary, #E85513)",
+            backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 10%, transparent)",
+            color: "var(--color-brand-primary, #0EA5E9)",
           }}
         >
           {icon}
@@ -734,8 +734,8 @@ export function HelpPage() {
                     style={
                       activeSection === item.id
                         ? {
-                            backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 10%, transparent)",
-                            color: "var(--color-brand-primary, #E85513)",
+                            backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 10%, transparent)",
+                            color: "var(--color-brand-primary, #0EA5E9)",
                           }
                         : undefined
                     }
@@ -743,7 +743,7 @@ export function HelpPage() {
                     <span
                       style={
                         activeSection === item.id
-                          ? { color: "var(--color-brand-primary, #E85513)" }
+                          ? { color: "var(--color-brand-primary, #0EA5E9)" }
                           : { color: "#52525b" }
                       }
                     >
@@ -864,8 +864,8 @@ export function HelpPage() {
                     {t("help.sections.theme.description", "J1リーグ全20チームのカラーパレットをアプリに適用できます。お気に入りのチームカラーで日々の記録をより楽しく。")}
                   </p>
                   <StepList steps={themeSteps} />
-                  <div className="mt-6 p-4 rounded-xl border" style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 5%, transparent)", borderColor: "color-mix(in srgb, var(--color-brand-primary, #E85513) 20%, transparent)" }}>
-                    <p className="text-sm" style={{ color: "color-mix(in srgb, var(--color-brand-primary, #E85513) 80%, #000)" }}>
+                  <div className="mt-6 p-4 rounded-xl border" style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 5%, transparent)", borderColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 20%, transparent)" }}>
+                    <p className="text-sm" style={{ color: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 80%, #000)" }}>
                       <span className="font-semibold">{t("help.sections.theme.noteLabel", "プレミアム限定：")}</span>{" "}
                       {t("help.sections.theme.noteBody", "カラーテーマ機能はプレミアムプラン（月額500円）でご利用いただけます。")}
                     </p>
@@ -933,7 +933,7 @@ export function HelpPage() {
                       <th className="py-3 px-4 text-center text-zinc-700 dark:text-zinc-300 font-semibold">{t("help.planCompare.freePlan", "無料プラン")}</th>
                       <th
                         className="py-3 px-4 text-center font-semibold"
-                        style={{ color: "var(--color-brand-primary, #E85513)" }}
+                        style={{ color: "var(--color-brand-primary, #0EA5E9)" }}
                       >
                         {t("help.planCompare.premiumPlan", "プレミアムプラン")}
                       </th>
@@ -949,7 +949,7 @@ export function HelpPage() {
                         <td className="py-3 px-4 text-center text-zinc-500 dark:text-zinc-500">{row.free}</td>
                         <td
                           className="py-3 px-4 text-center font-medium"
-                          style={{ color: "var(--color-brand-primary, #E85513)" }}
+                          style={{ color: "var(--color-brand-primary, #0EA5E9)" }}
                         >
                           {row.premium}
                         </td>
@@ -987,7 +987,7 @@ export function HelpPage() {
                   <Link
                     to="/pricing"
                     className="mt-4 inline-flex items-center gap-1 text-sm font-medium hover:underline"
-                    style={{ color: "var(--color-brand-primary, #E85513)" }}
+                    style={{ color: "var(--color-brand-primary, #0EA5E9)" }}
                   >
                     {t("help.sections.pricing.viewPlans", "料金プランを確認する")}
                     <ChevronRight className="w-4 h-4" />

@@ -5,8 +5,8 @@
 
 @theme {
   /* デフォルトブランドカラー（JSによって上書きされる） */
-  --color-brand-primary: #E85513;
-  --color-brand-secondary: #00133F;
+  --color-brand-primary: #0EA5E9;
+  --color-brand-secondary: #1E3A5F;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -46,8 +46,8 @@
 }
 
 :root {
-  --color-brand-primary: #E85513;
-  --color-brand-secondary: #00133F;
+  --color-brand-primary: #0EA5E9;
+  --color-brand-secondary: #1E3A5F;
   --color-brand-primary-light: color-mix(in srgb, var(--color-brand-primary) 15%, white);
   --color-brand-primary-dark: color-mix(in srgb, var(--color-brand-primary) 80%, black);
 }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 特定商取引法に基づく表示ページ
  * LegalPageLayoutを使って構成
  */
@@ -50,7 +50,7 @@ export function LegalPage() {
               <a
                 href="mailto:contact@fam-grow.com"
                 className="hover:underline"
-                style={{ color: "var(--color-brand-primary, #E85513)" }}
+                style={{ color: "var(--color-brand-primary, #0EA5E9)" }}
               >
                 contact@fam-grow.com
               </a>
@@ -60,7 +60,7 @@ export function LegalPage() {
             <a
               href="mailto:contact@fam-grow.com"
               className="hover:underline"
-              style={{ color: "var(--color-brand-primary, #E85513)" }}
+              style={{ color: "var(--color-brand-primary, #0EA5E9)" }}
             >
               contact@fam-grow.com
             </a>
@@ -131,7 +131,7 @@ export function LegalPage() {
           <a
             href="mailto:contact@fam-grow.com"
             className="hover:underline"
-            style={{ color: "var(--color-brand-primary, #E85513)" }}
+            style={{ color: "var(--color-brand-primary, #0EA5E9)" }}
           >
             contact@fam-grow.com
           </a>{" "}
