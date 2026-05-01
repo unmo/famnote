@@ -1,6 +1,6 @@
 # FamNote テスト仕様書
 
-最終更新: 2026-04-25
+最終更新: 2026-05-01
 
 ---
 
@@ -11,7 +11,7 @@
 npx vitest run
 ```
 
-### テストファイル一覧（14ファイル / 119テスト）
+### テストファイル一覧（21ファイル / 190テスト）
 
 | ファイル | テスト数 | 対象 |
 |---------|---------|------|
@@ -25,10 +25,17 @@ npx vitest run
 | `tests/unit/journals/matchJournalSchema.test.ts` | 12 | 試合ジャーナルバリデーション |
 | `tests/unit/journals/journalCommentService.test.ts` | 10 | コメントサービス関数（addComment・deleteComment・subscribe） |
 | `tests/unit/journals/JournalCommentForm.test.tsx` | 7 | コメント入力フォーム（管理者のみ表示・文字数制限） |
+| `tests/unit/journals/JournalAccordionBlock.test.tsx` | 9 | ジャーナルアコーディオンブロック |
 | `tests/unit/lib/inviteCode.test.ts` | 11 | 招待コード生成・検証 |
 | `tests/unit/lib/streak.test.ts` | 14 | 連続記録計算ロジック |
-| `tests/unit/theme/ThemeContext.test.tsx` | 8 | テーマコンテキスト |
+| `tests/unit/theme/ThemeContext.test.tsx` | 8 | テーマコンテキスト（デフォルトテーマ: FamNote スカイブルー） |
 | `tests/unit/theme/DarkModeContext.test.tsx` | 5 | ダークモードコンテキスト |
+| `tests/unit/firebase/firestore-profile.test.ts` | 8 | Firestoreプロフィール操作 |
+| `tests/unit/settings/ProfileManagementSection.test.tsx` | 13 | プロフィール管理セクション |
+| `src/components/journals/JournalCommentItem.test.tsx` | 4 | ジャーナルコメントアイテムコンポーネント |
+| `src/components/shared/RoleBadge.test.tsx` | 7 | ロールバッジコンポーネント |
+| `src/components/shared/RoleSelector.test.tsx` | 7 | ロールセレクターコンポーネント |
+| `src/routes/app/LandingPage.test.tsx` | 23 | ランディングページ（8セクション・i18n・レンダリング） |
 
 ### E2Eテスト（Playwright）
 
