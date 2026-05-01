@@ -70,8 +70,8 @@ jobs:
       - name: gcloudのセットアップ
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Docker認証
-        run: gcloud auth configure-docker
+      - name: Docker認証（Artifact Registry）
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
 
       - name: Docker Buildx のセットアップ
         uses: docker/setup-buildx-action@v3
@@ -81,7 +81,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          tags: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/${{ env.SERVICE_NAME }}:${{ github.sha }}
           build-args: |
             VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
             VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -99,7 +99,7 @@ jobs:
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
-          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          image: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/${{ env.SERVICE_NAME }}:${{ github.sha }}
           flags: |
             --allow-unauthenticated
             --port=8080
