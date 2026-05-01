@@ -1,7 +1,7 @@
-import { Theme } from '@/types/theme';
+﻿import { Theme } from '@/types/theme';
 export type { Theme };
 
-// 20種類のテーマカラー定義（Jリーグクラブカラーをモチーフ）
+// 20種類のテーマカラー定義
 export const THEMES: Theme[] = [
   { id: 'default', name: 'FamNote', primary: '#0EA5E9', secondary: '#1E3A5F', isPremium: false },
   { id: 'kashima', name: 'Kashima', primary: '#B30024', secondary: '#002244', isPremium: true },

@@ -418,7 +418,7 @@ function ThemeMockup() {
       </div>
 
       <div className="px-3 pt-3 pb-2 border-b border-zinc-700">
-        <p className="text-zinc-300 text-[9px] font-bold">{t("help.mock.theme.selectLabel", "J-Leagueチームテーマ")}</p>
+        <p className="text-zinc-300 text-[9px] font-bold">{t("help.mock.theme.selectLabel", "カラーテーマ")}</p>
         <p className="text-zinc-500 text-[8px] mt-0.5">{t("help.mock.theme.planNote", "プレミアムプランで利用可能")}</p>
       </div>
 
@@ -671,7 +671,7 @@ export function HelpPage() {
 
   const themeSteps: HelpStep[] = [
     { step: 1, title: t("help.steps.theme.step1Title", "設定を開く"), description: t("help.steps.theme.step1Description", "プロフィールアイコンから設定画面を開きます。") },
-    { step: 2, title: t("help.steps.theme.step2Title", "「カラーテーマ」を選択"), description: t("help.steps.theme.step2Description", "J1リーグ20チームのカラーパレットから好みのテーマを選びます。") },
+    { step: 2, title: t("help.steps.theme.step2Title", "「カラーテーマ」を選択"), description: t("help.steps.theme.step2Description", "20種類のカラーから好みのテーマを選びます。") },
     { step: 3, title: t("help.steps.theme.step3Title", "テーマを適用"), description: t("help.steps.theme.step3Description", "選択したテーマがアプリ全体に即時反映されます。") },
   ];
 
@@ -700,7 +700,7 @@ export function HelpPage() {
     { feature: t("help.planCompare.matchJournal", "試合ジャーナル"), free: t("help.planCompare.unlimited", "無制限"), premium: t("help.planCompare.unlimited", "無制限") },
     { feature: t("help.planCompare.familyTimeline", "家族タイムライン"), free: t("help.planCompare.upTo10", "最大10名"), premium: t("help.planCompare.upTo10", "最大10名") },
     { feature: t("help.planCompare.goalManagement", "目標設定・管理"), free: t("help.planCompare.available", "利用可"), premium: t("help.planCompare.available", "利用可") },
-    { feature: t("help.planCompare.theme", "J-Leagueテーマ"), free: t("help.planCompare.unavailable", "利用不可"), premium: t("help.planCompare.colors20", "20チーム") },
+    { feature: t("help.planCompare.theme", "カラーテーマ"), free: t("help.planCompare.unavailable", "利用不可"), premium: t("help.planCompare.colors20", "20チーム") },
     { feature: t("help.planCompare.advancedCharts", "高度なグラフ"), free: t("help.planCompare.unavailable", "利用不可"), premium: t("help.planCompare.available", "利用可") },
   ];
 
@@ -855,13 +855,13 @@ export function HelpPage() {
             <HelpSection
               id="theme"
               title={t("help.sections.theme.title", "カラーテーマ")}
-              subtitle={t("help.sections.theme.subtitle", "J-Leagueチームカラーでカスタマイズ")}
+              subtitle={t("help.sections.theme.subtitle", "好みのカラーコンビネーションでカスタマイズ")}
               icon={<Palette className="w-5 h-5" />}
             >
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <p className="text-zinc-700 dark:text-zinc-300 text-sm mb-6 leading-relaxed">
-                    {t("help.sections.theme.description", "J1リーグ全20チームのカラーパレットをアプリに適用できます。お気に入りのチームカラーで日々の記録をより楽しく。")}
+                    {t("help.sections.theme.description", "好みのカラーコンビネーションでアプリをカスタマイズ。20種類から選べます。")}
                   </p>
                   <StepList steps={themeSteps} />
                   <div className="mt-6 p-4 rounded-xl border" style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 5%, transparent)", borderColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 20%, transparent)" }}>

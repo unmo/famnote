@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "name": "FamNote",
     "tagline": "Record and share your sports growth with family"
@@ -486,8 +486,8 @@
     "feature5Title": "Highlight Insights",
     "feature5Desc": "Automatically collect key insights from practice and matches. Never miss a lesson learned.",
     "feature5Badge": "Free",
-    "feature6Title": "J-League Themes",
-    "feature6Desc": "Apply color themes from all 20 J1 League teams. Cheer in your favorite team's colors.",
+    "feature6Title": "Color Themes",
+    "feature6Desc": "Customize your app with your favorite color combination. Choose from 20 options.",
     "feature6Badge": "Premium",
     "howItWorksSectionTitle": "How It Works",
     "howItWorksSectionSubtitle": "Get started in just 3 simple steps",
@@ -512,7 +512,7 @@
     "freePlanFeature3": "Family timeline (up to 10 members)",
     "freePlanFeature4": "Goals & highlight insights",
     "premiumPlanFeature1": "Everything in Free",
-    "premiumPlanFeature2": "J-League team color themes (20 teams)",
+    "premiumPlanFeature2": "Color themes (20 options)",
     "premiumPlanFeature3": "Advanced growth charts & stats",
     "premiumPlanFeature4": "Increased photo storage",
     "premiumPlanFeature5": "Special badge & streak designs",
@@ -609,7 +609,7 @@
       },
       "theme": {
         "title": "Color Themes",
-        "subtitle": "Customize with J-League team colors",
+        "subtitle": "Customize with your favorite color combination",
         "description": "Apply color palettes from all 20 J1 League teams to the app. Make your daily records more enjoyable with your favorite team's colors.",
         "noteLabel": "Premium only:",
         "noteBody": "Color themes are available with the Premium Plan (¥500/month)."
@@ -716,7 +716,7 @@
       "matchJournal": "Match Journal",
       "familyTimeline": "Family Timeline",
       "goalManagement": "Goal Management",
-      "theme": "J-League Themes",
+      "theme": "Color Themes",
       "advancedCharts": "Advanced Charts",
       "unlimited": "Unlimited",
       "upTo10": "Up to 10",
@@ -765,7 +765,7 @@
       "theme": {
         "ariaLabel": "Color theme selection mockup",
         "header": "Color Themes",
-        "selectLabel": "J-League Team Themes",
+        "selectLabel": "Color Themes",
         "planNote": "Available with Premium Plan",
         "theme1": "Orange × Navy",
         "theme2": "Dark Red × Navy",

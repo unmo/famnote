@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "name": "FamNote",
     "tagline": "家族でスポーツの成長を記録・共有しよう"
@@ -486,8 +486,8 @@
     "feature5Title": "気づきのハイライト",
     "feature5Desc": "練習・試合から得た気づきを自動収集。大切な学びを見逃さずストックできます。",
     "feature5Badge": "無料",
-    "feature6Title": "J-Leagueテーマ",
-    "feature6Desc": "J1リーグ20チームのカラーテーマをアプリに適用。お気に入りチームカラーで使えます。",
+    "feature6Title": "カラーテーマ",
+    "feature6Desc": "好みのカラーコンビネーションでアプリをカスタマイズ。20種類から選べます。",
     "feature6Badge": "プレミアム",
     "howItWorksSectionTitle": "はじめかた",
     "howItWorksSectionSubtitle": "3ステップでかんたんにスタートできます",
@@ -512,7 +512,7 @@
     "freePlanFeature3": "家族タイムライン（最大10名）",
     "freePlanFeature4": "目標設定・気づきハイライト",
     "premiumPlanFeature1": "無料プランのすべての機能",
-    "premiumPlanFeature2": "J-Leagueチームカラーテーマ（20チーム）",
+    "premiumPlanFeature2": "カラーテーマ（20種類）",
     "premiumPlanFeature3": "高度な成長グラフ・統計",
     "premiumPlanFeature4": "写真アップロード容量増量",
     "premiumPlanFeature5": "バッジ・ストリーク特別デザイン",
@@ -609,8 +609,8 @@
       },
       "theme": {
         "title": "カラーテーマ",
-        "subtitle": "J-Leagueチームカラーでカスタマイズ",
-        "description": "J1リーグ全20チームのカラーパレットをアプリに適用できます。お気に入りのチームカラーで日々の記録をより楽しく。",
+        "subtitle": "好みのカラーコンビネーションでカスタマイズ",
+        "description": "好みのカラーコンビネーションでアプリをカスタマイズ。20種類から選べます。",
         "noteLabel": "プレミアム限定：",
         "noteBody": "カラーテーマ機能はプレミアムプラン（月額500円）でご利用いただけます。"
       },
@@ -678,7 +678,7 @@
         "step1Title": "設定を開く",
         "step1Description": "プロフィールアイコンから設定画面を開きます。",
         "step2Title": "「カラーテーマ」を選択",
-        "step2Description": "J1リーグ20チームのカラーパレットから好みのテーマを選びます。",
+        "step2Description": "20種類のカラーから好みのテーマを選びます。",
         "step3Title": "テーマを適用",
         "step3Description": "選択したテーマがアプリ全体に即時反映されます。"
       },
@@ -716,7 +716,7 @@
       "matchJournal": "試合ジャーナル",
       "familyTimeline": "家族タイムライン",
       "goalManagement": "目標設定・管理",
-      "theme": "J-Leagueテーマ",
+      "theme": "カラーテーマ",
       "advancedCharts": "高度なグラフ",
       "unlimited": "無制限",
       "upTo10": "最大10名",
@@ -765,7 +765,7 @@
       "theme": {
         "ariaLabel": "カラーテーマ選択のモックアップ",
         "header": "カラーテーマ",
-        "selectLabel": "J-Leagueチームテーマ",
+        "selectLabel": "カラーテーマ",
         "planNote": "プレミアムプランで利用可能",
         "theme1": "オレンジ × ネイビー",
         "theme2": "ダークレッド × ネイビー",
