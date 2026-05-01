@@ -527,6 +527,263 @@
     "footerTerms": "利用規約",
     "whyFamNote": "なぜFamNoteを選ぶのか？"
   },
+  "legal": {
+    "pageTitle": "特定商取引法に基づく表示",
+    "navTitle": "特定商取引法に基づく表示",
+    "lastUpdated": "最終更新日：2026年5月1日",
+    "tocLabel": "目次",
+    "toc": {
+      "table": "表記事項テーブル",
+      "notes": "補足事項"
+    },
+    "backToTop": "← トップに戻る",
+    "copyright": "©2026 FamNote / FamGrow",
+    "intro": "特定商取引法第11条の規定に基づき、以下の事項を表示します。",
+    "disclosureOnRequest": "※請求に応じて遅滞なく開示します",
+    "phoneNote": "お問い合わせはメールにて受け付けています：",
+    "rows": {
+      "seller": "販売業者",
+      "representative": "代表者名",
+      "address": "所在地",
+      "phone": "電話番号",
+      "email": "メールアドレス",
+      "serviceName": "サービス名",
+      "price": "販売価格",
+      "payment": "支払方法",
+      "paymentTiming": "支払時期",
+      "serviceStart": "サービス提供時期",
+      "cancellation": "キャンセル・返金について",
+      "environment": "動作環境"
+    },
+    "price": {
+      "free": "無料プラン：",
+      "freeValue": "無料",
+      "premium": "プレミアムプラン：",
+      "premiumValue": "月額500円（税込）／年額5,000円（税込）"
+    },
+    "paymentMethod": "クレジットカード（Stripe決済）",
+    "paymentCards": "Visa / Mastercard / American Express / JCB",
+    "paymentTiming": "お申し込み時に即時決済。月額プランは毎月、年額プランは毎年自動更新。",
+    "serviceStart": "お支払い完了後、即時利用可能。",
+    "cancellation1": "マイページの設定からいつでも解約できます。解約後は当該契約期間の終了日まで引き続きご利用いただけます。",
+    "cancellation2": "既にお支払い済みの料金の返金は、法令に定める場合を除き原則として行いません。",
+    "environment": "インターネット接続環境が必要です。",
+    "environmentNote": "最新版のChrome・Safari・Edge・Firefoxを推奨します。",
+    "note1": "本サービスは日本国内の法令に基づき運営しています。",
+    "note2Prefix": "ご不明な点は",
+    "note2Suffix": "までお問い合わせください。",
+    "note3": "本表示は予告なく変更する場合があります。最新の内容は本ページをご確認ください。",
+    "enacted": "制定：2026年5月1日"
+  },
+  "help": {
+    "pageTitle": "ヘルプ・使い方ガイド",
+    "heroTitle": "FamNoteの使い方",
+    "heroSubtitle": "練習ノートから試合記録・家族タイムラインまで、FamNoteのすべての機能をご紹介します。",
+    "lastUpdated": "最終更新: 2026年4月",
+    "toc": "目次",
+    "backToApp": "← トップに戻る",
+    "sections": {
+      "gettingStarted": {
+        "title": "はじめに",
+        "subtitle": "アカウント登録とログイン",
+        "description": "FamNoteはGoogleアカウントで簡単に始められます。登録・ログインはワンタップで完了し、すぐに家族グループを作成して使い始められます。",
+        "logoutLabel": "ログアウト：",
+        "logoutNote": "プロフィール画面の設定から行えます。データはクラウドに保存されるため、再ログインしてもすべての記録が復元されます。"
+      },
+      "notes": {
+        "title": "練習ノート",
+        "subtitle": "毎日の練習内容を記録・共有",
+        "description": "練習内容・気づき・改善点をノートに記録します。継続して記録することで成長の軌跡が残り、家族タイムラインにも共有されます。"
+      },
+      "matches": {
+        "title": "試合記録・ジャーナル",
+        "subtitle": "試合前後の目標設定と振り返り",
+        "description": "試合前に目標を立て、試合後に振り返ることで学びが深まります。気づきのハイライト機能で重要な気づきを自動保存します。"
+      },
+      "timeline": {
+        "title": "家族タイムライン",
+        "subtitle": "家族みんなで応援・共有",
+        "description": "グループ全員の練習・試合記録がリアルタイムで共有されます。リアクションやコメントで離れた場所からでも応援できます。",
+        "tipLabel": "ヒント：",
+        "tipBody": "「下書き保存」した記録はタイムラインには公開されません。家族に共有したいときだけ「公開して保存」を使いましょう。"
+      },
+      "theme": {
+        "title": "カラーテーマ",
+        "subtitle": "J-Leagueチームカラーでカスタマイズ",
+        "description": "J1リーグ全20チームのカラーパレットをアプリに適用できます。お気に入りのチームカラーで日々の記録をより楽しく。",
+        "noteLabel": "プレミアム限定：",
+        "noteBody": "カラーテーマ機能はプレミアムプラン（月額500円）でご利用いただけます。"
+      },
+      "install": {
+        "title": "スマホにインストール",
+        "subtitle": "ホーム画面に追加してアプリとして使う",
+        "description": "FamNoteはPWA対応のWebアプリです。ホーム画面に追加することで、ネイティブアプリのように快適に使えます。",
+        "noteLabel": "注意：",
+        "noteBody": "インストール後もデータはクラウドに保存されます。アプリを削除してもデータは失われません。"
+      },
+      "pricing": {
+        "title": "プラン・お支払い",
+        "subtitle": "プランの変更とアップグレード",
+        "tableFeature": "機能",
+        "upgradeTitle": "アップグレード手順",
+        "planInfoTitle": "プランについて",
+        "planInfo1": "月額プラン：500円（税込）/ 月",
+        "planInfo2": "年額プラン：5,000円（税込）/ 年（2ヶ月分お得）",
+        "planInfo3": "いつでもキャンセル可能。解約後は期間終了まで利用継続。",
+        "viewPlans": "料金プランを確認する"
+      }
+    },
+    "steps": {
+      "gettingStarted": {
+        "step1Title": "FamNoteにアクセス",
+        "step1Description": "ブラウザで app.famnote.com を開きます。",
+        "step2Title": "Googleでログイン",
+        "step2Description": "「Googleでログイン / 登録」ボタンをタップします。Googleアカウントを選択して認証してください。",
+        "step3Title": "プロフィール設定",
+        "step3Description": "お名前と担当スポーツを設定します。",
+        "step4Title": "グループを作成・参加",
+        "step4Description": "新しい家族グループを作るか、招待コードで既存のグループに参加します。"
+      },
+      "notes": {
+        "step1Title": "「練習ノート」タブを開く",
+        "step1Description": "ボトムナビの練習ノートアイコンをタップします。",
+        "step2Title": "「練習を記録する」をタップ",
+        "step2Description": "新規ノート作成画面が開きます。",
+        "step3Title": "練習内容を入力",
+        "step3Description": "タイトル・スポーツ種目・練習内容・気づきを入力します。",
+        "step4Title": "保存して共有",
+        "step4Description": "「公開して保存」で家族タイムラインに投稿されます。"
+      },
+      "matches": {
+        "step1Title": "「試合ノート」をタップ",
+        "step1Description": "ダッシュボードまたはボトムナビから試合ノートを選びます。",
+        "step2Title": "試合前の目標を入力",
+        "step2Description": "試合名・対戦相手・今日の目標を記録します。",
+        "step3Title": "試合後に振り返りを記録",
+        "step3Description": "スコア・自己評価・できたこと・課題・気づきを入力します。",
+        "step4Title": "ハイライトにピン",
+        "step4Description": "気づきの箇条書きにある📌をタップすると「気づきのかけら」に自動保存されます。"
+      },
+      "timeline": {
+        "step1Title": "タイムラインタブを開く",
+        "step1Description": "ボトムナビの家族アイコンをタップします。",
+        "step2Title": "家族の投稿を確認",
+        "step2Description": "グループメンバー全員の練習・試合記録が時系列で表示されます。",
+        "step3Title": "リアクションを送る",
+        "step3Description": "👏⭐💪などのリアクションをタップして応援を伝えましょう。",
+        "step4Title": "コメントで応援",
+        "step4Description": "コメント欄にメッセージを入力して家族を応援できます。"
+      },
+      "theme": {
+        "step1Title": "設定を開く",
+        "step1Description": "プロフィールアイコンから設定画面を開きます。",
+        "step2Title": "「カラーテーマ」を選択",
+        "step2Description": "J1リーグ20チームのカラーパレットから好みのテーマを選びます。",
+        "step3Title": "テーマを適用",
+        "step3Description": "選択したテーマがアプリ全体に即時反映されます。"
+      },
+      "installAndroid": {
+        "step1Title": "Chromeで開く",
+        "step1Description": "AndroidのChromeブラウザでFamNoteにアクセスします。",
+        "step2Title": "メニューを開く",
+        "step2Description": "右上の「⋮」メニューをタップします。",
+        "step3Title": "「ホーム画面に追加」",
+        "step3Description": "「ホーム画面に追加」または「アプリをインストール」を選択します。",
+        "step4Title": "インストール完了",
+        "step4Description": "ホーム画面にFamNoteのアイコンが追加されます。"
+      },
+      "installIos": {
+        "step1Title": "Safariで開く",
+        "step1Description": "iPhoneのSafariブラウザでFamNoteにアクセスします。",
+        "step2Title": "共有メニューをタップ",
+        "step2Description": "画面下部の共有アイコン（□↑）をタップします。",
+        "step3Title": "「ホーム画面に追加」",
+        "step3Description": "「ホーム画面に追加」をタップして完了です。"
+      },
+      "pricing": {
+        "step1Title": "プロフィール → 設定を開く",
+        "step1Description": "プロフィールアイコンから設定画面を開きます。",
+        "step2Title": "「プランをアップグレード」をタップ",
+        "step2Description": "月額・年額プランを選択します。年額は2ヶ月分お得です。",
+        "step3Title": "支払い情報を入力",
+        "step3Description": "Stripe決済でクレジットカード情報を安全に入力します。支払い後すぐに利用開始できます。"
+      }
+    },
+    "planCompare": {
+      "freePlan": "無料プラン",
+      "premiumPlan": "プレミアムプラン",
+      "practiceNotes": "練習ノート記録",
+      "matchJournal": "試合ジャーナル",
+      "familyTimeline": "家族タイムライン",
+      "goalManagement": "目標設定・管理",
+      "theme": "J-Leagueテーマ",
+      "advancedCharts": "高度なグラフ",
+      "unlimited": "無制限",
+      "upTo10": "最大10名",
+      "available": "利用可",
+      "unavailable": "利用不可",
+      "colors20": "20チーム"
+    },
+    "mock": {
+      "login": {
+        "ariaLabel": "ログイン画面のモックアップ",
+        "tagline": "家族の成長を一緒に記録しよう",
+        "loginButton": "Googleでログイン",
+        "footer": "利用規約・プライバシーポリシーに同意して続行"
+      },
+      "notes": {
+        "ariaLabel": "練習ノート一覧のモックアップ",
+        "header": "練習ノート",
+        "item1Title": "ドリブル練習 100本",
+        "item1Date": "4月15日",
+        "item1Tag": "サッカー",
+        "item2Title": "シュート練習 フォーム修正",
+        "item2Date": "4月14日",
+        "item2Tag": "サッカー",
+        "item3Title": "体幹トレーニング 30分",
+        "item3Date": "4月13日",
+        "item3Tag": "フィジカル",
+        "addButton": "+ 練習を記録する"
+      },
+      "matches": {
+        "ariaLabel": "試合記録のモックアップ",
+        "header": "試合ノート",
+        "matchName": "春季リーグ第3節",
+        "matchDate": "4月12日",
+        "reviewLabel": "試合後の振り返り",
+        "reviewText": "積極的なドリブルが決まった。次はシュート精度を高めたい。"
+      },
+      "timeline": {
+        "ariaLabel": "家族タイムラインのモックアップ",
+        "header": "家族タイムライン",
+        "member1": "太郎（本人）",
+        "time1": "3時間前",
+        "post1": "今日のシュート練習、100本達成！",
+        "commenter": "お母さん",
+        "comment": "すごい！頑張ったね！⭐"
+      },
+      "theme": {
+        "ariaLabel": "カラーテーマ選択のモックアップ",
+        "header": "カラーテーマ",
+        "selectLabel": "J-Leagueチームテーマ",
+        "planNote": "プレミアムプランで利用可能",
+        "theme1": "オレンジ × ネイビー",
+        "theme2": "ダークレッド × ネイビー",
+        "theme3": "レッド × ブラック",
+        "theme4": "イエロー × ブラック",
+        "theme5": "グリーン × ゴールド",
+        "total": "全20種類"
+      },
+      "install": {
+        "ariaLabel": "インストールダイアログのモックアップ",
+        "appName": "FamNote",
+        "appUrl": "app.famnote.com",
+        "dialogTitle": "ホーム画面に追加しますか？",
+        "installButton": "追加する",
+        "cancelButton": "キャンセル"
+      }
+    }
+  },
   "common": {
     "save": "保存",
     "defaultName": "さん",

@@ -527,6 +527,263 @@
     "footerTerms": "Terms of Service",
     "whyFamNote": "Why Choose FamNote?"
   },
+  "legal": {
+    "pageTitle": "Specified Commercial Transaction Act",
+    "navTitle": "Specified Commercial Transaction Act",
+    "lastUpdated": "Last Updated: May 1, 2026",
+    "tocLabel": "Contents",
+    "toc": {
+      "table": "Disclosure Table",
+      "notes": "Additional Notes"
+    },
+    "backToTop": "← Back to Top",
+    "copyright": "©2026 FamNote / FamGrow",
+    "intro": "The following disclosures are provided pursuant to Article 11 of the Act on Specified Commercial Transactions.",
+    "disclosureOnRequest": "* Will be disclosed promptly upon request",
+    "phoneNote": "Inquiries accepted by email:",
+    "rows": {
+      "seller": "Seller",
+      "representative": "Representative",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "serviceName": "Service Name",
+      "price": "Price",
+      "payment": "Payment Method",
+      "paymentTiming": "Payment Timing",
+      "serviceStart": "Service Start",
+      "cancellation": "Cancellation & Refund",
+      "environment": "System Requirements"
+    },
+    "price": {
+      "free": "Free Plan: ",
+      "freeValue": "Free",
+      "premium": "Premium Plan: ",
+      "premiumValue": "¥500/month (tax included) / ¥5,000/year (tax included)"
+    },
+    "paymentMethod": "Credit Card (Stripe)",
+    "paymentCards": "Visa / Mastercard / American Express / JCB",
+    "paymentTiming": "Charged immediately upon subscription. Monthly plans renew monthly; annual plans renew annually.",
+    "serviceStart": "Available immediately after payment.",
+    "cancellation1": "You can cancel anytime from your account settings. After cancellation, you can continue using the service until the end of the current billing period.",
+    "cancellation2": "Payments already made are non-refundable except as required by law.",
+    "environment": "An internet connection is required.",
+    "environmentNote": "Latest versions of Chrome, Safari, Edge, or Firefox are recommended.",
+    "note1": "This service operates in accordance with Japanese law.",
+    "note2Prefix": "For inquiries, please contact",
+    "note2Suffix": ".",
+    "note3": "This disclosure is subject to change without notice. Please check this page for the latest information.",
+    "enacted": "Established: May 1, 2026"
+  },
+  "help": {
+    "pageTitle": "Help & User Guide",
+    "heroTitle": "How to Use FamNote",
+    "heroSubtitle": "From practice notes to match journals and family timelines — a guide to all FamNote features.",
+    "lastUpdated": "Last Updated: April 2026",
+    "toc": "Contents",
+    "backToApp": "← Back to Top",
+    "sections": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "subtitle": "Account registration and login",
+        "description": "FamNote is easy to start with your Google account. Login is just one tap, and you can immediately create a family group and begin recording.",
+        "logoutLabel": "Logout:",
+        "logoutNote": "Available from the profile settings screen. Since data is saved to the cloud, all your records will be restored after re-logging in."
+      },
+      "notes": {
+        "title": "Practice Notes",
+        "subtitle": "Record and share daily practice",
+        "description": "Record your practice content, insights, and improvements. Consistent recording builds a lasting growth history and shares with the family timeline."
+      },
+      "matches": {
+        "title": "Match Journal",
+        "subtitle": "Set goals and reflect before and after matches",
+        "description": "Setting goals before matches and reflecting afterward deepens learning. The highlight feature automatically saves important insights."
+      },
+      "timeline": {
+        "title": "Family Timeline",
+        "subtitle": "Cheer and share as a family",
+        "description": "Practice and match records from all group members are shared in real time. React and comment to cheer from anywhere.",
+        "tipLabel": "Tip:",
+        "tipBody": "Records saved as 'Draft' are not published to the timeline. Use 'Save & Share' only when you want to share with family."
+      },
+      "theme": {
+        "title": "Color Themes",
+        "subtitle": "Customize with J-League team colors",
+        "description": "Apply color palettes from all 20 J1 League teams to the app. Make your daily records more enjoyable with your favorite team's colors.",
+        "noteLabel": "Premium only:",
+        "noteBody": "Color themes are available with the Premium Plan (¥500/month)."
+      },
+      "install": {
+        "title": "Install on Smartphone",
+        "subtitle": "Add to home screen for app-like experience",
+        "description": "FamNote is a PWA-compatible web app. Adding it to your home screen lets you use it just like a native app.",
+        "noteLabel": "Note:",
+        "noteBody": "Data is saved to the cloud even after installation. Your data won't be lost if you remove the app."
+      },
+      "pricing": {
+        "title": "Plans & Payment",
+        "subtitle": "Plan changes and upgrades",
+        "tableFeature": "Feature",
+        "upgradeTitle": "How to Upgrade",
+        "planInfoTitle": "About Plans",
+        "planInfo1": "Monthly Plan: ¥500 (tax included) / month",
+        "planInfo2": "Annual Plan: ¥5,000 (tax included) / year (2 months free)",
+        "planInfo3": "Cancel anytime. Access continues until the end of the current billing period.",
+        "viewPlans": "View pricing plans"
+      }
+    },
+    "steps": {
+      "gettingStarted": {
+        "step1Title": "Open FamNote",
+        "step1Description": "Visit app.famnote.com in your browser.",
+        "step2Title": "Login with Google",
+        "step2Description": "Tap 'Continue with Google / Sign up' and select your Google account to authenticate.",
+        "step3Title": "Set up your profile",
+        "step3Description": "Enter your name and select your sport(s).",
+        "step4Title": "Create or join a group",
+        "step4Description": "Create a new family group or join an existing one with an invite code."
+      },
+      "notes": {
+        "step1Title": "Open Practice Notes tab",
+        "step1Description": "Tap the practice notes icon in the bottom navigation.",
+        "step2Title": "Tap 'Record Practice'",
+        "step2Description": "The new note creation screen will open.",
+        "step3Title": "Enter practice content",
+        "step3Description": "Fill in the title, sport, practice content, and insights.",
+        "step4Title": "Save and share",
+        "step4Description": "Tap 'Save & Share' to post to the family timeline."
+      },
+      "matches": {
+        "step1Title": "Tap 'Match Journal'",
+        "step1Description": "Select Match Journal from the dashboard or bottom navigation.",
+        "step2Title": "Enter pre-match goals",
+        "step2Description": "Record the match name, opponent, and today's goals.",
+        "step3Title": "Record post-match reflection",
+        "step3Description": "Enter the score, self-rating, achievements, challenges, and insights.",
+        "step4Title": "Pin to Highlights",
+        "step4Description": "Tap 📌 next to bullet points in your insights to auto-save to 'Highlight Insights'."
+      },
+      "timeline": {
+        "step1Title": "Open Timeline tab",
+        "step1Description": "Tap the family icon in the bottom navigation.",
+        "step2Title": "View family posts",
+        "step2Description": "All group members' practice and match records appear in chronological order.",
+        "step3Title": "Send a reaction",
+        "step3Description": "Tap reactions like 👏⭐💪 to show your support.",
+        "step4Title": "Cheer with comments",
+        "step4Description": "Type a message in the comment field to encourage your family."
+      },
+      "theme": {
+        "step1Title": "Open Settings",
+        "step1Description": "Open the settings screen from the profile icon.",
+        "step2Title": "Select 'Color Theme'",
+        "step2Description": "Choose your preferred theme from the 20 J1 League team color palettes.",
+        "step3Title": "Apply theme",
+        "step3Description": "The selected theme is applied instantly across the entire app."
+      },
+      "installAndroid": {
+        "step1Title": "Open in Chrome",
+        "step1Description": "Access FamNote in the Chrome browser on Android.",
+        "step2Title": "Open the menu",
+        "step2Description": "Tap the '⋮' menu in the top right.",
+        "step3Title": "Add to Home Screen",
+        "step3Description": "Select 'Add to Home Screen' or 'Install App'.",
+        "step4Title": "Installation complete",
+        "step4Description": "The FamNote icon will be added to your home screen."
+      },
+      "installIos": {
+        "step1Title": "Open in Safari",
+        "step1Description": "Access FamNote in the Safari browser on iPhone.",
+        "step2Title": "Tap the Share menu",
+        "step2Description": "Tap the share icon (□↑) at the bottom of the screen.",
+        "step3Title": "Add to Home Screen",
+        "step3Description": "Tap 'Add to Home Screen' and you're done."
+      },
+      "pricing": {
+        "step1Title": "Open Profile → Settings",
+        "step1Description": "Open the settings screen from the profile icon.",
+        "step2Title": "Tap 'Upgrade Plan'",
+        "step2Description": "Choose monthly or annual plan. The annual plan saves 2 months.",
+        "step3Title": "Enter payment details",
+        "step3Description": "Securely enter your credit card details via Stripe. Access begins immediately after payment."
+      }
+    },
+    "planCompare": {
+      "freePlan": "Free Plan",
+      "premiumPlan": "Premium Plan",
+      "practiceNotes": "Practice Notes",
+      "matchJournal": "Match Journal",
+      "familyTimeline": "Family Timeline",
+      "goalManagement": "Goal Management",
+      "theme": "J-League Themes",
+      "advancedCharts": "Advanced Charts",
+      "unlimited": "Unlimited",
+      "upTo10": "Up to 10",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "colors20": "20 teams"
+    },
+    "mock": {
+      "login": {
+        "ariaLabel": "Login screen mockup",
+        "tagline": "Record your family's growth together",
+        "loginButton": "Continue with Google",
+        "footer": "By continuing, you agree to our Terms and Privacy Policy"
+      },
+      "notes": {
+        "ariaLabel": "Practice notes list mockup",
+        "header": "Practice Notes",
+        "item1Title": "Dribble drills x100",
+        "item1Date": "Apr 15",
+        "item1Tag": "Soccer",
+        "item2Title": "Shooting form correction",
+        "item2Date": "Apr 14",
+        "item2Tag": "Soccer",
+        "item3Title": "Core training 30 min",
+        "item3Date": "Apr 13",
+        "item3Tag": "Physical",
+        "addButton": "+ Record Practice"
+      },
+      "matches": {
+        "ariaLabel": "Match record mockup",
+        "header": "Match Journal",
+        "matchName": "Spring League Round 3",
+        "matchDate": "Apr 12",
+        "reviewLabel": "Post-match reflection",
+        "reviewText": "Aggressive dribbling worked well. Next: improve shooting accuracy."
+      },
+      "timeline": {
+        "ariaLabel": "Family timeline mockup",
+        "header": "Family Timeline",
+        "member1": "Taro (self)",
+        "time1": "3 hours ago",
+        "post1": "Hit 100 shots in practice today!",
+        "commenter": "Mom",
+        "comment": "Amazing! Great work! ⭐"
+      },
+      "theme": {
+        "ariaLabel": "Color theme selection mockup",
+        "header": "Color Themes",
+        "selectLabel": "J-League Team Themes",
+        "planNote": "Available with Premium Plan",
+        "theme1": "Orange × Navy",
+        "theme2": "Dark Red × Navy",
+        "theme3": "Red × Black",
+        "theme4": "Yellow × Black",
+        "theme5": "Green × Gold",
+        "total": "20 themes total"
+      },
+      "install": {
+        "ariaLabel": "Install dialog mockup",
+        "appName": "FamNote",
+        "appUrl": "app.famnote.com",
+        "dialogTitle": "Add to Home Screen?",
+        "installButton": "Add",
+        "cancelButton": "Cancel"
+      }
+    }
+  },
   "common": {
     "save": "Save",
     "defaultName": "there",
