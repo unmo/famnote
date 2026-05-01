@@ -229,7 +229,7 @@ export function LegalPageLayout({
             className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl"
             style={{ backgroundColor: "color-mix(in srgb, var(--color-brand-primary, #0EA5E9) 10%, transparent)" }}
           />
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

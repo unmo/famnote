@@ -103,7 +103,7 @@ export function BulletListInput({
                 className={clsx(
                   'flex items-center gap-2 bg-zinc-800 rounded-xl px-3 py-2.5 border transition-colors duration-150',
                   isPinned
-                    ? 'border-amber-500/60 bg-amber-500/5'
+                    ? 'border-sky-500/60 bg-sky-500/5'
                     : 'border-zinc-700/60 focus-within:border-[var(--color-brand-primary)]/60'
                 )}
               >
@@ -132,7 +132,7 @@ export function BulletListInput({
 
                 {/* 文字数（上限付近のみ表示） */}
                 {isNearLimit && (
-                  <span className="text-[10px] text-amber-500 flex-shrink-0">
+                  <span className="text-[10px] text-sky-500 flex-shrink-0">
                     {remaining}
                   </span>
                 )}
@@ -149,8 +149,8 @@ export function BulletListInput({
                     className={clsx(
                       'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150',
                       isPinned
-                        ? 'text-amber-400 bg-amber-400/10'
-                        : 'text-zinc-600 hover:text-amber-400 hover:bg-amber-400/10'
+                        ? 'text-sky-400 bg-sky-400/10'
+                        : 'text-zinc-600 hover:text-sky-400 hover:bg-sky-400/10'
                     )}
                   >
                     <Pin size={13} />

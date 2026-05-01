@@ -11,8 +11,8 @@ interface HighlightCardProps {
 
 const SOURCE_TYPE_LABELS: Record<HighlightSourceType, { label: string; badge: string }> = {
   // アクティブなsourceType（鮮やかバッジ）
-  journal_insight: { label: '試合の気づき', badge: 'bg-amber-500/20 text-amber-400' },
-  note_insight: { label: '練習の気づき', badge: 'bg-amber-500/20 text-amber-400' },
+  journal_insight: { label: '試合の気づき', badge: 'bg-sky-500/20 text-sky-400' },
+  note_insight: { label: '練習の気づき', badge: 'bg-sky-500/20 text-sky-400' },
   practice_bullet: { label: '練習メモ', badge: 'bg-purple-500/20 text-purple-400' },
   // 過去データ互換（薄いグレーバッジ）
   journal_pre_goal: { label: '試合メモ（過去データ）', badge: 'bg-zinc-700/50 text-zinc-500' },
@@ -30,10 +30,10 @@ export function HighlightCard({ highlight, onPress, variant = 'full' }: Highligh
     return (
       <div
         onClick={() => onPress?.(highlight)}
-        className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-3 cursor-pointer hover:border-amber-500/30 transition-colors duration-150"
+        className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-3 cursor-pointer hover:border-sky-500/30 transition-colors duration-150"
       >
         <p className="text-sm text-zinc-200 line-clamp-2">
-          <span className="text-amber-400 text-xs mr-1.5">📌</span>
+          <span className="text-sky-400 text-xs mr-1.5">📌</span>
           {highlight.text}
         </p>
         <p className="text-xs text-zinc-600 mt-1">{dateStr} · {sourceInfo.label}</p>
@@ -44,12 +44,12 @@ export function HighlightCard({ highlight, onPress, variant = 'full' }: Highligh
   return (
     <div
       onClick={() => onPress?.(highlight)}
-      className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-amber-500/30 transition-colors duration-150 cursor-pointer"
+      className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-sky-500/30 transition-colors duration-150 cursor-pointer"
     >
       {/* ヘッダー行 */}
       <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-2">
-          <span className="text-amber-400 text-sm">📌</span>
+          <span className="text-sky-400 text-sm">📌</span>
           <span className={clsx('rounded-full px-2 py-0.5 text-xs font-medium', sourceInfo.badge)}>
             {sourceInfo.label}
           </span>

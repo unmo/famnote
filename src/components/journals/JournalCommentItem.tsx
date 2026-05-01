@@ -61,7 +61,7 @@ export function JournalCommentItem({
           ) : (
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                isParent ? 'bg-amber-900/50 text-amber-300' : 'bg-zinc-700 text-zinc-300'
+                isParent ? 'bg-sky-900/50 text-sky-300' : 'bg-zinc-700 text-zinc-300'
               }`}
             >
               {initial}
@@ -75,12 +75,12 @@ export function JournalCommentItem({
         </div>
 
         {/* 表示名 + 父/母バッジ + 役割バッジ */}
-        <span className={`text-sm font-bold ${isParent ? 'text-amber-300' : 'text-zinc-200'}`}>
+        <span className={`text-sm font-bold ${isParent ? 'text-sky-300' : 'text-zinc-200'}`}>
           {comment.displayName}
         </span>
         <RoleBadge parentRole={comment.parentRole} />
         {isParent ? (
-          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-400 border border-amber-800/50 flex items-center gap-0.5">
+          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-sky-900/40 text-sky-400 border border-sky-800/50 flex items-center gap-0.5">
             <Crown size={8} />{t('profile.admin')}
           </span>
         ) : (
@@ -133,7 +133,7 @@ export function JournalCommentItem({
         <div
           className={`ml-9 rounded-xl rounded-tl-sm px-3 py-2.5 text-sm leading-relaxed break-all ${
             isParent
-              ? 'bg-amber-950/40 border border-amber-900/30 text-zinc-100'
+              ? 'bg-sky-950/40 border border-sky-900/30 text-zinc-100'
               : 'bg-zinc-800/60 border border-zinc-700/40 text-zinc-200'
           }`}
         >

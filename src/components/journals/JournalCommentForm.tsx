@@ -70,7 +70,7 @@ export function JournalCommentForm({ journalId, onSubmitSuccess }: JournalCommen
 
   const counterColor =
     text.length > MAX_LENGTH ? 'text-red-400' :
-    text.length > 180 ? 'text-amber-500' : 'text-zinc-600';
+    text.length > 180 ? 'text-sky-500' : 'text-zinc-600';
 
   const initial = activeProfile.displayName ? Array.from(activeProfile.displayName)[0] : '?';
   const isJa = i18n.language === 'ja';
@@ -91,7 +91,7 @@ export function JournalCommentForm({ journalId, onSubmitSuccess }: JournalCommen
         {activeProfile.avatarUrl ? (
           <img src={activeProfile.avatarUrl} alt={activeProfile.displayName} className="w-8 h-8 rounded-full object-cover" />
         ) : (
-          <div className="w-8 h-8 rounded-full bg-amber-900/40 flex items-center justify-center text-xs font-bold text-amber-300">
+          <div className="w-8 h-8 rounded-full bg-sky-900/40 flex items-center justify-center text-xs font-bold text-sky-300">
             {initial}
           </div>
         )}
@@ -106,10 +106,10 @@ export function JournalCommentForm({ journalId, onSubmitSuccess }: JournalCommen
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="mb-2 inline-flex items-center gap-1.5 bg-amber-950/40 border border-amber-900/40 rounded-xl px-3 py-1.5"
+              className="mb-2 inline-flex items-center gap-1.5 bg-sky-950/40 border border-sky-900/40 rounded-xl px-3 py-1.5"
             >
               <span className="text-2xl">{selectedStamp.emoji}</span>
-              <span className="text-xs text-amber-300 font-medium">
+              <span className="text-xs text-sky-300 font-medium">
                 {isJa ? selectedStamp.label : selectedStamp.labelEn}
               </span>
               <button
@@ -185,7 +185,7 @@ export function JournalCommentForm({ journalId, onSubmitSuccess }: JournalCommen
                     }}
                     className={`flex items-center justify-center p-1.5 rounded-xl transition-colors ${
                       stampId === stamp.id
-                        ? 'bg-amber-950/60 border border-amber-800/50'
+                        ? 'bg-sky-950/60 border border-sky-800/50'
                         : 'hover:bg-zinc-700'
                     }`}
                     title={isJa ? stamp.label : stamp.labelEn}
@@ -206,7 +206,7 @@ export function JournalCommentForm({ journalId, onSubmitSuccess }: JournalCommen
             onClick={() => setShowStampPicker((v) => !v)}
             className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
               showStampPicker || stampId
-                ? 'text-amber-400 bg-amber-950/40'
+                ? 'text-sky-400 bg-sky-950/40'
                 : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-700'
             }`}
             aria-label="スタンプを選択"

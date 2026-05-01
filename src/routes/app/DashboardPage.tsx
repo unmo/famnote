@@ -105,9 +105,9 @@ const MENU_ITEMS = [
     icon: NotebookPen,
     label: '試合ノート',
     sub: '記録・振り返り',
-    color: 'from-orange-500/20 to-orange-600/5',
-    iconColor: 'text-orange-400',
-    borderColor: 'border-orange-500/20',
+    color: 'from-sky-500/20 to-sky-600/5',
+    iconColor: 'text-sky-400',
+    borderColor: 'border-sky-500/20',
   },
   {
     to: '/notes',
@@ -123,9 +123,9 @@ const MENU_ITEMS = [
     icon: Star,
     label: '気づきのかけら',
     sub: '蓄積した気づき',
-    color: 'from-amber-500/20 to-amber-600/5',
-    iconColor: 'text-amber-400',
-    borderColor: 'border-amber-500/20',
+    color: 'from-sky-500/20 to-sky-600/5',
+    iconColor: 'text-sky-400',
+    borderColor: 'border-sky-500/20',
   },
   {
     to: '/theme',
@@ -218,7 +218,7 @@ export function DashboardPage() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gradient-to-r from-orange-950/50 to-amber-950/50 border border-orange-900/50 rounded-2xl p-6"
+        className="bg-gradient-to-r from-sky-950/50 to-sky-900/30 border border-sky-900/50 rounded-2xl p-6"
       >
         <div className="flex items-center justify-between">
           <div>
@@ -234,7 +234,7 @@ export function DashboardPage() {
               <span className="text-5xl font-extrabold text-zinc-50">{currentStreak}</span>
               <span className="text-zinc-400 text-lg">日</span>
             </div>
-            <p className="text-orange-300 font-medium mt-1">{t('dashboard.streak')}</p>
+            <p className="text-sky-300 font-medium mt-1">{t('dashboard.streak')}</p>
           </div>
 
           <div className="flex flex-col gap-1">
@@ -293,11 +293,11 @@ export function DashboardPage() {
                   {/* ノート種別アイコン */}
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
                     item.kind === 'journal'
-                      ? 'bg-orange-500/15'
+                      ? 'bg-sky-500/15'
                       : 'bg-blue-500/15'
                   }`}>
                     {item.kind === 'journal'
-                      ? <NotebookPen size={16} className="text-orange-400" />
+                      ? <NotebookPen size={16} className="text-sky-400" />
                       : <BookOpen size={16} className="text-blue-400" />
                     }
                   </div>
@@ -307,7 +307,7 @@ export function DashboardPage() {
                       {/* 種別ラベル */}
                       <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
                         item.kind === 'journal'
-                          ? 'bg-orange-500/15 text-orange-400'
+                          ? 'bg-sky-500/15 text-sky-400'
                           : 'bg-blue-500/15 text-blue-400'
                       }`}>
                         {item.kind === 'journal' ? '試合ノート' : '練習ノート'}
