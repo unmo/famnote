@@ -1,8 +1,49 @@
 {
-  "feature": "",
-  "phase": "",
-  "loop_count": 0,
+  "feature": "landing-page-renewal",
+  "phase": "completed",
+  "loop_count": 1,
   "max_loops": 3,
   "stop_requested": false,
-  "history": []
+  "history": [
+    {
+      "phase": "planner",
+      "status": "completed",
+      "timestamp": "2026-04-30T00:00:00.000Z"
+    },
+    {
+      "phase": "designer",
+      "status": "completed",
+      "timestamp": "2026-04-30T01:00:00.000Z",
+      "output": ".claude/specs/landing-page-design.md"
+    },
+    {
+      "phase": "generator",
+      "status": "completed",
+      "timestamp": "2026-04-30T02:00:00.000Z",
+      "output": {
+        "changed_files": [
+          "src/routes/app/LandingPage.tsx",
+          "src/i18n/locales/ja.json",
+          "src/i18n/locales/en.json",
+          "src/routes/app/LandingPage.test.tsx"
+        ],
+        "summary": "LandingPage全面リライト（8セクション構成）・i18n翻訳キー大幅追加・ユニットテスト23件作成。全190テストパス・TypeScriptエラーなし。"
+      }
+    },
+    {
+      "phase": "evaluator",
+      "status": "passed",
+      "timestamp": "2026-04-30T03:00:00.000Z",
+      "result": {
+        "build": "OK",
+        "vulnerabilities": "OK（critical/high: 0件・moderate: 6件はdevServer系許容）",
+        "unitTests": "OK（190/190テストパス）",
+        "e2eTests": "SKIPPED（Firebase Emulator導入まで保留・既存CI方針に準拠）",
+        "codeReview": "OK（軽微な指摘: FeatureCardのindex未使用・フッターcopyright未翻訳）",
+        "security": "OK",
+        "uiux": "OK",
+        "degrade": "OK"
+      }
+    }
+  ]
 }
