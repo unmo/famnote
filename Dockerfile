@@ -1,3 +1,6 @@
+# syntax=docker/dockerfile:1
+# check=skip=SecretsUsedInArgOrEnv
+
 # ---- Build Stage ----
 FROM node:22-alpine AS builder
 
@@ -9,22 +12,14 @@ RUN npm ci --frozen-lockfile
 COPY . .
 
 # ビルド引数（GitHub Actions から渡される）
-# hadolint ignore=DL3025
 ARG VITE_FIREBASE_API_KEY
-# hadolint ignore=DL3025
 ARG VITE_FIREBASE_AUTH_DOMAIN
-# hadolint ignore=DL3025
 ARG VITE_FIREBASE_PROJECT_ID
-# hadolint ignore=DL3025
 ARG VITE_FIREBASE_STORAGE_BUCKET
-# hadolint ignore=DL3025
 ARG VITE_FIREBASE_MESSAGING_SENDER_ID
-# hadolint ignore=DL3025
 ARG VITE_FIREBASE_APP_ID
-# hadolint ignore=DL3025
 ARG VITE_APP_URL=""
 
-# hadolint ignore=DL3025
 ENV VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY \
     VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN \
     VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID \
