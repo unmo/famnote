@@ -9,14 +9,14 @@ interface StatusBadgeProps {
 const STATUS_STYLES = {
   pre: {
     label: '振り返り待ち',
-    className: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-    dotColor: 'bg-amber-400',
+    className: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
+    dotColor: 'bg-sky-400',
     animate: true,
   },
   completed: {
     label: '振り返り完了',
-    className: 'bg-green-500/15 text-green-400 border-green-500/30',
-    dotColor: 'bg-green-400',
+    className: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+    dotColor: 'bg-emerald-400',
     animate: false,
   },
   post_only: {

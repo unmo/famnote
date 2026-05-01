@@ -16,9 +16,9 @@ interface MatchJournalCardProps {
 }
 
 const STATUS_THEME = {
-  pre:       { bar: 'bg-amber-500', glow: 'from-amber-500/6' },
-  completed: { bar: 'bg-green-500', glow: 'from-green-500/6' },
-  post_only: { bar: 'bg-blue-500',  glow: 'from-blue-500/6'  },
+  pre:       { bar: 'bg-sky-500',     glow: 'from-sky-500/6'     },
+  completed: { bar: 'bg-emerald-500', glow: 'from-emerald-500/6' },
+  post_only: { bar: 'bg-sky-700',     glow: 'from-sky-700/6'     },
 } as const;
 
 const RESULT_LABEL: Record<string, { label: string; cls: string }> = {
@@ -108,7 +108,7 @@ export function MatchJournalCard({ journal, onPress, onPostNotePress }: MatchJou
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onPostNotePress?.(journal.id); }}
-            className="w-full mt-1 bg-amber-500/10 border border-amber-500/30 rounded-lg py-1.5 text-[11px] text-amber-400 font-semibold flex items-center justify-center gap-0.5"
+            className="w-full mt-1 bg-sky-500/10 border border-sky-500/30 rounded-lg py-1.5 text-[11px] text-sky-400 font-semibold flex items-center justify-center gap-0.5"
           >
             振り返りを書く <ChevronRight size={12} />
           </button>
