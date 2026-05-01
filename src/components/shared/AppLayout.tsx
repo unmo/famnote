@@ -53,9 +53,9 @@ export function AppLayout() {
           {/* ロゴ */}
           <div className="flex items-center gap-2">
             <Link to="/dashboard" className="flex items-center gap-2 group">
-              <img src="/favicon.svg" alt="FamNote" className="w-8 h-8" />
-              <span className="text-xl font-bold text-zinc-50 tracking-wider">
-                Fam<span className="text-[var(--color-brand-primary)]">Note</span>
+              <img src="/favicon.svg" alt="FamNote" className="w-9 h-9 rounded-xl" />
+              <span className="text-xl font-bold tracking-tight text-zinc-50">
+                Fam<span style={{ color: 'var(--color-brand-primary)' }}>Note</span>
               </span>
             </Link>
           </div>
