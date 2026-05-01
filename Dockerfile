@@ -1,15 +1,15 @@
-# ビルドステージ
+# ビルドステージ（distが存在しない場合のみビルド）
 FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# 依存関係のインストール（キャッシュ最適化）
 COPY package*.json ./
 RUN npm ci --frozen-lockfile
 
-# ソースコードのコピーとビルド
 COPY . .
-RUN npm run build
+
+# dist/ が既に存在する場合はビルドをスキップ（CI でビルド済みの成果物を使用）
+RUN if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then npm run build; fi
 
 # 本番ステージ（Nginxで静的ファイルを配信）
 FROM nginx:1.27-alpine AS production
