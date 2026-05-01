@@ -278,7 +278,7 @@ export function LoginPage() {
           transition={{ delay: 0.4, duration: 0.4 }}
         >
           <p className="text-[10px] text-zinc-500 font-bold tracking-[0.25em] uppercase">
-            POWERED BY FAMNOTE
+            家族の成長を、記録しよう。
           </p>
         </motion.div>
       </div>

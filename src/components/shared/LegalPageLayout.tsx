@@ -159,7 +159,7 @@ export function LegalFooter() {
         {/* コピーライト */}
         <div className="mt-6 text-center">
           <p className="text-xs text-zinc-500">
-            {t("legal.copyright", "©2026 FamNote / FamGrow")}
+            {t("legal.copyright", "© 2026 FamGrow. All rights reserved.")}
           </p>
         </div>
       </div>

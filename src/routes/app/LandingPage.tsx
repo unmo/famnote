@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring } from 'motion/react';
+﻿import { motion, useMotionValue, useSpring } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
@@ -692,7 +692,7 @@ function LandingFooter() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* コピーライト */}
           <p className="text-sm text-zinc-500 order-2 md:order-1">
-            ©2026 FamNote. All rights reserved.
+            © 2026 FamGrow. All rights reserved.
           </p>
 
           {/* リンク群 */}
