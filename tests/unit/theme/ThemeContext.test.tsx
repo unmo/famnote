@@ -12,12 +12,12 @@ const resetStorage = () => {
 describe('ThemeProvider', () => {
   beforeEach(resetStorage);
 
-  it('正常系: デフォルトテーマ（shimizu）が適用される', () => {
+  it('正常系: デフォルトテーマ（default）が適用される', () => {
     const { result } = renderHook(() => useThemeContext(), {
       wrapper: ({ children }) => <ThemeProvider>{children}</ThemeProvider>,
     });
-    expect(result.current.currentTheme.id).toBe('shimizu');
-    expect(result.current.currentTheme.primary).toBe('#E85513');
+    expect(result.current.currentTheme.id).toBe('default');
+    expect(result.current.currentTheme.primary).toBe('#0EA5E9');
   });
 
   it('正常系: setTheme呼び出しでテーマが変更される', () => {
@@ -94,8 +94,8 @@ describe('useThemeContext (outside provider)', () => {
 });
 
 describe('DEFAULT_THEME', () => {
-  it('正常系: デフォルトテーマはshimizuである', () => {
-    expect(DEFAULT_THEME.id).toBe('shimizu');
+  it('正常系: デフォルトテーマはdefaultである', () => {
+    expect(DEFAULT_THEME.id).toBe('default');
     expect(DEFAULT_THEME.isPremium).toBe(false);
   });
 });
