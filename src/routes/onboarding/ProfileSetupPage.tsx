@@ -86,7 +86,7 @@ export function ProfileSetupPage() {
             {/* 表示名 */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-zinc-300">
-                {t('auth.displayName')}
+                {t('profile.nameLabel')}
               </label>
               <input
                 {...register('displayName')}

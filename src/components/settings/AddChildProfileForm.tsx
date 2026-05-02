@@ -46,7 +46,7 @@ export function AddChildProfileForm({ onAdd, isAtMemberLimit, maxMembers }: AddC
   const handleSubmit = async () => {
     const result = addChildProfileSchema.safeParse({ displayName: value });
     if (!result.success) {
-      setError(result.error.errors[0]?.message ?? t('common.validationError'));
+      setError(result.error.errors[0]?.message ?? t('profile.validationError'));
       return;
     }
     if (memberType === 'parent' && !parentRole) {

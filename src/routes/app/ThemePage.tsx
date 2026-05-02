@@ -38,7 +38,7 @@ export function ThemePage() {
                   setTheme(theme.id);
                 }}
                 title={theme.name}
-                aria-label={t('settings.themeAriaLabel', { name: theme.name }) + (isLocked ? ` (${t('settings.themeLocked')})` : '')}
+                aria-label={t('common.themeAriaLabel', { name: theme.name }) + (isLocked ? ` (${t('common.themeLocked')})` : '')}
                 className="relative flex flex-col items-center gap-2"
               >
                 <div
