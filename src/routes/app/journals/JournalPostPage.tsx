@@ -75,6 +75,7 @@ export function JournalPostPage() {
   };
 
   return (
+    <>
     <motion.div
       variants={pageVariants}
       initial="initial"
@@ -219,6 +220,8 @@ export function JournalPostPage() {
 
       </div>
 
+    </motion.div>
+
       {/* 固定フッター */}
       <div className="fixed bottom-0 left-0 right-0 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 px-4 py-3 flex gap-3">
         <button
@@ -239,6 +242,6 @@ export function JournalPostPage() {
           {addPostMutation.isPending ? t('common.saving') : t('journals.savePost')}
         </motion.button>
       </div>
-    </motion.div>
+    </>
   );
 }
