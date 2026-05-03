@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Users, ClipboardList, Share2, Heart, AlertCircle } from 'lucide-react';
+import { ClipboardList, Share2, Heart, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -129,15 +129,8 @@ export function LoginPage() {
           <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-4">
               {/* ブランドアイコン */}
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform duration-500 relative"
-                style={{
-                  background: 'linear-gradient(135deg, var(--color-brand-primary), #f97316)',
-                  boxShadow: '0 8px 24px -4px rgba(232,85,19,0.4)',
-                }}
-              >
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent" />
-                <Users className="w-7 h-7 text-white relative z-10" aria-hidden="true" />
+              <div className="transform group-hover:scale-105 transition-transform duration-500" style={{ filter: 'drop-shadow(0 8px 16px rgba(14,165,233,0.35))' }}>
+                <img src="/favicon.svg" alt="FamNote" className="w-14 h-14 rounded-2xl" />
               </div>
 
               {/* ブランド名 */}
