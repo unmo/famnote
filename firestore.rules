@@ -179,7 +179,10 @@ service cloud.firestore {
                        (request.resource.data.userId == request.auth.uid ||
                         (request.resource.data.groupId != null &&
                          isGroupMemberProxy(request.resource.data.groupId, request.resource.data.userId)));
-      allow update: if (isOwner(resource.data.userId) || isSameGroup(resource.data.groupId)) &&
+      allow update: if (isOwner(resource.data.userId) ||
+                        isSameGroup(resource.data.groupId) ||
+                        (resource.data.groupId != null &&
+                         isGroupMemberProxy(resource.data.groupId, resource.data.userId))) &&
                        resource.data.userId == request.resource.data.userId;
       allow delete: if isOwner(resource.data.userId) ||
                        (resource.data.groupId != null && isGroupOwner(resource.data.groupId));
@@ -210,9 +213,11 @@ service cloud.firestore {
       allow create: if isAuthenticated() &&
                        (request.resource.data.userId == request.auth.uid ||
                         (request.resource.data.groupId != null &&
-                         isGroupMemberProxy(request.resource.data.groupId, request.resource.data.userId)));
+                         isGroupMemberProxy(request.resource.data.groupId, request.resource.data.userId)) ||
+                        isSameGroup(resource.data.groupId));
       allow delete: if isOwner(resource.data.userId) ||
-                       (resource.data.groupId != null && isGroupOwner(resource.data.groupId));
+                       (resource.data.groupId != null && isGroupOwner(resource.data.groupId)) ||
+                       (resource.data.groupId != null && isSameGroup(resource.data.groupId));
       allow update: if false;
     }
 

@@ -113,7 +113,7 @@ export async function fetchUserHighlights(
 // 気づきをハイライトとして一括置換（保存時に呼び出す）
 export async function replaceInsightHighlights(
   userId: string,
-  groupId: string,
+  groupId: string | null,
   sport: Sport,
   sourceType: HighlightSourceType,
   sourceId: string,

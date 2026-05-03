@@ -94,10 +94,15 @@ export async function addPostMatchNote(
     updatedAt: serverTimestamp(),
   });
 
-  await replaceInsightHighlights(
-    userId, journalData.groupId ?? '', journalData.sport,
-    'journal_insight', journalId, data.insights, journalData.date
-  );
+  // ハイライト同期は失敗しても振り返り保存は成功扱いにする
+  try {
+    await replaceInsightHighlights(
+      userId, journalData.groupId ?? null, journalData.sport,
+      'journal_insight', journalId, data.insights, journalData.date
+    );
+  } catch (e) {
+    console.warn('[addPostMatchNote] replaceInsightHighlights failed (non-blocking):', e);
+  }
 }
 
 // 試合前ノート更新
@@ -158,10 +163,14 @@ export async function updatePostMatchNote(
     updatedAt: serverTimestamp(),
   });
 
-  await replaceInsightHighlights(
-    userId, journalData.groupId ?? '', journalData.sport,
-    'journal_insight', journalId, data.insights, journalData.date
-  );
+  try {
+    await replaceInsightHighlights(
+      userId, journalData.groupId ?? null, journalData.sport,
+      'journal_insight', journalId, data.insights, journalData.date
+    );
+  } catch (e) {
+    console.warn('[updatePostMatchNote] replaceInsightHighlights failed (non-blocking):', e);
+  }
 }
 
 // 試合後ノートのみ作成（試合前なし）
@@ -205,10 +214,14 @@ export async function createPostMatchOnly(
   });
 
   const sourceDate = Timestamp.fromDate(new Date(baseData.date));
-  await replaceInsightHighlights(
-    userId, groupId ?? '', baseData.sport,
-    'journal_insight', ref.id, postData.insights, sourceDate
-  );
+  try {
+    await replaceInsightHighlights(
+      userId, groupId, baseData.sport,
+      'journal_insight', ref.id, postData.insights, sourceDate
+    );
+  } catch (e) {
+    console.warn('[createPostMatchOnly] replaceInsightHighlights failed (non-blocking):', e);
+  }
   return { journalId: ref.id };
 }
 

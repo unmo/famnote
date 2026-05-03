@@ -16,7 +16,7 @@ export type HighlightSourceType =
 export interface Highlight {
   id: string;
   userId: string;
-  groupId: string;
+  groupId: string | null;
   sport: Sport;
   sourceType: HighlightSourceType;
   sourceId: string;       // journalId または noteId
