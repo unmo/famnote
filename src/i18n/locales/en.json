@@ -119,7 +119,7 @@
     },
     "date": "Date",
     "sport": "Sport",
-    "duration": "Duration (minutes)",
+    "duration": "Duration (min)",
     "location": "Location",
     "todayGoal": "Today's Goal",
     "content": "Practice Content",

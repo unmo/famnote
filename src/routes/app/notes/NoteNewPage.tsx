@@ -119,9 +119,9 @@ export function NoteNewPage() {
         </div>
 
         {/* 練習時間・場所 */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">{t('notes.duration')} <span className="text-zinc-500 text-xs">（任意）</span></label>
+            <label className="text-sm font-medium text-zinc-300">{t('notes.duration')} <span className="text-zinc-500 text-xs">{t('notes.optional')}</span></label>
             <input
               {...register('durationMinutes', { valueAsNumber: true })}
               type="number"
@@ -132,7 +132,7 @@ export function NoteNewPage() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">{t('notes.location')} <span className="text-zinc-500 text-xs">（任意）</span></label>
+            <label className="text-sm font-medium text-zinc-300">{t('notes.location')} <span className="text-zinc-500 text-xs">{t('notes.optional')}</span></label>
             <input
               {...register('location')}
               type="text"
@@ -144,7 +144,7 @@ export function NoteNewPage() {
 
         {/* 今日の目標 */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-300">{t('notes.todayGoal')} <span className="text-zinc-500 text-xs">（任意）</span></label>
+          <label className="text-sm font-medium text-zinc-300">{t('notes.todayGoal')} <span className="text-zinc-500 text-xs">{t('notes.optional')}</span></label>
           <textarea
             {...register('todayGoal')}
             placeholder="今日達成したいこと..."
@@ -172,7 +172,7 @@ export function NoteNewPage() {
 
         {/* 振り返り */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-300">{t('notes.reflection')} <span className="text-zinc-500 text-xs">（任意）</span></label>
+          <label className="text-sm font-medium text-zinc-300">{t('notes.reflection')} <span className="text-zinc-500 text-xs">{t('notes.optional')}</span></label>
           <textarea
             {...register('reflection')}
             placeholder="良かった点・改善点..."

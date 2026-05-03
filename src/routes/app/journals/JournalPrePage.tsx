@@ -148,9 +148,9 @@ export function JournalPrePage() {
           )}
         </div>
 
-        {/* 会場（任意） */}
+        {/* 会場{t('common.optional')} */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-300">{t('journals.venue')} <span className="text-zinc-500 text-xs">（任意）</span></label>
+          <label className="text-sm font-medium text-zinc-300">{t('journals.venue')} <span className="text-zinc-500 text-xs">{t('common.optional')}</span></label>
           <div className="relative">
             <input
               type="text"
@@ -183,7 +183,7 @@ export function JournalPrePage() {
         {/* チャレンジしたいこと */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-zinc-300">
-            {t('journals.challenges')} <span className="text-zinc-500 text-xs">（任意）</span>
+            {t('journals.challenges')} <span className="text-zinc-500 text-xs">{t('common.optional')}</span>
           </label>
           <BulletListInput
             value={challenges}

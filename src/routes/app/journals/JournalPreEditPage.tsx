@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useJournal, useUpdatePreMatchNote } from '@/hooks/useMatchJournals';
 import { BulletListInput } from '@/components/journals/BulletListInput';
@@ -17,6 +18,7 @@ const pageVariants = {
 };
 
 export function JournalPreEditPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id: journalId } = useParams<{ id: string }>();
   const { activeProfile } = useActiveProfile();
@@ -134,7 +136,7 @@ export function JournalPreEditPage() {
 
         {/* 会場 */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-300">会場 <span className="text-zinc-500 text-xs">（任意）</span></label>
+          <label className="text-sm font-medium text-zinc-300">会場 <span className="text-zinc-500 text-xs">{t('common.optional')}</span></label>
           <input
             type="text"
             value={venue}
@@ -159,7 +161,7 @@ export function JournalPreEditPage() {
 
         {/* チャレンジしたいこと */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-zinc-300">チャレンジしたいこと <span className="text-zinc-500 text-xs">（任意）</span></label>
+          <label className="text-sm font-medium text-zinc-300">チャレンジしたいこと <span className="text-zinc-500 text-xs">{t('common.optional')}</span></label>
           <BulletListInput
             value={challenges}
             onChange={setChallenges}
