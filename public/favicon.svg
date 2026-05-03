@@ -1,50 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0d1e3a"/>
-      <stop offset="100%" stop-color="#060c1a"/>
-    </linearGradient>
-    <linearGradient id="sky" x1="13" y1="10" x2="46" y2="54" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#e0f2fe"/>
-      <stop offset="40%" stop-color="#38bdf8"/>
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="60%" stop-color="#0EA5E9"/>
       <stop offset="100%" stop-color="#0369a1"/>
     </linearGradient>
-    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fde68a"/>
-      <stop offset="100%" stop-color="#f59e0b"/>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="white" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="white" stop-opacity="0"/>
     </linearGradient>
-    <radialGradient id="spot" cx="40%" cy="30%" r="60%">
-      <stop offset="0%" stop-color="#0EA5E9" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#0EA5E9" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="2.5" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#0369a1" flood-opacity="0.4"/>
     </filter>
   </defs>
 
-  <!-- Background -->
+  <!-- Background with brand blue -->
   <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <!-- Spotlight -->
-  <rect width="64" height="64" rx="14" fill="url(#spot)"/>
-  <!-- Top shine -->
-  <rect x="6" y="1" width="52" height="20" rx="10" fill="white" opacity="0.04"/>
-  <!-- Border -->
-  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" stroke="white" stroke-opacity="0.12" fill="none"/>
+  <!-- Top shine overlay -->
+  <rect width="64" height="32" rx="14" fill="url(#shine)"/>
 
-  <!-- Bold F: vertical bar -->
-  <rect x="13" y="11" width="11" height="42" rx="3" fill="url(#sky)" filter="url(#glow)"/>
-  <!-- Bold F: top horizontal bar -->
-  <rect x="13" y="11" width="32" height="11" rx="3" fill="url(#sky)" filter="url(#glow)"/>
-  <!-- Bold F: middle horizontal bar -->
-  <rect x="13" y="28" width="24" height="9" rx="2.5" fill="url(#sky)" opacity="0.85"/>
+  <!-- Bold white F -->
+  <!-- Vertical bar -->
+  <rect x="14" y="12" width="10" height="40" rx="2.5" fill="white" filter="url(#shadow)"/>
+  <!-- Top horizontal bar -->
+  <rect x="14" y="12" width="30" height="10" rx="2.5" fill="white" filter="url(#shadow)"/>
+  <!-- Middle horizontal bar -->
+  <rect x="14" y="28" width="22" height="9" rx="2.5" fill="white" opacity="0.9"/>
 
-  <!-- Accent badge (bottom-right) -->
-  <circle cx="47" cy="47" r="8" fill="#0c1a35"/>
-  <circle cx="47" cy="47" r="7" fill="url(#amber)"/>
-  <!-- Star shape in badge -->
-  <path d="M47 41.5l1.2 3.6h3.8l-3.1 2.2 1.2 3.6-3.1-2.2-3.1 2.2 1.2-3.6-3.1-2.2h3.8z" fill="white" opacity="0.95"/>
+  <!-- Accent dot (amber) -->
+  <circle cx="46" cy="46" r="5.5" fill="#fbbf24"/>
+  <circle cx="46" cy="46" r="3" fill="white" opacity="0.85"/>
 </svg>
