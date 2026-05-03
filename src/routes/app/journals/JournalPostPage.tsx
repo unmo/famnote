@@ -223,7 +223,7 @@ export function JournalPostPage() {
     </motion.div>
 
       {/* 固定フッター */}
-      <div className="fixed bottom-0 left-0 right-0 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 px-4 py-3 flex gap-3">
+      <div className="fixed bottom-0 left-0 right-0 z-[60] bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800 px-4 py-3 flex gap-3">
         <button
           type="button"
           onClick={() => navigate(-1)}
