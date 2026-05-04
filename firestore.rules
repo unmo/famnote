@@ -74,8 +74,12 @@ service cloud.firestore {
         // 自分自身の参加 または 同グループメンバーによる子プロフィール追加
         allow create: if isAuthenticated() &&
                          (memberId == request.auth.uid || isGroupMember(groupId));
-        allow update: if isOwner(memberId) || isGroupMember(groupId);
-        allow delete: if isOwner(memberId) || isGroupMember(groupId);
+        // 自分自身のみ更新可（role・uid・joinedAt の変更は不可）
+        allow update: if isOwner(memberId) &&
+                         !request.resource.data.diff(resource.data)
+                           .affectedKeys().hasAny(['role', 'uid', 'joinedAt']);
+        // 自分自身 または グループオーナーのみ削除可
+        allow delete: if isOwner(memberId) || isGroupOwner(groupId);
       }
     }
 
@@ -214,7 +218,7 @@ service cloud.firestore {
                        (request.resource.data.userId == request.auth.uid ||
                         (request.resource.data.groupId != null &&
                          isGroupMemberProxy(request.resource.data.groupId, request.resource.data.userId)) ||
-                        isSameGroup(resource.data.groupId));
+                        isSameGroup(request.resource.data.groupId));
       allow delete: if isOwner(resource.data.userId) ||
                        (resource.data.groupId != null && isGroupOwner(resource.data.groupId)) ||
                        (resource.data.groupId != null && isSameGroup(resource.data.groupId));
