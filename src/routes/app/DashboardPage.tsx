@@ -69,10 +69,17 @@ function BadgeItem({ badge, earned, label }: {
         onHoverEnd={() => setShowTip(false)}
         onTap={() => !earned && setShowTip((v) => !v)}
         className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all cursor-default ${
-          earned ? 'bg-zinc-900 border-zinc-700' : 'bg-zinc-950 border-zinc-800/50'
+          earned
+            ? 'bg-gradient-to-b from-zinc-800/80 to-zinc-900 border-zinc-600/80'
+            : 'bg-zinc-950 border-zinc-800/50'
         }`}
       >
-        <span className={`text-2xl ${!earned ? 'grayscale opacity-25' : ''}`}>{badge.emoji}</span>
+        <span
+          className={`text-2xl ${!earned ? 'grayscale opacity-25' : ''}`}
+          style={earned ? { filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.3))' } : undefined}
+        >
+          {badge.emoji}
+        </span>
         <p className={`text-[9px] font-semibold text-center leading-tight ${earned ? 'text-zinc-300' : 'text-zinc-700'}`}>
           {earned ? label : <Lock size={8} className="mx-auto" />}
         </p>
@@ -137,6 +144,9 @@ const MENU_ITEMS = [
     borderColor: 'border-purple-500/20',
   },
 ] as const;
+
+// ウィークリードットの曜日ラベル（月〜日）
+const WEEK_LABELS = ['月', '火', '水', '木', '金', '土', '日'] as const;
 
 const containerVariants = {
   animate: { transition: { staggerChildren: 0.06 } },
@@ -207,18 +217,29 @@ export function DashboardPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
       {/* ウェルカムメッセージ */}
-      <div>
-        <h1 className="text-2xl font-bold text-zinc-50">
-          {t('dashboard.greeting', { name: userProfile?.displayName ?? t('common.defaultName') })}
+      <div className="relative">
+        {/* 背景グロー */}
+        <div
+          className="absolute -top-8 -left-4 w-48 h-48 rounded-full blur-[60px] opacity-15 pointer-events-none"
+          aria-hidden="true"
+          style={{ background: 'var(--color-brand-primary)' }}
+        />
+        <h1 className="text-2xl font-bold text-white relative">
+          {/* 翻訳文字列 "こんにちは、{{name}} 👋" を分割してname部分だけグラデーション表示 */}
+          {t('dashboard.greeting', { name: '' }).split('{{name}}')[0] ?? 'こんにちは、'}
+          <span className="bg-gradient-to-r from-[var(--color-brand-primary)] to-sky-300 bg-clip-text text-transparent">
+            {userProfile?.displayName ?? t('common.defaultName')}
+          </span>
+          {t('dashboard.greeting', { name: '' }).split('{{name}}')[1] ?? ' 👋'}
         </h1>
-        <p className="text-zinc-400 text-sm mt-1">{t('dashboard.subtitle')}</p>
+        <p className="text-zinc-400 text-sm mt-1 relative">{t('dashboard.subtitle')}</p>
       </div>
 
       {/* ストリークカード */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gradient-to-r from-sky-950/50 to-sky-900/30 border border-sky-900/50 rounded-2xl p-6"
+        className="bg-gradient-to-r from-[var(--color-brand-secondary)]/80 via-[var(--color-brand-primary)]/15 to-zinc-900/50 border border-[var(--color-brand-primary)]/30 rounded-2xl p-6"
       >
         <div className="flex items-center justify-between">
           <div>
@@ -231,26 +252,40 @@ export function DashboardPage() {
               >
                 🔥
               </motion.span>
-              <span className="text-5xl font-extrabold text-zinc-50">{currentStreak}</span>
+              <span
+                className="text-5xl font-extrabold text-white"
+                style={{ textShadow: '0 0 20px var(--color-brand-primary)' }}
+              >
+                {currentStreak}
+              </span>
               <span className="text-zinc-400 text-lg">日</span>
             </div>
-            <p className="text-sky-300 font-medium mt-1">{t('dashboard.streak')}</p>
+            <p className="text-[var(--color-brand-primary)] font-medium mt-1">{t('dashboard.streak')}</p>
           </div>
 
           <div className="flex flex-col gap-1">
             <p className="text-zinc-500 text-xs text-right mb-1">{t('dashboard.thisWeek')}</p>
             <div className="flex gap-1.5">
               {weeklyStatus.map((active: boolean, i: number) => (
-                <div
-                  key={i}
-                  className={`w-6 h-6 rounded-full transition-all ${
-                    active ? 'bg-[var(--color-brand-primary)]' : 'bg-zinc-800'
-                  }`}
-                  aria-label={active ? '記録あり' : '記録なし'}
-                />
+                <div key={i} className="flex flex-col items-center gap-0.5">
+                  <div
+                    className={`w-7 h-7 rounded-full transition-all ${
+                      active
+                        ? 'bg-[var(--color-brand-primary)] shadow-[0_0_8px_var(--color-brand-primary)]'
+                        : 'bg-zinc-800 border border-zinc-700'
+                    }`}
+                    aria-label={active ? '記録あり' : '記録なし'}
+                  />
+                  <span className="text-[8px] text-zinc-600 select-none">{WEEK_LABELS[i]}</span>
+                </div>
               ))}
             </div>
           </div>
+        </div>
+        {/* 最長ストリーク */}
+        <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+          <span className="text-xs text-zinc-500">最長連続記録</span>
+          <span className="text-xs font-bold text-zinc-300">{longestStreak}日</span>
         </div>
       </motion.div>
 
@@ -353,11 +388,13 @@ export function DashboardPage() {
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
-                  className={`bg-gradient-to-br ${color} border ${borderColor} rounded-2xl p-4 transition-all duration-150`}
+                  className={`bg-gradient-to-br ${color} border ${borderColor} rounded-2xl p-4 transition-all duration-150 hover:shadow-lg hover:shadow-black/20`}
                 >
-                  <Icon size={24} className={`${iconColor} mb-3`} />
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-white/5">
+                    <Icon size={20} className={iconColor} />
+                  </div>
                   <p className="text-zinc-100 font-semibold text-sm">{label}</p>
-                  <p className="text-zinc-500 text-xs mt-0.5">{sub}</p>
+                  <p className="text-zinc-400 text-xs mt-0.5">{sub}</p>
                 </motion.div>
               </Link>
             </motion.div>

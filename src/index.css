@@ -151,3 +151,44 @@ body {
 input, textarea, select {
   font-size: 16px;
 }
+
+/* ======================================
+   スケルトンシマーアニメーション
+   ====================================== */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #27272a 0%,
+    #3f3f46 50%,
+    #27272a 100%
+  );
+  background-size: 200% auto;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* ======================================
+   ページヘッダーグラデーションライン
+   ====================================== */
+.page-header-gradient-line {
+  position: relative;
+}
+
+.page-header-gradient-line::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-brand-primary) 50%, transparent) 50%,
+    transparent 100%
+  );
+}

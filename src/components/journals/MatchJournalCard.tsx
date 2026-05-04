@@ -16,9 +16,21 @@ interface MatchJournalCardProps {
 }
 
 const STATUS_THEME = {
-  pre:       { bar: 'bg-sky-500',     glow: 'from-sky-500/6'     },
-  completed: { bar: 'bg-emerald-500', glow: 'from-emerald-500/6' },
-  post_only: { bar: 'bg-sky-700',     glow: 'from-sky-700/6'     },
+  pre: {
+    bar:       'bg-gradient-to-r from-sky-400 to-sky-500',
+    barShadow: 'shadow-[0_0_8px_rgba(14,165,233,0.5)]',
+    glow:      'from-sky-500/12',
+  },
+  completed: {
+    bar:       'bg-gradient-to-r from-emerald-400 to-emerald-500',
+    barShadow: 'shadow-[0_0_8px_rgba(52,211,153,0.5)]',
+    glow:      'from-emerald-500/12',
+  },
+  post_only: {
+    bar:       'bg-gradient-to-r from-sky-600 to-sky-700',
+    barShadow: '',
+    glow:      'from-sky-700/8',
+  },
 } as const;
 
 const RESULT_LABEL: Record<string, { label: string; cls: string }> = {
@@ -43,7 +55,7 @@ export function MatchJournalCard({ journal, onPress, onPostNotePress }: MatchJou
       aria-label={`${dateStr} ${journal.opponent}戦`}
       whileTap={{ scale: 0.97 }}
       onClick={() => onPress(journal.id)}
-      className="relative bg-zinc-900 border border-zinc-800 rounded-2xl overflow-visible cursor-pointer active:bg-zinc-800/80 transition-colors duration-100"
+      className="relative bg-zinc-900 border border-zinc-800/60 rounded-xl overflow-visible cursor-pointer active:bg-zinc-800/80 transition-all duration-150 hover:border-zinc-700 hover:shadow-lg hover:shadow-black/20"
     >
       {/* 未読コメントバッジ */}
       <AnimatePresence>
@@ -53,7 +65,7 @@ export function MatchJournalCard({ journal, onPress, onPostNotePress }: MatchJou
       </AnimatePresence>
 
       {/* カラーバー */}
-      <div className={`h-1 w-full rounded-t-2xl ${theme.bar}`} />
+      <div className={`h-1.5 w-full rounded-t-xl ${theme.bar} ${theme.barShadow}`} />
 
       <div className={`bg-gradient-to-b ${theme.glow} to-transparent p-3 flex flex-col gap-2`}>
         {/* 日付・スポーツ */}
@@ -66,8 +78,8 @@ export function MatchJournalCard({ journal, onPress, onPostNotePress }: MatchJou
 
         {/* 対戦相手 */}
         <div>
-          <p className="text-[10px] text-zinc-600 mb-0.5">vs</p>
-          <p className="text-sm font-bold text-zinc-100 truncate">{journal.opponent}</p>
+          <p className="text-[10px] text-[var(--color-brand-primary)]/60 font-bold uppercase tracking-wider mb-0.5">vs</p>
+          <p className="text-sm font-bold text-white truncate">{journal.opponent}</p>
         </div>
 
         {/* 完了時: スコア＋達成率 */}
@@ -79,7 +91,7 @@ export function MatchJournalCard({ journal, onPress, onPostNotePress }: MatchJou
                   {resultInfo.label}
                 </span>
               )}
-              <span className="text-lg font-black text-zinc-100 tabular-nums">
+              <span className="text-xl font-black text-white tabular-nums">
                 {journal.postNote.myScore ?? '-'}
               </span>
               <span className="text-xs text-zinc-600">-</span>
@@ -108,7 +120,7 @@ export function MatchJournalCard({ journal, onPress, onPostNotePress }: MatchJou
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onPostNotePress?.(journal.id); }}
-            className="w-full mt-1 bg-sky-500/10 border border-sky-500/30 rounded-lg py-1.5 text-[11px] text-sky-400 font-semibold flex items-center justify-center gap-0.5"
+            className="w-full mt-1 bg-[var(--color-brand-primary)]/12 border border-[var(--color-brand-primary)]/40 hover:bg-[var(--color-brand-primary)]/20 transition-colors rounded-lg py-1.5 text-[11px] text-[var(--color-brand-primary)] font-semibold flex items-center justify-center gap-0.5"
           >
             振り返りを書く <ChevronRight size={12} />
           </button>

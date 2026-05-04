@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Trophy } from 'lucide-react';
+import { Plus, Trophy, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useUserJournalsList } from '@/hooks/useMatchJournals';
@@ -22,18 +22,18 @@ const cardVariants = {
   animate: { opacity: 1, scale: 1, y: 0 },
 };
 
-// スケルトンローディング
+// スケルトンローディング（shimmer アニメーション使用）
 function JournalCardSkeleton() {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden animate-pulse">
-      <div className="h-1 bg-zinc-700 rounded-t-xl" />
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="h-1.5 skeleton-shimmer rounded-t-xl" />
       <div className="p-4 space-y-3">
-        <div className="h-4 bg-zinc-700 rounded-full w-1/3" />
-        <div className="h-6 bg-zinc-700 rounded-full w-2/3" />
-        <div className="h-4 bg-zinc-700 rounded-full w-1/2" />
+        <div className="h-4 skeleton-shimmer rounded-full w-1/3" />
+        <div className="h-6 skeleton-shimmer rounded-full w-2/3" />
+        <div className="h-4 skeleton-shimmer rounded-full w-1/2" />
         <div className="flex gap-4">
-          <div className="h-10 bg-zinc-700 rounded w-16" />
-          <div className="h-10 bg-zinc-700 rounded w-16" />
+          <div className="h-10 skeleton-shimmer rounded w-16" />
+          <div className="h-10 skeleton-shimmer rounded w-16" />
         </div>
       </div>
     </div>
@@ -59,14 +59,17 @@ export function JournalListPage() {
       className="min-h-screen bg-zinc-950 pb-24"
     >
       {/* ヘッダー */}
-      <header className="flex items-center justify-between px-4 py-3 sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-zinc-800/50">
-        <h1 className="text-xl font-bold text-zinc-50">{t('journals.title')}</h1>
+      <header className="page-header-gradient-line flex items-center justify-between px-4 py-3 sticky top-0 bg-zinc-950/95 backdrop-blur-xl z-10 border-b border-zinc-800/50">
+        <div className="flex items-center gap-2.5">
+          <div className="w-1 h-5 rounded-full bg-[var(--color-brand-primary)]" aria-hidden="true" />
+          <h1 className="text-xl font-bold text-white">{t('journals.title')}</h1>
+        </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.93 }}
           onClick={() => setShowActionSheet(true)}
           aria-label="新規ジャーナルを作成"
-          className="min-w-[44px] min-h-[44px] bg-[var(--color-brand-primary)] rounded-full flex items-center justify-center"
+          className="min-w-[44px] min-h-[44px] bg-[var(--color-brand-primary)] rounded-2xl flex items-center justify-center shadow-lg shadow-[var(--color-brand-primary)]/30"
         >
           <Plus size={20} className="text-white" />
         </motion.button>
@@ -81,13 +84,35 @@ export function JournalListPage() {
         ) : journals.length === 0 ? (
           /* 空状態 */
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="mb-4 opacity-20 flex justify-center"><Trophy size={64} className="text-zinc-400" /></div>
-            <h2 className="text-lg font-semibold text-zinc-300 mt-4">{t('journals.emptyTitle')}</h2>
-            <p className="text-sm text-zinc-500 mt-2 max-w-[240px]">{t('journals.emptyDesc')}</p>
+            {/* アイコングループ（入場アニメーション付き） */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+              className="relative mb-6"
+            >
+              {/* 外側の輪 */}
+              <div className="w-24 h-24 rounded-full bg-[var(--color-brand-primary)]/10 border border-[var(--color-brand-primary)]/20 flex items-center justify-center">
+                {/* 内側の輪 */}
+                <div className="w-16 h-16 rounded-full bg-[var(--color-brand-primary)]/15 border border-[var(--color-brand-primary)]/30 flex items-center justify-center">
+                  <Trophy size={32} className="text-[var(--color-brand-primary)]" />
+                </div>
+              </div>
+              {/* フローティング装飾（Star）- 上下に浮遊 */}
+              <motion.div
+                animate={{ y: [-2, 2, -2] }}
+                transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+                className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center"
+              >
+                <Star size={12} className="text-amber-400" />
+              </motion.div>
+            </motion.div>
+            <h2 className="text-base font-semibold text-zinc-200">{t('journals.emptyTitle')}</h2>
+            <p className="text-sm text-zinc-500 mt-1.5 max-w-[200px] leading-relaxed">{t('journals.emptyDesc')}</p>
             <motion.button
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate('/journals/new')}
-              className="mt-6 w-full max-w-[240px] bg-[var(--color-brand-primary)] text-white rounded-xl py-3 font-medium"
+              className="mt-6 w-full max-w-[240px] bg-[var(--color-brand-primary)] text-white rounded-xl py-3 font-medium shadow-lg shadow-[var(--color-brand-primary)]/20"
             >
               {t('journals.createFirst')}
             </motion.button>
