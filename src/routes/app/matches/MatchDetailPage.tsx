@@ -4,11 +4,13 @@ import { ChevronLeft, Edit2, Trash2, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useMatch, useDeleteMatch } from '@/hooks/useMatches';
 import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
+import { useMarkContentAsRead } from '@/hooks/useNotifications';
 import { SportBadge } from '@/components/shared/SportBadge';
 import { formatDateJa } from '@/lib/utils/date';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import { clsx } from 'clsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // 勝敗別スタイル
 const resultStyles = {
@@ -23,9 +25,18 @@ export function MatchDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { userProfile } = useAuthStore();
+  const { activeProfile } = useActiveProfile();
   const { data: match, isLoading } = useMatch(id);
   const deleteMatch = useDeleteMatch();
+  const markContentAsRead = useMarkContentAsRead();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // ページ表示時に対応する通知を既読化（親プロフィールのみ）
+  useEffect(() => {
+    if (!id || !activeProfile || activeProfile.isChildProfile) return;
+    markContentAsRead.mutate({ recipientProfileUid: activeProfile.uid, contentId: id });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, activeProfile?.uid]);
 
   const isOwner = match?.userId === userProfile?.uid;
 

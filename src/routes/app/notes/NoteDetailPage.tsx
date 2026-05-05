@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ChevronLeft, Edit2, Trash2, Clock, MapPin, Globe, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNote, useDeleteNote } from '@/hooks/useNotes';
 import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
+import { useMarkContentAsRead } from '@/hooks/useNotifications';
 import { formatDateJa } from '@/lib/utils/date';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 
@@ -29,8 +31,17 @@ export function NoteDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { userProfile } = useAuthStore();
+  const { activeProfile } = useActiveProfile();
   const { data: note, isLoading } = useNote(id);
   const deleteNote = useDeleteNote();
+  const markContentAsRead = useMarkContentAsRead();
+
+  // ページ表示時に対応する通知を既読化（親プロフィールのみ）
+  useEffect(() => {
+    if (!id || !activeProfile || activeProfile.isChildProfile) return;
+    markContentAsRead.mutate({ recipientProfileUid: activeProfile.uid, contentId: id });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, activeProfile?.uid]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const isOwner = note?.userId === userProfile?.uid;

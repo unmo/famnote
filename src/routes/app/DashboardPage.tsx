@@ -7,6 +7,8 @@ import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { useAuthStore } from '@/store/authStore';
 import { useGroupStore } from '@/store/groupStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
+import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { useStreak } from '@/hooks/useStreak';
 import { useGroupNotes } from '@/hooks/useNotes';
 import { useGroupJournals } from '@/hooks/useMatchJournals';
@@ -165,6 +167,10 @@ type ActivityItem =
 export function DashboardPage() {
   const { t } = useTranslation();
   const { userProfile } = useAuthStore();
+  const { activeProfile } = useActiveProfile();
+  // 子プロフィールの場合はActivityFeedを表示しない
+  const isChildProfile = activeProfile?.isChildProfile ?? false;
+  const recipientProfileUid = isChildProfile ? undefined : activeProfile?.uid;
   const members = useGroupStore((s) => s.members);
   const { data: streakData } = useStreak(userProfile?.uid);
   const { data: stats } = useProfileStats(userProfile?.uid);
@@ -234,6 +240,11 @@ export function DashboardPage() {
         </h1>
         <p className="text-zinc-400 text-sm mt-1 relative">{t('dashboard.subtitle')}</p>
       </div>
+
+      {/* 新着アクティビティ（親プロフィールのみ表示） */}
+      {!isChildProfile && recipientProfileUid && (
+        <ActivityFeed recipientProfileUid={recipientProfileUid} />
+      )}
 
       {/* ストリークカード */}
       <motion.div

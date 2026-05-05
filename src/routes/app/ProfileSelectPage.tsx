@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'motion/react';
 import { Crown, User, AlertCircle, Pencil } from 'lucide-react';
+import { NotificationBadge } from '@/components/shared/NotificationBadge';
+import { useUnreadCountByProfiles } from '@/hooks/useNotifications';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { RoleBadge } from '@/components/shared/RoleBadge';
 import type { GroupMember } from '@/types/group';
@@ -205,6 +207,12 @@ export function ProfileSelectPage() {
   const selfMember = members.find((m) => m.uid === firebaseUser?.uid);
   const isOwner = selfMember?.role === 'owner';
 
+  // 親プロフィールの未読件数を一括取得
+  const parentProfileUids = members
+    .filter((m) => !m.isChildProfile)
+    .map((m) => m.uid);
+  const unreadCounts = useUnreadCountByProfiles(parentProfileUids);
+
   // セッション復元でプロフィールが自動設定された場合は保存パスへ遷移
   useEffect(() => {
     if (activeProfile) {
@@ -314,6 +322,17 @@ export function ProfileSelectPage() {
                   <div className="absolute -top-2 -right-2 bg-amber-400 rounded-full p-1 shadow-md shadow-amber-900/30">
                     <Crown className="w-3 h-3 text-amber-900" />
                   </div>
+                )}
+                {/* 通知バッジ（親プロフィールのみ）: オーナーはクラウンと逆側に配置 */}
+                {!member.isChildProfile && (
+                  <NotificationBadge
+                    count={unreadCounts[member.uid] ?? 0}
+                    positionClassName={
+                      member.role === 'owner'
+                        ? 'absolute -top-2 -left-2'
+                        : 'absolute -top-1.5 -right-1.5'
+                    }
+                  />
                 )}
                 {/* 編集ボタン（オーナーのみ表示） */}
                 {isOwner && group && (

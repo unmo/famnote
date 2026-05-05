@@ -15,6 +15,7 @@ import { JournalAccordionBlock } from '@/components/journals/JournalAccordionBlo
 import { JournalStepProgress } from '@/components/journals/JournalStepProgress';
 import { SPORT_LABELS } from '@/types/sport';
 import { markCommentsAsRead } from '@/lib/firebase/journalCommentService';
+import { useMarkContentAsRead } from '@/hooks/useNotifications';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -39,9 +40,10 @@ export function JournalDetailPage() {
   const user = useAuthStore((s) => s.userProfile);
   // AuthContextでメンバーリストがロードされる前はisManagerが確定しないため、authStore.isLoadingで待機
   const isAuthLoading = useAuthStore((s) => s.isLoading);
-  const { isManager } = useActiveProfile();
+  const { isManager, activeProfile } = useActiveProfile();
   const { data: journal, isLoading } = useJournal(journalId);
   const deleteMutation = useDeleteJournal();
+  const markContentAsRead = useMarkContentAsRead();
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -57,6 +59,13 @@ export function JournalDetailPage() {
       markCommentsAsRead(journalId).catch(() => {});
     }
   }, [journalId, isOwner, journal]);
+
+  // ページ表示時に対応する通知を既読化（親プロフィールのみ）
+  useEffect(() => {
+    if (!journalId || !activeProfile || activeProfile.isChildProfile) return;
+    markContentAsRead.mutate({ recipientProfileUid: activeProfile.uid, contentId: journalId });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [journalId, activeProfile?.uid]);
 
   const handleDelete = async () => {
     if (!user || !journalId) return;

@@ -14,8 +14,10 @@ import { clsx } from 'clsx';
 import { BottomNav } from './BottomNav';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSelector } from './ThemeSelector';
+import { NotificationBellButton } from './NotificationPanel';
 import { useDarkMode } from '@/theme/DarkModeContext';
 import { useAuthStore } from '@/store/authStore';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { logout } from '@/lib/firebase/auth';
 import { toast } from 'sonner';
 
@@ -26,6 +28,10 @@ export function AppLayout() {
   const navigate = useNavigate();
   const { theme, setTheme } = useDarkMode();
   const firebaseUser = useAuthStore((s) => s.firebaseUser);
+  const { activeProfile } = useActiveProfile();
+  // 子プロフィールの場合はベルアイコンを表示しない
+  const isChildProfile = activeProfile?.isChildProfile ?? false;
+  const bellRecipientUid = isChildProfile ? undefined : activeProfile?.uid;
 
   const handleLogout = async () => {
     try {
@@ -83,6 +89,10 @@ export function AppLayout() {
 
               {/* 右側: 言語・テーマ・ダークモード・ログアウト */}
               <div className="flex items-center gap-1 border-l border-zinc-800/60 pl-2 md:pl-3">
+                {/* ベルアイコン（親プロフィールのみ） */}
+                {!isChildProfile && activeProfile && (
+                  <NotificationBellButton recipientProfileUid={bellRecipientUid} />
+                )}
                 <LanguageSwitcher />
                 <ThemeSelector />
                 <button

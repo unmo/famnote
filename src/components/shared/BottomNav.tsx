@@ -2,6 +2,9 @@ import { motion } from 'motion/react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Star, NotebookPen, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useActiveProfile } from '@/hooks/useActiveProfile';
+import { useUnreadCount } from '@/hooks/useNotifications';
+import { NotificationBadge } from './NotificationBadge';
 
 // ナビタブ定義
 const NAV_ITEMS = [
@@ -16,6 +19,12 @@ const NAV_ITEMS = [
 export function BottomNav() {
   const { t } = useTranslation();
   const location = useLocation();
+  const { activeProfile } = useActiveProfile();
+  // 子プロフィールの場合はバッジを表示しない
+  const isChildProfile = activeProfile?.isChildProfile ?? false;
+  const { count: unreadCount } = useUnreadCount(
+    isChildProfile ? undefined : activeProfile?.uid,
+  );
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-zinc-800/60">
@@ -41,13 +50,32 @@ export function BottomNav() {
                   transition={{ type: 'spring', stiffness: 400, damping: 35 }}
                 />
               )}
-              <Icon
-                className={
-                  isActive
-                    ? 'w-6 h-6 text-[var(--color-brand-primary)] relative z-10'
-                    : 'w-5 h-5 text-zinc-500 relative z-10'
-                }
-              />
+              {/* Homeアイコンのみ未読バッジを表示 */}
+              {path === '/dashboard' ? (
+                <div className="relative">
+                  <Icon
+                    className={
+                      isActive
+                        ? 'w-6 h-6 text-[var(--color-brand-primary)] relative z-10'
+                        : 'w-5 h-5 text-zinc-500 relative z-10'
+                    }
+                  />
+                  {!isChildProfile && (
+                    <NotificationBadge
+                      count={unreadCount}
+                      positionClassName="absolute -top-1 -right-1"
+                    />
+                  )}
+                </div>
+              ) : (
+                <Icon
+                  className={
+                    isActive
+                      ? 'w-6 h-6 text-[var(--color-brand-primary)] relative z-10'
+                      : 'w-5 h-5 text-zinc-500 relative z-10'
+                  }
+                />
+              )}
               <span
                 className={
                   isActive

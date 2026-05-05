@@ -27,6 +27,7 @@ import { JournalPostEditPage } from '@/routes/app/journals/JournalPostEditPage';
 import { JournalDetailPage } from '@/routes/app/journals/JournalDetailPage';
 import { HighlightsPage } from '@/routes/app/highlights/HighlightsPage';
 import { ProfileSelectPage } from '@/routes/app/ProfileSelectPage';
+import { NotificationsPage } from '@/routes/app/NotificationsPage';
 import { ThemePage } from '@/routes/app/ThemePage';
 import { LegalPage } from '@/routes/app/LegalPage';
 import { HelpPage } from '@/routes/app/HelpPage';
@@ -107,6 +108,8 @@ export const router = createBrowserRouter([
           { path: '/journals/:id/edit/post', element: <JournalPostEditPage /> },
           // ハイライト
           { path: '/highlights', element: <HighlightsPage /> },
+          // 通知センター
+          { path: '/notifications', element: <NotificationsPage /> },
         ],
       },
     ],
