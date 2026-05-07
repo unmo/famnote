@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { BarChart3, AlertTriangle, Lock, ShoppingCart } from 'lucide-react';
-import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 import type { NoteCountInfo } from '@/types/noteCount';
 
 interface NoteCountBarProps {
@@ -35,11 +35,6 @@ export function NoteCountBar({ noteCountInfo, isError, isGroupMember }: NoteCoun
     : 0;
 
   const barColor = getBarColor(percentage);
-
-  const handlePurchaseClick = () => {
-    // 現フェーズでは購入ページが未実装のため準備中トーストを表示
-    toast.info('準備中です');
-  };
 
   return (
     <motion.section
@@ -106,15 +101,14 @@ export function NoteCountBar({ noteCountInfo, isError, isGroupMember }: NoteCoun
               <span className="text-xs text-red-400">上限に達しました</span>
             </div>
             <div className="mt-3 w-full">
-              <button
-                type="button"
-                onClick={handlePurchaseClick}
+              <Link
+                to="/purchase"
                 aria-label="ノート追加パックを購入する"
                 className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-400 text-sm font-medium hover:bg-sky-500/25 hover:border-sky-500/50 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-950 min-h-[44px]"
               >
                 <ShoppingCart className="w-4 h-4" aria-hidden="true" />
                 ノートを追加購入する
-              </button>
+              </Link>
             </div>
           </motion.div>
         )}
@@ -127,11 +121,20 @@ export function NoteCountBar({ noteCountInfo, isError, isGroupMember }: NoteCoun
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="flex items-center gap-1.5 mt-2">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-              <span className="text-xs text-amber-400">
-                あと{noteCountInfo.remaining}件で記録できなくなります
-              </span>
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+                <span className="text-xs text-amber-400">
+                  あと{noteCountInfo.remaining}件で記録できなくなります
+                </span>
+              </div>
+              <Link
+                to="/purchase"
+                aria-label="ノートを追加購入する"
+                className="text-sky-400 text-xs font-medium hover:text-sky-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
+              >
+                追加購入
+              </Link>
             </div>
           </motion.div>
         )}

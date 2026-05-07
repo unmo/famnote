@@ -31,6 +31,9 @@ import { NotificationsPage } from '@/routes/app/NotificationsPage';
 import { ThemePage } from '@/routes/app/ThemePage';
 import { LegalPage } from '@/routes/app/LegalPage';
 import { HelpPage } from '@/routes/app/HelpPage';
+import { PurchasePage } from '@/routes/app/PurchasePage';
+import { PurchaseSuccessPage } from '@/routes/app/PurchaseSuccessPage';
+import { PurchaseCancelPage } from '@/routes/app/PurchaseCancelPage';
 
 export const router = createBrowserRouter([
   {
@@ -110,6 +113,10 @@ export const router = createBrowserRouter([
           { path: '/highlights', element: <HighlightsPage /> },
           // 通知センター
           { path: '/notifications', element: <NotificationsPage /> },
+          // Stripe課金
+          { path: '/purchase', element: <PurchasePage /> },
+          { path: '/purchase/success', element: <PurchaseSuccessPage /> },
+          { path: '/purchase/cancel', element: <PurchaseCancelPage /> },
         ],
       },
     ],

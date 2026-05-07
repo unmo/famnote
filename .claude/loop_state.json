@@ -1,68 +1,56 @@
 {
-  "feature": "note-count",
-  "phase": "evaluator",
-  "loop_count": 2,
+  "feature": "stripe-checkout",
+  "phase": "completed",
+  "loop_count": 1,
   "max_loops": 3,
   "stop_requested": false,
   "history": [
-    {"phase": "planner", "status": "completed", "timestamp": "2026-05-05T00:00:00.000Z"},
-    {"phase": "designer", "status": "completed", "timestamp": "2026-05-05T01:00:00.000Z"},
     {
-      "phase": "generator",
+      "phase": "planner",
       "status": "completed",
-      "timestamp": "2026-05-05T03:00:00.000Z",
-      "summary": "ノート残数カウント機能を実装完了。248テスト全件パス・TypeScriptエラーなし。",
-      "changedFiles": [
-        "src/types/noteCount.ts（新規）",
-        "src/lib/firebase/noteCountService.ts（新規）",
-        "src/hooks/useNoteCount.ts（新規）",
-        "src/components/dashboard/NoteCountBar.tsx（新規）",
-        "src/components/note/NoteCountWarning.tsx（新規）",
-        "src/lib/firebase/noteCountService.test.ts（新規）",
-        "src/hooks/useNoteCount.test.ts（新規）",
-        "src/types/user.ts（plan・purchasedCount追加）",
-        "src/types/group.ts（totalNoteCount・noteCount追加）",
-        "src/lib/firebase/firestore.ts（createNote・deleteNoteにカウンター連動）",
-        "src/lib/firebase/matchJournalService.ts（createPreMatchNote・createPostMatchOnly・deleteMatchJournalにカウンター連動）",
-        "src/lib/firebase/auth.ts（createUserProfileにplan・purchasedCount追加）",
-        "src/hooks/useNotes.ts（noteCountクエリ無効化追加）",
-        "src/hooks/useMatchJournals.ts（noteCountクエリ無効化追加）",
-        "src/routes/app/DashboardPage.tsx（NoteCountBar追加）",
-        "src/routes/app/notes/NoteNewPage.tsx（NoteCountWarning・disabled制御追加）",
-        "src/routes/app/journals/JournalPrePage.tsx（NoteCountWarning・disabled制御追加）",
-        "firestore.rules（totalNoteCount・noteCount・plan・purchasedCountのセキュリティルール追加）"
-      ]
+      "timestamp": "2026-05-05T07:00:00.000Z",
+      "summary": "Stripe課金連携の詳細仕様書を作成。購入フロー・Cloud Functions・Webhook署名検証・Firestoreルール・テスト観点を網羅。"
     },
     {
-      "phase": "evaluator",
-      "status": "failed",
-      "timestamp": "2026-05-05T04:00:00.000Z",
-      "loop_count": 1,
-      "feedback": [
-        "createNote のトランザクション内上限チェックが FREE_NOTE_LIMIT 固定",
-        "createPreMatchNote・createPostMatchOnly も同様",
-        "incrementNoteCount も FREE_NOTE_LIMIT 固定"
-      ]
+      "phase": "designer",
+      "status": "completed",
+      "timestamp": "2026-05-05T08:00:00.000Z",
+      "summary": "Stripe課金連携のUI/UXデザイン仕様書を作成。PurchasePage・PurchaseSuccessPage・PurchaseCancelPageの全コンポーネント設計・Tailwindクラス・Framer Motionアニメーション仕様・アクセシビリティを網羅。"
     },
     {
       "phase": "generator",
       "status": "completed",
-      "timestamp": "2026-05-05T05:00:00.000Z",
-      "loop_count": 2,
-      "summary": "有料プラン上限バグを修正。全29テストファイル・250テスト全件パス・TypeScriptエラーなし。",
-      "changedFiles": [
-        "src/lib/firebase/noteCountService.ts（incrementNoteCount に ownerUserId 引数追加、tx内でユーザープラン参照）",
-        "src/lib/firebase/firestore.ts（createNote のtx内でgroupのownerUidからユーザープラン参照）",
-        "src/lib/firebase/matchJournalService.ts（createPreMatchNote・createPostMatchOnly のtx内でユーザープラン参照）",
-        "src/lib/firebase/noteCountService.test.ts（有料プランテストケース追加・シグネチャ更新）"
+      "timestamp": "2026-05-07T14:35:00.000Z",
+      "summary": "Stripe課金連携を全面実装。Cloud Functions（createCheckoutSession・stripeWebhook）・フロントエンドページ3画面・hooks・型定義・Firestoreルール・環境変数example・ユニットテスト・E2Eテストを作成。tsc --noEmitおよびvitest run（253テスト全パス）・vite build成功を確認。",
+      "changed_files": [
+        "functions/package.json",
+        "functions/tsconfig.json",
+        "functions/vitest.config.ts",
+        "functions/.env.example",
+        "functions/src/index.ts",
+        "functions/src/stripe/createCheckoutSession.ts",
+        "functions/src/stripe/stripeWebhook.ts",
+        "functions/src/stripe/createCheckoutSession.test.ts",
+        "functions/src/stripe/stripeWebhook.test.ts",
+        "src/types/purchase.ts",
+        "src/hooks/useStripeCheckout.ts",
+        "src/hooks/useStripeCheckout.test.ts",
+        "src/hooks/useCountUp.ts",
+        "src/routes/app/PurchasePage.tsx",
+        "src/routes/app/PurchaseSuccessPage.tsx",
+        "src/routes/app/PurchaseCancelPage.tsx",
+        "src/routes/index.tsx",
+        "src/components/note/NoteCountWarning.tsx",
+        "src/components/dashboard/NoteCountBar.tsx",
+        "firestore.rules",
+        "e2e/purchase.spec.ts"
       ]
     },
     {
       "phase": "evaluator",
       "status": "passed",
-      "timestamp": "2026-05-05T06:00:00.000Z",
-      "loop_count": 2,
-      "summary": "全チェック合格。ビルドOK・250テスト全件パス・有料プラン対応確認済み・脆弱性critical/highゼロ。"
+      "timestamp": "2026-05-07T14:55:00.000Z",
+      "summary": "全評価項目合格。TSCエラーなし・vitest 253件全パス・Webhook署名検証OK・userId=request.auth.uid確認・冪等性チェックOK・purchasesコレクション書き込み禁止確認。"
     }
   ]
 }

@@ -1,27 +1,16 @@
 import { motion } from 'motion/react';
 import { AlertTriangle, Lock } from 'lucide-react';
-import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 import { LOW_COUNT_THRESHOLD, type NoteCountInfo } from '@/types/noteCount';
 
 interface NoteCountWarningProps {
   /** useNoteCount から取得した情報 */
   noteCountInfo: NoteCountInfo;
-  /** 購入ページへの遷移ハンドラ（未指定時は準備中トーストを表示） */
-  onPurchaseClick?: () => void;
 }
 
-export function NoteCountWarning({ noteCountInfo, onPurchaseClick }: NoteCountWarningProps) {
+export function NoteCountWarning({ noteCountInfo }: NoteCountWarningProps) {
   // 残数が閾値を超えている場合は非表示
   if (noteCountInfo.remaining > LOW_COUNT_THRESHOLD) return null;
-
-  const handlePurchaseClick = () => {
-    if (onPurchaseClick) {
-      onPurchaseClick();
-    } else {
-      // 現フェーズでは購入ページが未実装のため準備中トーストを表示
-      toast.info('準備中です');
-    }
-  };
 
   const isExceeded = noteCountInfo.isExceeded;
 
@@ -60,18 +49,17 @@ export function NoteCountWarning({ noteCountInfo, onPurchaseClick }: NoteCountWa
             ? '新しい記録を追加するには追加購入が必要です。'
             : '追加購入でいつでも記録を続けられます。'}
         </p>
-        <button
-          type="button"
-          onClick={handlePurchaseClick}
-          aria-label="ノート追加パックの購入ページへ移動"
+        <Link
+          to="/purchase"
+          aria-label="ノートを追加購入するページに移動する"
           className={`self-start mt-1 text-xs underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 rounded min-h-[44px] py-3 ${
             isExceeded
               ? 'text-red-400 hover:text-red-300 focus-visible:ring-red-400'
               : 'text-amber-400 hover:text-amber-300 focus-visible:ring-amber-400'
           }`}
         >
-          {isExceeded ? 'ノートを追加購入する →' : '追加購入を検討する →'}
-        </button>
+          {isExceeded ? 'ノートを追加購入する →' : '追加購入する →'}
+        </Link>
       </div>
     </motion.div>
   );
