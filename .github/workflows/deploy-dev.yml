@@ -112,26 +112,6 @@ jobs:
             --min-instances=0
             --max-instances=5
 
-      - name: Node.js 20 をセットアップ（Functions用）
-        uses: actions/setup-node@v5
-        with:
-          node-version: '20'
-
-      - name: Functions 依存関係のインストール
-        run: npm ci --frozen-lockfile
-        working-directory: functions
-
-      - name: Firebase CLI のインストール
-        run: npm install -g firebase-tools
-
-      - name: Firebase Storage ルールのデプロイ
-        run: firebase deploy --only storage --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-
-      - name: Cloud Functions のデプロイ
-        run: firebase deploy --only functions --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-        env:
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
       - name: デプロイ完了通知
         run: |
