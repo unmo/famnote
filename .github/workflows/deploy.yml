@@ -49,6 +49,8 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_STRIPE_PRICE_ID: ${{ secrets.VITE_STRIPE_PRICE_ID }}
 
       - name: ユニットテストの実行
         run: npm run test
@@ -106,6 +108,8 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          VITE_STRIPE_PRICE_ID: ${{ secrets.VITE_STRIPE_PRICE_ID }}
 
       - name: E2Eテストの実行
         run: npm run test:e2e -- --project=chromium
@@ -160,6 +164,8 @@ jobs:
             VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
             VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
             VITE_APP_URL=${{ secrets.VITE_APP_URL }}
+            VITE_STRIPE_PUBLISHABLE_KEY=${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+            VITE_STRIPE_PRICE_ID=${{ secrets.VITE_STRIPE_PRICE_ID }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
