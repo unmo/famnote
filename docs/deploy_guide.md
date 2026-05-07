@@ -65,6 +65,13 @@ push to develop
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase Messaging Sender ID |
 | `VITE_FIREBASE_APP_ID` | Firebase App ID |
 | `VITE_APP_URL` | アプリURL |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe 公開可能キー（フロントエンド用） |
+| `VITE_STRIPE_PRICE_ID` | Stripe 料金プランID（フロントエンド用） |
+| `STRIPE_SECRET_KEY` | Stripe シークレットキー（Cloud Functions用・絶対に公開しないこと） |
+| `STRIPE_WEBHOOK_SECRET` | Stripe Webhook署名シークレット（Cloud Functions用） |
+| `FIREBASE_TOKEN` | Firebase CLI 認証トークン（`firebase login:ci` で取得） |
+
+> **注意:** `STRIPE_SECRET_KEY` および `STRIPE_WEBHOOK_SECRET` はサーバーサイド（Cloud Functions）でのみ使用します。フロントエンドのビルド引数には含めないでください。
 
 ---
 
@@ -310,6 +317,35 @@ firebase deploy --only firestore:rules
 firebase use dev  # または prod
 firebase deploy --only firestore:rules
 ```
+
+---
+
+## Storage ルール デプロイ手順
+
+```bash
+# Storage ルールをデプロイ
+firebase deploy --only storage
+
+# 環境を指定する場合
+firebase use dev  # または prod
+firebase deploy --only storage
+```
+
+---
+
+## Cloud Functions デプロイ手順
+
+```bash
+# Functions をビルドしてデプロイ
+cd functions && npm run build && cd ..
+firebase deploy --only functions
+
+# 環境を指定する場合
+firebase use prod
+firebase deploy --only functions
+```
+
+> **注意:** Cloud Functions の環境変数（`STRIPE_SECRET_KEY` 等）は Firebase Console の「Functions > 設定 > 環境変数」または `firebase functions:config:set` で設定してください。GitHub Secretsから自動設定されます。
 
 ---
 
