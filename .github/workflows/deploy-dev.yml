@@ -8,6 +8,7 @@ on:
 env:
   SERVICE_NAME: famnote-dev
   REGION: asia-northeast1
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   test:

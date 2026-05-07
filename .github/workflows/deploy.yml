@@ -10,6 +10,7 @@ on:
 env:
   SERVICE_NAME: famnote
   REGION: asia-northeast1
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   test:
