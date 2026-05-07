@@ -16,6 +16,7 @@ import {
   onSnapshot,
   writeBatch,
   runTransaction,
+  increment,
   type DocumentSnapshot,
   type QueryDocumentSnapshot,
   type Unsubscribe,
@@ -28,6 +29,8 @@ import type { Goal } from '@/types/goal';
 import type { Reaction, ReactionType } from '@/types/reaction';
 import { generateInviteCode } from '@/lib/utils/inviteCode';
 import { replaceInsightHighlights } from './highlightService';
+import { NoteCountExceededError } from '@/types/noteCount';
+import { getNoteLimit } from './noteCountService';
 
 // ===================== グループ関連 =====================
 
@@ -166,9 +169,66 @@ export function subscribeGroupMembers(
 // ===================== ノート関連 =====================
 
 // ノート作成
+// グループに参加している場合はトランザクションでカウンターをインクリメントする。
+// 上限を超えている場合は NoteCountExceededError をスローする。
 export async function createNote(
   data: Omit<Note, 'id' | 'createdAt' | 'updatedAt' | 'reactionCounts' | 'commentCount'>
 ): Promise<{ noteId: string }> {
+  // グループに参加しており、かつ下書きでない場合はカウンターをインクリメント
+  if (data.groupId && !data.isDraft) {
+    const groupRef = doc(db, 'groups', data.groupId);
+    const memberRef = doc(db, 'groups', data.groupId, 'members', data.userId);
+    // トランザクション外で新規IDを生成しておく（runTransaction内では参照のみ）
+    const noteRef = doc(collection(db, 'notes'));
+
+    await runTransaction(db, async (tx) => {
+      const groupSnap = await tx.get(groupRef);
+      const memberSnap = await tx.get(memberRef);
+
+      if (!groupSnap.exists()) {
+        throw new Error('GROUP_NOT_FOUND');
+      }
+
+      // グループオーナーのプランを参照して実際の上限を算出する
+      const ownerUid = (groupSnap.data().ownerUid ?? '') as string;
+      const ownerRef = doc(db, 'users', ownerUid);
+      const ownerSnap = await tx.get(ownerRef);
+      const plan = (ownerSnap.data()?.plan ?? 'free') as 'free' | 'paid';
+      const purchasedCount = (ownerSnap.data()?.purchasedCount ?? 0) as number;
+      const limit = getNoteLimit(plan, purchasedCount);
+
+      const currentTotal = (groupSnap.data().totalNoteCount ?? 0) as number;
+      if (currentTotal >= limit) {
+        throw new NoteCountExceededError();
+      }
+
+      tx.set(noteRef, {
+        ...data,
+        insights: data.insights ?? [],
+        reactionCounts: { applause: 0, fire: 0, star: 0, muscle: 0 },
+        commentCount: 0,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      tx.update(groupRef, { totalNoteCount: increment(1) });
+      // メンバードキュメントが存在する場合のみカウントを更新
+      if (memberSnap.exists()) {
+        tx.update(memberRef, { noteCount: increment(1) });
+      }
+    });
+
+    // インサイトハイライトはトランザクション外で非ブロッキング処理
+    if ((data.insights ?? []).length > 0) {
+      await replaceInsightHighlights(
+        data.userId, data.groupId, data.sport,
+        'note_insight', noteRef.id, data.insights ?? [], data.date
+      );
+    }
+
+    return { noteId: noteRef.id };
+  }
+
+  // グループ未参加またはグループIDがない場合（制限なし）
   const ref = await addDoc(collection(db, 'notes'), {
     ...data,
     insights: data.insights ?? [],
@@ -203,12 +263,44 @@ export async function updateNote(
 }
 
 // ノート削除
+// グループに参加している場合はカウンターをデクリメントする。
 export async function deleteNote(noteId: string, userId: string): Promise<void> {
   const ref = doc(db, 'notes', noteId);
   const snap = await getDoc(ref);
   if (!snap.exists() || snap.data()?.userId !== userId) {
     throw new Error('UNAUTHORIZED');
   }
+
+  const noteData = snap.data() as Note;
+  const groupId = noteData.groupId;
+
+  // グループに参加しており、かつ下書きでない場合はカウンターをデクリメント
+  if (groupId && !noteData.isDraft) {
+    const groupRef = doc(db, 'groups', groupId);
+    const memberRef = doc(db, 'groups', groupId, 'members', userId);
+
+    await runTransaction(db, async (tx) => {
+      const groupSnap = await tx.get(groupRef);
+      const memberSnap = await tx.get(memberRef);
+
+      tx.delete(ref);
+
+      if (groupSnap.exists()) {
+        const currentTotal = (groupSnap.data().totalNoteCount ?? 0) as number;
+        if (currentTotal > 0) {
+          tx.update(groupRef, { totalNoteCount: increment(-1) });
+        }
+      }
+      if (memberSnap.exists()) {
+        const currentCount = (memberSnap.data().noteCount ?? 0) as number;
+        if (currentCount > 0) {
+          tx.update(memberRef, { noteCount: increment(-1) });
+        }
+      }
+    });
+    return;
+  }
+
   await deleteDoc(ref);
 }
 

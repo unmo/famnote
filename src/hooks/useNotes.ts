@@ -74,10 +74,19 @@ export function useCreateNote() {
       qc.invalidateQueries({ queryKey: ['notes', variables.userId] });
       qc.invalidateQueries({ queryKey: ['groupNotes', variables.groupId] });
       qc.invalidateQueries({ queryKey: ['streak', variables.userId] });
+      // ノート残数カウントのキャッシュを無効化
+      if (variables.groupId) {
+        qc.invalidateQueries({ queryKey: ['noteCount', variables.groupId] });
+      }
       toast.success(t('notes.savedSuccess'));
     },
-    onError: () => {
-      toast.error(t('common.error'));
+    onError: (error) => {
+      // NOTE_COUNT_EXCEEDED エラーは専用メッセージを表示
+      if (error instanceof Error && error.message === 'NOTE_COUNT_EXCEEDED') {
+        toast.error('ノートの上限（20件）に達しました');
+      } else {
+        toast.error(t('common.error'));
+      }
     },
   });
 }
@@ -88,11 +97,15 @@ export function useDeleteNote() {
   const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: ({ noteId, userId }: { noteId: string; userId: string }) =>
+    mutationFn: ({ noteId, userId }: { noteId: string; userId: string; groupId?: string | null }) =>
       deleteNote(noteId, userId),
-    onSuccess: () => {
+    onSuccess: (_, { groupId }) => {
       qc.invalidateQueries({ queryKey: ['notes'] });
       qc.invalidateQueries({ queryKey: ['groupNotes'] });
+      // ノート残数カウントのキャッシュを無効化
+      if (groupId) {
+        qc.invalidateQueries({ queryKey: ['noteCount', groupId] });
+      }
       toast.success(t('notes.deletedSuccess'));
     },
     onError: () => {

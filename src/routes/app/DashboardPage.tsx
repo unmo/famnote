@@ -12,6 +12,8 @@ import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { useStreak } from '@/hooks/useStreak';
 import { useGroupNotes } from '@/hooks/useNotes';
 import { useGroupJournals } from '@/hooks/useMatchJournals';
+import { useNoteCount } from '@/hooks/useNoteCount';
+import { NoteCountBar } from '@/components/dashboard/NoteCountBar';
 import { calculateStreak } from '@/lib/utils/streak';
 import { formatRelativeTime } from '@/lib/utils/date';
 import { db } from '@/lib/firebase/config';
@@ -176,6 +178,7 @@ export function DashboardPage() {
   const { data: stats } = useProfileStats(userProfile?.uid);
   const { data: recentNotes, isLoading: notesLoading } = useGroupNotes(userProfile?.groupId ?? undefined);
   const { data: recentJournals, isLoading: journalsLoading } = useGroupJournals(userProfile?.groupId ?? undefined);
+  const { data: noteCountInfo, isLoading: noteCountLoading, isError: noteCountError } = useNoteCount();
 
   const currentStreak = streakData?.currentStreak ?? 0;
   const longestStreak = stats?.recordDates ? calculateStreak(stats.recordDates) : 0;
@@ -299,6 +302,13 @@ export function DashboardPage() {
           <span className="text-xs font-bold text-zinc-300">{longestStreak}日</span>
         </div>
       </motion.div>
+
+      {/* ノート残数バー（グループ参加済みのみ表示） */}
+      <NoteCountBar
+        noteCountInfo={noteCountLoading ? undefined : noteCountInfo}
+        isError={noteCountError}
+        isGroupMember={!!(userProfile?.groupId)}
+      />
 
       {/* バッジ */}
       <div>

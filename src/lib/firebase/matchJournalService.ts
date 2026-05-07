@@ -13,6 +13,8 @@ import {
   startAfter,
   serverTimestamp,
   Timestamp,
+  runTransaction,
+  increment,
   type DocumentSnapshot,
 } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
@@ -21,6 +23,8 @@ import type { MatchJournal, PreMatchFormData, PostMatchFormData } from '@/types/
 import type { Sport } from '@/types/sport';
 import { replaceInsightHighlights } from './highlightService';
 import { v4 as uuidv4 } from 'uuid';
+import { NoteCountExceededError } from '@/types/noteCount';
+import { getNoteLimit } from './noteCountService';
 
 // テキスト配列をBulletItem配列に変換
 function textsToBullets(texts: string[]) {
@@ -30,11 +34,72 @@ function textsToBullets(texts: string[]) {
 }
 
 // 試合前ノート作成
+// グループに参加している場合はトランザクションでカウンターをインクリメントする。
+// 上限を超えている場合は NoteCountExceededError をスローする。
 export async function createPreMatchNote(
   userId: string,
   groupId: string | null,
   data: PreMatchFormData
 ): Promise<{ journalId: string }> {
+  if (groupId) {
+    const groupRef = doc(db, 'groups', groupId);
+    const memberRef = doc(db, 'groups', groupId, 'members', userId);
+    const journalRef = doc(collection(db, 'matchJournals'));
+
+    await runTransaction(db, async (tx) => {
+      const groupSnap = await tx.get(groupRef);
+      const memberSnap = await tx.get(memberRef);
+
+      if (!groupSnap.exists()) {
+        throw new Error('GROUP_NOT_FOUND');
+      }
+
+      // グループオーナーのプランを参照して実際の上限を算出する
+      const ownerUid = (groupSnap.data().ownerUid ?? '') as string;
+      const ownerRef = doc(db, 'users', ownerUid);
+      const ownerSnap = await tx.get(ownerRef);
+      const plan = (ownerSnap.data()?.plan ?? 'free') as 'free' | 'paid';
+      const purchasedCount = (ownerSnap.data()?.purchasedCount ?? 0) as number;
+      const limit = getNoteLimit(plan, purchasedCount);
+
+      const currentTotal = (groupSnap.data().totalNoteCount ?? 0) as number;
+      if (currentTotal >= limit) {
+        throw new NoteCountExceededError();
+      }
+
+      tx.set(journalRef, {
+        userId,
+        groupId,
+        sport: data.sport,
+        date: Timestamp.fromDate(new Date(data.date)),
+        opponent: data.opponent,
+        venue: data.venue,
+        status: 'pre',
+        isDraft: false,
+        isPublic: data.isPublic,
+        preNote: {
+          goals: textsToBullets(data.goals),
+          challenges: textsToBullets(data.challenges),
+          recordedAt: serverTimestamp(),
+        },
+        postNote: null,
+        reactionCounts: { applause: 0, fire: 0, star: 0, muscle: 0 },
+        commentCount: 0,
+        unreadCommentCount: 0,
+        pinnedCount: 0,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      tx.update(groupRef, { totalNoteCount: increment(1) });
+      if (memberSnap.exists()) {
+        tx.update(memberRef, { noteCount: increment(1) });
+      }
+    });
+
+    return { journalId: journalRef.id };
+  }
+
+  // グループ未参加の場合（制限なし）
   const ref = await addDoc(collection(db, 'matchJournals'), {
     userId,
     groupId,
@@ -174,6 +239,7 @@ export async function updatePostMatchNote(
 }
 
 // 試合後ノートのみ作成（試合前なし）
+// グループに参加している場合はトランザクションでカウンターをインクリメントする。
 export async function createPostMatchOnly(
   userId: string,
   groupId: string | null,
@@ -181,7 +247,7 @@ export async function createPostMatchOnly(
   postData: PostMatchFormData,
   imageUrls: string[] = []
 ): Promise<{ journalId: string }> {
-  const ref = await addDoc(collection(db, 'matchJournals'), {
+  const journalData = {
     userId,
     groupId,
     sport: baseData.sport,
@@ -196,7 +262,7 @@ export async function createPostMatchOnly(
       result: postData.result,
       myScore: postData.myScore,
       opponentScore: postData.opponentScore,
-      goalReviews: [],
+      goalReviews: [] as ReturnType<typeof textsToBullets>,
       achievements: textsToBullets(postData.achievements),
       improvements: textsToBullets(postData.improvements),
       explorations: textsToBullets(postData.explorations),
@@ -211,21 +277,63 @@ export async function createPostMatchOnly(
     pinnedCount: 0,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  });
+  };
+
+  let journalId: string;
+
+  if (groupId) {
+    const groupRef = doc(db, 'groups', groupId);
+    const memberRef = doc(db, 'groups', groupId, 'members', userId);
+    const journalRef = doc(collection(db, 'matchJournals'));
+
+    await runTransaction(db, async (tx) => {
+      const groupSnap = await tx.get(groupRef);
+      const memberSnap = await tx.get(memberRef);
+
+      if (!groupSnap.exists()) {
+        throw new Error('GROUP_NOT_FOUND');
+      }
+
+      // グループオーナーのプランを参照して実際の上限を算出する
+      const ownerUid = (groupSnap.data().ownerUid ?? '') as string;
+      const ownerRef = doc(db, 'users', ownerUid);
+      const ownerSnap = await tx.get(ownerRef);
+      const plan = (ownerSnap.data()?.plan ?? 'free') as 'free' | 'paid';
+      const purchasedCount = (ownerSnap.data()?.purchasedCount ?? 0) as number;
+      const limit = getNoteLimit(plan, purchasedCount);
+
+      const currentTotal = (groupSnap.data().totalNoteCount ?? 0) as number;
+      if (currentTotal >= limit) {
+        throw new NoteCountExceededError();
+      }
+
+      tx.set(journalRef, journalData);
+      tx.update(groupRef, { totalNoteCount: increment(1) });
+      if (memberSnap.exists()) {
+        tx.update(memberRef, { noteCount: increment(1) });
+      }
+    });
+
+    journalId = journalRef.id;
+  } else {
+    const ref = await addDoc(collection(db, 'matchJournals'), journalData);
+    journalId = ref.id;
+  }
 
   const sourceDate = Timestamp.fromDate(new Date(baseData.date));
   try {
     await replaceInsightHighlights(
       userId, groupId, baseData.sport,
-      'journal_insight', ref.id, postData.insights, sourceDate
+      'journal_insight', journalId, postData.insights, sourceDate
     );
   } catch (e) {
     console.warn('[createPostMatchOnly] replaceInsightHighlights failed (non-blocking):', e);
   }
-  return { journalId: ref.id };
+  return { journalId };
 }
 
 // ジャーナル削除（Storage画像も削除）
+// グループに参加している場合はカウンターをデクリメントする。
 export async function deleteMatchJournal(journalId: string, userId: string): Promise<void> {
   const journalRef = doc(db, 'matchJournals', journalId);
   const snap = await getDoc(journalRef);
@@ -233,10 +341,10 @@ export async function deleteMatchJournal(journalId: string, userId: string): Pro
     throw new Error('UNAUTHORIZED');
   }
 
-  const data = snap.data() as MatchJournal;
+  const journalData = snap.data() as MatchJournal;
   // Storage画像を削除
-  if (data.postNote?.imageUrls) {
-    for (const url of data.postNote.imageUrls) {
+  if (journalData.postNote?.imageUrls) {
+    for (const url of journalData.postNote.imageUrls) {
       try {
         // Firebase StorageのURLからパスを抽出して削除
         const storageRef = ref(storage, `matchJournals/${journalId}/${url.split('/').pop()?.split('?')[0]}`);
@@ -245,6 +353,35 @@ export async function deleteMatchJournal(journalId: string, userId: string): Pro
         // 画像削除失敗は無視（既に削除済みの場合など）
       }
     }
+  }
+
+  const groupId = journalData.groupId;
+
+  // グループに参加している場合はトランザクションでカウンターをデクリメント
+  if (groupId) {
+    const groupRef = doc(db, 'groups', groupId);
+    const memberRef = doc(db, 'groups', groupId, 'members', userId);
+
+    await runTransaction(db, async (tx) => {
+      const groupSnap = await tx.get(groupRef);
+      const memberSnap = await tx.get(memberRef);
+
+      tx.delete(journalRef);
+
+      if (groupSnap.exists()) {
+        const currentTotal = (groupSnap.data().totalNoteCount ?? 0) as number;
+        if (currentTotal > 0) {
+          tx.update(groupRef, { totalNoteCount: increment(-1) });
+        }
+      }
+      if (memberSnap.exists()) {
+        const currentCount = (memberSnap.data().noteCount ?? 0) as number;
+        if (currentCount > 0) {
+          tx.update(memberRef, { noteCount: increment(-1) });
+        }
+      }
+    });
+    return;
   }
 
   await deleteDoc(journalRef);

@@ -12,6 +12,10 @@ export interface User {
   themeId: string; // テーマID（デフォルト: 'shimizu'）
   subscriptionStatus: 'free' | 'family' | 'premium';
   stripeCustomerId: string | null;
+  /** ノート残数制御に使用するプランフラグ（初期値: 'free'） */
+  plan: 'free' | 'paid';
+  /** Stripe購入済み追加ノート数（初期値: 0） */
+  purchasedCount: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
   totalNotes: number;

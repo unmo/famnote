@@ -49,6 +49,8 @@ export async function createUserProfile(
     currentStreak: 0,
     longestStreak: 0,
     lastRecordedAt: null,
+    plan: 'free',
+    purchasedCount: 0,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };

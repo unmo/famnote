@@ -12,6 +12,8 @@ export interface Group {
   maxMembers: number; // 固定: 10
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  /** グループ全体のノート総数（ノート残数制御に使用） */
+  totalNoteCount?: number;
 }
 
 // 保護者の役割（父・母・未設定）
@@ -30,6 +32,8 @@ export interface GroupMember {
   isChildProfile?: boolean;
   // 保護者の役割（子プロフィールは常に null）
   parentRole?: ParentRole;
+  /** メンバー個人のノート数（ノート残数制御に使用） */
+  noteCount?: number;
 }
 
 // 招待コード型

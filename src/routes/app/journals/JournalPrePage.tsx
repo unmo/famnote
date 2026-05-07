@@ -8,6 +8,10 @@ import { useAuthStore } from '@/store/authStore';
 import { useGroupStore } from '@/store/groupStore';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useCreatePreMatchNote } from '@/hooks/useMatchJournals';
+import { useNoteCount } from '@/hooks/useNoteCount';
+import { NoteCountWarning } from '@/components/note/NoteCountWarning';
+import { AnimatePresence } from 'motion/react';
+import { Lock } from 'lucide-react';
 import { BulletListInput } from '@/components/journals/BulletListInput';
 import { preMatchSchema } from '@/lib/validations/matchJournalSchema';
 import type { Sport } from '@/types/sport';
@@ -26,6 +30,7 @@ export function JournalPrePage() {
   const group = useGroupStore((s) => s.group);
   const { activeProfile } = useActiveProfile();
   const createMutation = useCreatePreMatchNote();
+  const { data: noteCountInfo } = useNoteCount();
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const [date, setDate] = useState(today);
@@ -117,6 +122,13 @@ export function JournalPrePage() {
 
       {/* フォーム */}
       <div className="px-4 py-4 space-y-6">
+        {/* ノート残数警告（残り5件以下の場合のみ表示） */}
+        <AnimatePresence>
+          {noteCountInfo && (
+            <NoteCountWarning noteCountInfo={noteCountInfo} />
+          )}
+        </AnimatePresence>
+
         {/* 日付 */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-zinc-300">{t('journals.date')}</label>
@@ -209,12 +221,26 @@ export function JournalPrePage() {
         <motion.button
           type="button"
           whileTap={{ scale: 0.97 }}
-          disabled={createMutation.isPending}
-          onClick={() => handleSubmit()}
+          disabled={createMutation.isPending || (noteCountInfo?.isExceeded ?? false)}
           aria-busy={createMutation.isPending}
-          className="flex-[2] bg-[var(--color-brand-primary)] text-white rounded-lg px-4 py-2.5 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+          aria-disabled={noteCountInfo?.isExceeded ?? false}
+          onClick={() => handleSubmit()}
+          className={`flex-[2] rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-150 disabled:cursor-not-allowed ${
+            noteCountInfo?.isExceeded
+              ? 'bg-zinc-800 text-zinc-600 border border-zinc-700'
+              : 'bg-[var(--color-brand-primary)] text-white disabled:opacity-40'
+          }`}
         >
-          {createMutation.isPending ? t('common.saving') : t('journals.savePublic')}
+          {noteCountInfo?.isExceeded ? (
+            <span className="flex items-center justify-center gap-1.5">
+              <Lock className="w-4 h-4" aria-hidden="true" />
+              記録できません
+            </span>
+          ) : createMutation.isPending ? (
+            t('common.saving')
+          ) : (
+            t('journals.savePublic')
+          )}
         </motion.button>
       </div>
     </>

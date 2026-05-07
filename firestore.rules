@@ -52,9 +52,11 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId);
       allow create: if isOwner(userId) && request.resource.data.uid == userId;
+      // plan と purchasedCount はサーバーサイド（Admin SDK）のみ変更可
       allow update: if isOwner(userId) &&
                        !request.resource.data.diff(resource.data).affectedKeys()
-                         .hasAny(['uid', 'createdAt', 'totalNotes', 'totalMatches', 'currentStreak', 'longestStreak']);
+                         .hasAny(['uid', 'createdAt', 'totalNotes', 'totalMatches', 'currentStreak', 'longestStreak',
+                                  'plan', 'purchasedCount']);
       allow delete: if false;
     }
 
@@ -65,8 +67,14 @@ service cloud.firestore {
                        request.resource.data.ownerUid == request.auth.uid &&
                        request.resource.data.memberCount == 1 &&
                        request.resource.data.maxMembers == 10;
-      allow update: if isGroupOwner(groupId) &&
-                       !request.resource.data.diff(resource.data).affectedKeys().hasAny(['id', 'createdAt', 'ownerUid']);
+      // totalNoteCount の更新はグループメンバーも許可（ノート作成・削除時のカウンター更新）
+      // その他のフィールド変更はグループオーナーのみ許可
+      allow update: if (isGroupMember(groupId) &&
+                        request.resource.data.diff(resource.data).affectedKeys()
+                          .hasOnly(['totalNoteCount'])) ||
+                       (isGroupOwner(groupId) &&
+                        !request.resource.data.diff(resource.data).affectedKeys()
+                          .hasAny(['id', 'createdAt', 'ownerUid']));
       allow delete: if false;
 
       match /members/{memberId} {
@@ -74,10 +82,14 @@ service cloud.firestore {
         // 自分自身の参加 または 同グループメンバーによる子プロフィール追加
         allow create: if isAuthenticated() &&
                          (memberId == request.auth.uid || isGroupMember(groupId));
-        // 自分自身のみ更新可（role・uid・joinedAt の変更は不可）
-        allow update: if isOwner(memberId) &&
-                         !request.resource.data.diff(resource.data)
-                           .affectedKeys().hasAny(['role', 'uid', 'joinedAt']);
+        // noteCount の更新は同グループメンバーも許可（ノート作成・削除時のカウンター更新）
+        // その他のフィールド変更は自分自身のみ許可
+        allow update: if (isGroupMember(groupId) &&
+                          request.resource.data.diff(resource.data).affectedKeys()
+                            .hasOnly(['noteCount'])) ||
+                         (isOwner(memberId) &&
+                          !request.resource.data.diff(resource.data)
+                            .affectedKeys().hasAny(['role', 'uid', 'joinedAt']));
         // 自分自身 または グループオーナーのみ削除可
         allow delete: if isOwner(memberId) || isGroupOwner(groupId);
       }

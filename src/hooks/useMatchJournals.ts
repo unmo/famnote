@@ -85,13 +85,21 @@ export function useCreatePreMatchNote() {
       groupId: string | null;
       data: PreMatchFormData;
     }) => createPreMatchNote(userId, groupId, data),
-    onSuccess: (_, { userId }) => {
+    onSuccess: (_, { userId, groupId }) => {
       qc.invalidateQueries({ queryKey: ['matchJournalsList', userId] });
       qc.invalidateQueries({ queryKey: ['matchJournals', userId] });
+      // ノート残数カウントのキャッシュを無効化
+      if (groupId) {
+        qc.invalidateQueries({ queryKey: ['noteCount', groupId] });
+      }
       toast.success('試合前ノートを保存しました！');
     },
-    onError: () => {
-      toast.error('保存に失敗しました。再試行してください');
+    onError: (error) => {
+      if (error instanceof Error && error.message === 'NOTE_COUNT_EXCEEDED') {
+        toast.error('ノートの上限（20件）に達しました');
+      } else {
+        toast.error('保存に失敗しました。再試行してください');
+      }
     },
   });
 }
@@ -172,13 +180,21 @@ export function useCreatePostMatchOnly() {
       postData: PostMatchFormData;
       imageUrls?: string[];
     }) => createPostMatchOnly(userId, groupId, baseData, postData, imageUrls),
-    onSuccess: (_, { userId }) => {
+    onSuccess: (_, { userId, groupId }) => {
       qc.invalidateQueries({ queryKey: ['matchJournalsList', userId] });
       qc.invalidateQueries({ queryKey: ['matchJournals', userId] });
+      // ノート残数カウントのキャッシュを無効化
+      if (groupId) {
+        qc.invalidateQueries({ queryKey: ['noteCount', groupId] });
+      }
       toast.success('試合後ノートを保存しました！');
     },
-    onError: () => {
-      toast.error('保存に失敗しました。再試行してください');
+    onError: (error) => {
+      if (error instanceof Error && error.message === 'NOTE_COUNT_EXCEEDED') {
+        toast.error('ノートの上限（20件）に達しました');
+      } else {
+        toast.error('保存に失敗しました。再試行してください');
+      }
     },
   });
 }
@@ -188,11 +204,15 @@ export function useDeleteJournal() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ journalId, userId }: { journalId: string; userId: string }) =>
+    mutationFn: ({ journalId, userId }: { journalId: string; userId: string; groupId?: string | null }) =>
       deleteMatchJournal(journalId, userId),
-    onSuccess: (_, { userId }) => {
+    onSuccess: (_, { userId, groupId }) => {
       qc.invalidateQueries({ queryKey: ['matchJournalsList', userId] });
       qc.invalidateQueries({ queryKey: ['matchJournals', userId] });
+      // ノート残数カウントのキャッシュを無効化
+      if (groupId) {
+        qc.invalidateQueries({ queryKey: ['noteCount', groupId] });
+      }
       toast.success('ジャーナルを削除しました');
     },
     onError: () => {

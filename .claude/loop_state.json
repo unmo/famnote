@@ -1,63 +1,68 @@
 {
-  "feature": "profile-image-upload",
+  "feature": "note-count",
   "phase": "evaluator",
-  "loop_count": 1,
+  "loop_count": 2,
   "max_loops": 3,
   "stop_requested": false,
   "history": [
+    {"phase": "planner", "status": "completed", "timestamp": "2026-05-05T00:00:00.000Z"},
+    {"phase": "designer", "status": "completed", "timestamp": "2026-05-05T01:00:00.000Z"},
     {
-      "phase": "planner",
+      "phase": "generator",
       "status": "completed",
-      "timestamp": "2026-05-05T00:00:00Z",
-      "output": ".claude/specs/profile-image-upload-spec.md"
+      "timestamp": "2026-05-05T03:00:00.000Z",
+      "summary": "ノート残数カウント機能を実装完了。248テスト全件パス・TypeScriptエラーなし。",
+      "changedFiles": [
+        "src/types/noteCount.ts（新規）",
+        "src/lib/firebase/noteCountService.ts（新規）",
+        "src/hooks/useNoteCount.ts（新規）",
+        "src/components/dashboard/NoteCountBar.tsx（新規）",
+        "src/components/note/NoteCountWarning.tsx（新規）",
+        "src/lib/firebase/noteCountService.test.ts（新規）",
+        "src/hooks/useNoteCount.test.ts（新規）",
+        "src/types/user.ts（plan・purchasedCount追加）",
+        "src/types/group.ts（totalNoteCount・noteCount追加）",
+        "src/lib/firebase/firestore.ts（createNote・deleteNoteにカウンター連動）",
+        "src/lib/firebase/matchJournalService.ts（createPreMatchNote・createPostMatchOnly・deleteMatchJournalにカウンター連動）",
+        "src/lib/firebase/auth.ts（createUserProfileにplan・purchasedCount追加）",
+        "src/hooks/useNotes.ts（noteCountクエリ無効化追加）",
+        "src/hooks/useMatchJournals.ts（noteCountクエリ無効化追加）",
+        "src/routes/app/DashboardPage.tsx（NoteCountBar追加）",
+        "src/routes/app/notes/NoteNewPage.tsx（NoteCountWarning・disabled制御追加）",
+        "src/routes/app/journals/JournalPrePage.tsx（NoteCountWarning・disabled制御追加）",
+        "firestore.rules（totalNoteCount・noteCount・plan・purchasedCountのセキュリティルール追加）"
+      ]
     },
     {
-      "phase": "designer",
-      "status": "completed",
-      "timestamp": "2026-05-05T01:00:00Z",
-      "output": ".claude/specs/profile-image-upload-design.md"
+      "phase": "evaluator",
+      "status": "failed",
+      "timestamp": "2026-05-05T04:00:00.000Z",
+      "loop_count": 1,
+      "feedback": [
+        "createNote のトランザクション内上限チェックが FREE_NOTE_LIMIT 固定",
+        "createPreMatchNote・createPostMatchOnly も同様",
+        "incrementNoteCount も FREE_NOTE_LIMIT 固定"
+      ]
     },
     {
       "phase": "generator",
       "status": "completed",
-      "timestamp": "2026-05-05T02:00:00Z",
-      "output": {
-        "new_files": [
-          "src/types/avatar.ts",
-          "src/lib/utils/imageResize.ts",
-          "src/lib/utils/imageResize.test.ts",
-          "src/lib/firebase/avatarService.ts",
-          "src/lib/firebase/avatarService.test.ts",
-          "src/hooks/useAvatarUpload.ts",
-          "src/hooks/useAvatarUpload.test.ts",
-          "src/components/shared/AvatarUpload.tsx",
-          "storage.rules",
-          "e2e/profile-image-upload.spec.ts"
-        ],
-        "modified_files": [
-          "src/components/shared/Avatar.tsx",
-          "src/lib/firebase/storage.ts",
-          "src/components/settings/ProfileEditForm.tsx",
-          "src/components/settings/ProfileManagementSection.tsx",
-          "tests/unit/settings/ProfileManagementSection.test.tsx"
-        ],
-        "test_result": "232 tests passed (27 test files)",
-        "build_result": "TypeScript no errors (npx tsc -b --noEmit)"
-      }
+      "timestamp": "2026-05-05T05:00:00.000Z",
+      "loop_count": 2,
+      "summary": "有料プラン上限バグを修正。全29テストファイル・250テスト全件パス・TypeScriptエラーなし。",
+      "changedFiles": [
+        "src/lib/firebase/noteCountService.ts（incrementNoteCount に ownerUserId 引数追加、tx内でユーザープラン参照）",
+        "src/lib/firebase/firestore.ts（createNote のtx内でgroupのownerUidからユーザープラン参照）",
+        "src/lib/firebase/matchJournalService.ts（createPreMatchNote・createPostMatchOnly のtx内でユーザープラン参照）",
+        "src/lib/firebase/noteCountService.test.ts（有料プランテストケース追加・シグネチャ更新）"
+      ]
     },
     {
       "phase": "evaluator",
       "status": "passed",
-      "timestamp": "2026-05-05T03:00:00Z",
-      "result": "PASS",
-      "details": {
-        "build": "OK",
-        "vulnerability_scan": "OK (critical/high: 0件、moderate: Vite/esbuild devServer系のみ・許容)",
-        "unit_tests": "OK (232 tests passed, 27 test files)",
-        "code_review": "OK",
-        "security": "OK",
-        "ux": "OK"
-      }
+      "timestamp": "2026-05-05T06:00:00.000Z",
+      "loop_count": 2,
+      "summary": "全チェック合格。ビルドOK・250テスト全件パス・有料プラン対応確認済み・脆弱性critical/highゼロ。"
     }
   ]
 }

@@ -9,6 +9,10 @@ import { noteSchema, type NoteSchema } from '@/lib/validations/noteSchema';
 import { useAuthStore } from '@/store/authStore';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useCreateNote } from '@/hooks/useNotes';
+import { useNoteCount } from '@/hooks/useNoteCount';
+import { NoteCountWarning } from '@/components/note/NoteCountWarning';
+import { AnimatePresence } from 'motion/react';
+import { Lock } from 'lucide-react';
 import { BulletListInput } from '@/components/journals/BulletListInput';
 import { Timestamp } from 'firebase/firestore';
 import { getTodayInputValue } from '@/lib/utils/date';
@@ -26,6 +30,7 @@ export function NoteNewPage() {
   const { userProfile } = useAuthStore();
   const { activeProfile } = useActiveProfile();
   const createNote = useCreateNote();
+  const { data: noteCountInfo } = useNoteCount();
   const [isDraftSaving, setIsDraftSaving] = useState(false);
   const [insights, setInsights] = useState<string[]>(['']);
 
@@ -105,6 +110,13 @@ export function NoteNewPage() {
 
       {/* フォーム */}
       <form onSubmit={handleSubmit((data) => onSubmit(data, false))} className="px-4 py-4 space-y-6">
+
+        {/* ノート残数警告（残り5件以下の場合のみ表示） */}
+        <AnimatePresence>
+          {noteCountInfo && (
+            <NoteCountWarning noteCountInfo={noteCountInfo} />
+          )}
+        </AnimatePresence>
 
         {/* 日付 */}
         <div className="space-y-2">
@@ -238,10 +250,24 @@ export function NoteNewPage() {
           whileTap={{ scale: 0.97 }}
           type="button"
           onClick={() => handleSubmit((data) => onSubmit(data, false))()}
-          disabled={isSubmitting || createNote.isPending}
-          className="flex-[2] bg-[var(--color-brand-primary)] text-white rounded-lg px-4 py-2.5 text-sm font-medium disabled:opacity-40"
+          disabled={isSubmitting || createNote.isPending || (noteCountInfo?.isExceeded ?? false)}
+          aria-disabled={noteCountInfo?.isExceeded ?? false}
+          className={`flex-[2] rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-150 ${
+            noteCountInfo?.isExceeded
+              ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed border border-zinc-700'
+              : 'bg-[var(--color-brand-primary)] text-white disabled:opacity-40'
+          }`}
         >
-          {isSubmitting || createNote.isPending ? t('common.saving') : t('notes.save')}
+          {noteCountInfo?.isExceeded ? (
+            <span className="flex items-center justify-center gap-1.5">
+              <Lock className="w-4 h-4" aria-hidden="true" />
+              記録できません
+            </span>
+          ) : isSubmitting || createNote.isPending ? (
+            t('common.saving')
+          ) : (
+            t('notes.save')
+          )}
         </motion.button>
       </div>
     </>
