@@ -137,21 +137,21 @@ jobs:
 
       - name: GCP認証
         id: auth
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: gcloudのセットアップ
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3
 
       - name: Docker認証（Artifact Registry）
         run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
 
       - name: Docker Buildx のセットアップ
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Dockerイメージをビルドしてプッシュ
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
@@ -171,7 +171,7 @@ jobs:
 
       - name: Cloud Run（本番環境）にデプロイ
         id: deploy
-        uses: google-github-actions/deploy-cloudrun@v2
+        uses: google-github-actions/deploy-cloudrun@v3
         with:
           service: ${{ env.SERVICE_NAME }}
           region: ${{ env.REGION }}
