@@ -54,8 +54,6 @@ process.env.STRIPE_SECRET_KEY = 'sk_test_mock';
 process.env.STRIPE_PRICE_ID = 'price_test_mock';
 process.env.FRONTEND_URL = 'http://localhost:5173';
 
-import { HttpsError } from 'firebase-functions/v2/https';
-
 describe('createCheckoutSession', () => {
   beforeEach(() => {
     vi.clearAllMocks();

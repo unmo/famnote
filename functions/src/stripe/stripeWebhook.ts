@@ -22,7 +22,7 @@ function getStripe(): Stripe {
  * 署名検証は必ず最初に実行し、検証通過後のみビジネスロジックを実行する。
  */
 export const stripeWebhook = onRequest(
-  { rawBody: true },
+  {},
   async (req, res) => {
     // Stripe-Signatureヘッダーの存在チェック
     const sig = req.headers['stripe-signature'];
