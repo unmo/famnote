@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ProfileManagementSection } from '@/components/settings/ProfileManagementSection';
 
+
 // i18n モック：テスト内で日本語テキストが正しく検索できるよう実際の翻訳値を返す
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -60,6 +61,14 @@ vi.mock('motion/react', () => {
     AnimatePresence: ({ children }: { children: unknown }) => children,
   };
 });
+
+// AvatarUpload をモック（useQueryClient 依存を切り離す）
+vi.mock('@/components/shared/AvatarUpload', () => ({
+  AvatarUpload: ({ name, src }: { name: string; src: string | null }) => {
+    const React = require('react');
+    return React.createElement('div', { 'data-testid': 'avatar-upload', 'data-name': name, 'data-src': src });
+  },
+}));
 
 // Firestore 操作のモック
 const mockUpdateMemberDisplayName = vi.fn();

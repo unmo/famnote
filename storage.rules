@@ -1,0 +1,42 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // グループメンバーのアバター画像
+    match /avatars/{groupId}/{memberId} {
+      // 読み取り: 認証済みユーザーなら誰でも許可
+      allow read: if request.auth != null;
+
+      // 書き込み（アップロード・上書き）:
+      // 1. グループメンバーであること
+      // 2. ファイルサイズが 5MB 以下
+      // 3. 対応フォーマット（image/jpeg, image/png, image/webp）
+      allow write: if request.auth != null
+        && isGroupMember(groupId)
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+
+      // 削除: グループメンバーのみ
+      allow delete: if request.auth != null && isGroupMember(groupId);
+    }
+
+    // ノート添付画像
+    match /notes/{noteId}/{filename} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    // グループアイコン
+    match /groups/{groupId}/{filename} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && isGroupMember(groupId);
+      allow delete: if request.auth != null && isGroupMember(groupId);
+    }
+
+    // ヘルパー関数: グループメンバーシップを Firestore で確認
+    function isGroupMember(groupId) {
+      return exists(/databases/(default)/documents/groups/$(groupId)/members/$(request.auth.uid));
+    }
+  }
+}

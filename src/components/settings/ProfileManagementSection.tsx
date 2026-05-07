@@ -93,6 +93,8 @@ export function ProfileManagementSection() {
         member={selfMember}
         isChildProfile={false}
         onSave={handleSaveSelf}
+        groupId={group.id}
+        memberId={selfMember.uid}
       />
 
       {/* 子プロフィール管理（オーナーのみ表示） */}

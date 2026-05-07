@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Avatar } from '@/components/shared/Avatar';
+import { AvatarUpload } from '@/components/shared/AvatarUpload';
 import { RoleSelector } from '@/components/shared/RoleSelector';
 import { profileEditSchema } from '@/lib/validations/profileSchema';
 import type { GroupMember, ParentRole } from '@/types/group';
@@ -11,12 +11,16 @@ interface ProfileEditFormProps {
   member: GroupMember;
   isChildProfile: boolean;
   onSave: (displayName: string, parentRole: ParentRole) => Promise<void>;
+  /** アバターアップロード用グループID */
+  groupId: string;
+  /** アバターアップロード用メンバーID */
+  memberId: string;
   className?: string;
 }
 
 // プロフィール名前インライン編集フォーム
 // 鉛筆ボタンで編集状態に切り替わり、保存・キャンセルが可能
-export function ProfileEditForm({ member, isChildProfile, onSave, className }: ProfileEditFormProps) {
+export function ProfileEditForm({ member, isChildProfile, onSave, groupId, memberId, className }: ProfileEditFormProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(member.displayName);
@@ -87,37 +91,51 @@ export function ProfileEditForm({ member, isChildProfile, onSave, className }: P
     <div className={className}>
       <AnimatePresence mode="wait">
         {!isEditing ? (
-          // 表示状態: アバター + 名前テキスト + 鉛筆ボタン
+          // 表示状態: AvatarUpload + 区切り線 + 名前テキスト + 鉛筆ボタン
           <motion.div
             key="display"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="flex items-center justify-between gap-3 bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3"
+            className="flex flex-col bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-4"
           >
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <Avatar src={member.avatarUrl} name={member.displayName} size="md" />
+            {/* アバター（中央配置・タップでアップロード可能） */}
+            <div className="flex flex-col items-center gap-1 mb-3">
+              <AvatarUpload
+                src={member.avatarUrl}
+                name={member.displayName}
+                groupId={groupId}
+                memberId={memberId}
+                size="lg"
+              />
+            </div>
+
+            {/* 区切り線 */}
+            <div className="border-t border-zinc-700/50 -mx-4 mb-3" />
+
+            {/* 名前と編集ボタン */}
+            <div className="flex items-center justify-between gap-3">
               <span className="text-zinc-50 font-medium text-sm flex-1 truncate">
                 {member.displayName || t('profile.noName')}
               </span>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleEdit}
+                aria-label={t('profile.editNameAriaLabel', { name: member.displayName })}
+                aria-expanded={isEditing}
+                className="p-2 rounded-md text-zinc-400 hover:text-zinc-50 hover:bg-zinc-700 transition-colors
+                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)]
+                           focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900
+                           min-w-[44px] min-h-[44px] flex items-center justify-center shrink-0"
+              >
+                <Pencil className="w-4 h-4" />
+              </motion.button>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleEdit}
-              aria-label={t('profile.editNameAriaLabel', { name: member.displayName })}
-              aria-expanded={isEditing}
-              className="p-2 rounded-md text-zinc-400 hover:text-zinc-50 hover:bg-zinc-700 transition-colors
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)]
-                         focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900
-                         min-w-[44px] min-h-[44px] flex items-center justify-center shrink-0"
-            >
-              <Pencil className="w-4 h-4" />
-            </motion.button>
           </motion.div>
         ) : (
-          // 編集状態: アバター + テキストフィールド + 保存/キャンセルボタン
+          // 編集状態: AvatarUpload + 区切り線 + テキストフィールド + 保存/キャンセルボタン
           <motion.div
             key="editing"
             initial={{ opacity: 0, height: 0, y: -4 }}
@@ -126,12 +144,20 @@ export function ProfileEditForm({ member, isChildProfile, onSave, className }: P
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <div className="flex flex-col gap-3 bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3">
-              {/* アバター行 */}
-              <div className="flex items-center gap-3">
-                <Avatar src={member.avatarUrl} name={member.displayName} size="md" />
-                <span className="text-zinc-400 text-xs">{t('profile.changeName')}</span>
+            <div className="flex flex-col gap-3 bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-4">
+              {/* アバター（中央配置・編集中もアップロード可能） */}
+              <div className="flex flex-col items-center gap-1">
+                <AvatarUpload
+                  src={member.avatarUrl}
+                  name={member.displayName}
+                  groupId={groupId}
+                  memberId={memberId}
+                  size="lg"
+                />
               </div>
+
+              {/* 区切り線 */}
+              <div className="border-t border-zinc-700/50 -mx-4" />
 
               {/* 入力フィールド */}
               <div>

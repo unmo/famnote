@@ -75,3 +75,8 @@ export function getAvatarPath(userId: string, filename: string): string {
 export function getGroupIconPath(groupId: string, filename: string): string {
   return `groups/${groupId}/${filename}`;
 }
+
+// グループメンバーのアバター用パスを生成（拡張子は常に .jpg に統一）
+export function getGroupAvatarPath(groupId: string, memberId: string): string {
+  return `avatars/${groupId}/${memberId}.jpg`;
+}

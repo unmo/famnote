@@ -25,11 +25,22 @@ export function Avatar({ src, name, size = 'md', className, showOnlineIndicator,
     ? name.slice(0, 2).toUpperCase()
     : null;
 
+  // 背景クラスの決定ロジック
+  // 画像あり: 中立背景（画像で覆われるため）
+  // イニシャルあり: グラデーション背景（デザイン仕様書準拠）
+  // アイコン表示: 中立背景
+  const bgClass = src
+    ? 'bg-zinc-700'
+    : initials
+      ? 'bg-gradient-to-br from-sky-400 to-blue-600'
+      : 'bg-zinc-700';
+
   return (
     <div className={clsx('relative inline-flex', className)}>
       <div
         className={clsx(
-          'rounded-full bg-zinc-700 flex items-center justify-center overflow-hidden shrink-0',
+          'rounded-full flex items-center justify-center overflow-hidden shrink-0',
+          bgClass,
           sizeClasses[size]
         )}
       >
@@ -42,7 +53,7 @@ export function Avatar({ src, name, size = 'md', className, showOnlineIndicator,
             crossOrigin="anonymous"
           />
         ) : initials ? (
-          <span className="font-semibold text-zinc-300">{initials}</span>
+          <span className="font-semibold text-white">{initials}</span>
         ) : (
           <User className="text-zinc-400 w-1/2 h-1/2" />
         )}
