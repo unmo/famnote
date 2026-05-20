@@ -250,15 +250,15 @@ export function NoteNewPage() {
           whileTap={{ scale: 0.97 }}
           type="button"
           onClick={() => handleSubmit((data) => onSubmit(data, false))()}
-          disabled={isSubmitting || createNote.isPending || (noteCountInfo?.isExceeded ?? false)}
-          aria-disabled={noteCountInfo?.isExceeded ?? false}
+          disabled={isSubmitting || createNote.isPending || (noteCountInfo?.isOverLimit ?? false)}
+          aria-disabled={noteCountInfo?.isOverLimit ?? false}
           className={`flex-[2] rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-150 ${
-            noteCountInfo?.isExceeded
+            noteCountInfo?.isOverLimit
               ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed border border-zinc-700'
               : 'bg-[var(--color-brand-primary)] text-white disabled:opacity-40'
           }`}
         >
-          {noteCountInfo?.isExceeded ? (
+          {noteCountInfo?.isOverLimit ? (
             <span className="flex items-center justify-center gap-1.5">
               <Lock className="w-4 h-4" aria-hidden="true" />
               記録できません

@@ -1,56 +1,29 @@
 {
-  "feature": "stripe-checkout",
+  "feature": "note-count-aggregate",
   "phase": "completed",
   "loop_count": 1,
   "max_loops": 3,
   "stop_requested": false,
   "history": [
     {
-      "phase": "planner",
-      "status": "completed",
-      "timestamp": "2026-05-05T07:00:00.000Z",
-      "summary": "Stripe課金連携の詳細仕様書を作成。購入フロー・Cloud Functions・Webhook署名検証・Firestoreルール・テスト観点を網羅。"
-    },
-    {
-      "phase": "designer",
-      "status": "completed",
-      "timestamp": "2026-05-05T08:00:00.000Z",
-      "summary": "Stripe課金連携のUI/UXデザイン仕様書を作成。PurchasePage・PurchaseSuccessPage・PurchaseCancelPageの全コンポーネント設計・Tailwindクラス・Framer Motionアニメーション仕様・アクセシビリティを網羅。"
-    },
-    {
       "phase": "generator",
       "status": "completed",
-      "timestamp": "2026-05-07T14:35:00.000Z",
-      "summary": "Stripe課金連携を全面実装。Cloud Functions（createCheckoutSession・stripeWebhook）・フロントエンドページ3画面・hooks・型定義・Firestoreルール・環境変数example・ユニットテスト・E2Eテストを作成。tsc --noEmitおよびvitest run（253テスト全パス）・vite build成功を確認。",
+      "timestamp": "2026-05-07T17:30:00.000Z",
+      "summary": "ノート残数カウントを保存フィールドのインクリメント方式から Firestore getCountFromServer() による集計方式に変更。NoteCountInfo の型を { totalCount, limit, remaining, isOverLimit, isLow, plan } に統一。fetchTotalNoteCount を新設し notes/matchJournals/matches を groupId 条件で集計合算。createNote/createPreMatchNote/createPostMatchOnly は事前 fetchTotalNoteCount で上限チェック、deleteNote/deleteMatchJournal はカウンター操作を撤廃。Group.totalNoteCount と GroupMember.noteCount を型から削除し、firestore.rules の totalNoteCount/noteCount 特例許可を削除。表示コンポーネント・テストを新型に追従。tsc --noEmit OK・vitest run 249件全パス・vite build 成功。",
       "changed_files": [
-        "functions/package.json",
-        "functions/tsconfig.json",
-        "functions/vitest.config.ts",
-        "functions/.env.example",
-        "functions/src/index.ts",
-        "functions/src/stripe/createCheckoutSession.ts",
-        "functions/src/stripe/stripeWebhook.ts",
-        "functions/src/stripe/createCheckoutSession.test.ts",
-        "functions/src/stripe/stripeWebhook.test.ts",
-        "src/types/purchase.ts",
-        "src/hooks/useStripeCheckout.ts",
-        "src/hooks/useStripeCheckout.test.ts",
-        "src/hooks/useCountUp.ts",
-        "src/routes/app/PurchasePage.tsx",
-        "src/routes/app/PurchaseSuccessPage.tsx",
-        "src/routes/app/PurchaseCancelPage.tsx",
-        "src/routes/index.tsx",
-        "src/components/note/NoteCountWarning.tsx",
+        "src/types/noteCount.ts",
+        "src/types/group.ts",
+        "src/lib/firebase/noteCountService.ts",
+        "src/lib/firebase/firestore.ts",
+        "src/lib/firebase/matchJournalService.ts",
         "src/components/dashboard/NoteCountBar.tsx",
-        "firestore.rules",
-        "e2e/purchase.spec.ts"
+        "src/components/note/NoteCountWarning.tsx",
+        "src/routes/app/notes/NoteNewPage.tsx",
+        "src/routes/app/journals/JournalPrePage.tsx",
+        "src/lib/firebase/noteCountService.test.ts",
+        "src/hooks/useNoteCount.test.ts",
+        "firestore.rules"
       ]
-    },
-    {
-      "phase": "evaluator",
-      "status": "passed",
-      "timestamp": "2026-05-07T14:55:00.000Z",
-      "summary": "全評価項目合格。TSCエラーなし・vitest 253件全パス・Webhook署名検証OK・userId=request.auth.uid確認・冪等性チェックOK・purchasesコレクション書き込み禁止確認。"
     }
   ]
 }

@@ -16,7 +16,6 @@ import {
   onSnapshot,
   writeBatch,
   runTransaction,
-  increment,
   type DocumentSnapshot,
   type QueryDocumentSnapshot,
   type Unsubscribe,
@@ -30,7 +29,7 @@ import type { Reaction, ReactionType } from '@/types/reaction';
 import { generateInviteCode } from '@/lib/utils/inviteCode';
 import { replaceInsightHighlights } from './highlightService';
 import { NoteCountExceededError } from '@/types/noteCount';
-import { getNoteLimit } from './noteCountService';
+import { getNoteLimit, fetchTotalNoteCount } from './noteCountService';
 
 // ===================== グループ関連 =====================
 
@@ -169,55 +168,44 @@ export function subscribeGroupMembers(
 // ===================== ノート関連 =====================
 
 // ノート作成
-// グループに参加している場合はトランザクションでカウンターをインクリメントする。
+// グループに参加しており下書きでない場合は、Firestore count() 集計で現在の総数を取得し、
 // 上限を超えている場合は NoteCountExceededError をスローする。
+// 集計クエリと作成は別オペレーションのため厳密なatomicityはなく、race conditionは許容する。
 export async function createNote(
   data: Omit<Note, 'id' | 'createdAt' | 'updatedAt' | 'reactionCounts' | 'commentCount'>
 ): Promise<{ noteId: string }> {
-  // グループに参加しており、かつ下書きでない場合はカウンターをインクリメント
+  // グループに参加しており、かつ下書きでない場合は上限チェックを行う
   if (data.groupId && !data.isDraft) {
     const groupRef = doc(db, 'groups', data.groupId);
-    const memberRef = doc(db, 'groups', data.groupId, 'members', data.userId);
-    // トランザクション外で新規IDを生成しておく（runTransaction内では参照のみ）
+    const groupSnap = await getDoc(groupRef);
+    if (!groupSnap.exists()) {
+      throw new Error('GROUP_NOT_FOUND');
+    }
+
+    // グループオーナーのプランを参照して実際の上限を算出する
+    const ownerUid = (groupSnap.data().ownerUid ?? '') as string;
+    const ownerSnap = await getDoc(doc(db, 'users', ownerUid));
+    const plan = (ownerSnap.data()?.plan ?? 'free') as 'free' | 'paid';
+    const purchasedCount = (ownerSnap.data()?.purchasedCount ?? 0) as number;
+    const limit = getNoteLimit(plan, purchasedCount);
+
+    // 現在の総ノート数を集計クエリで取得
+    const currentTotal = await fetchTotalNoteCount(data.groupId);
+    if (currentTotal >= limit) {
+      throw new NoteCountExceededError();
+    }
+
     const noteRef = doc(collection(db, 'notes'));
-
-    await runTransaction(db, async (tx) => {
-      const groupSnap = await tx.get(groupRef);
-      const memberSnap = await tx.get(memberRef);
-
-      if (!groupSnap.exists()) {
-        throw new Error('GROUP_NOT_FOUND');
-      }
-
-      // グループオーナーのプランを参照して実際の上限を算出する
-      const ownerUid = (groupSnap.data().ownerUid ?? '') as string;
-      const ownerRef = doc(db, 'users', ownerUid);
-      const ownerSnap = await tx.get(ownerRef);
-      const plan = (ownerSnap.data()?.plan ?? 'free') as 'free' | 'paid';
-      const purchasedCount = (ownerSnap.data()?.purchasedCount ?? 0) as number;
-      const limit = getNoteLimit(plan, purchasedCount);
-
-      const currentTotal = (groupSnap.data().totalNoteCount ?? 0) as number;
-      if (currentTotal >= limit) {
-        throw new NoteCountExceededError();
-      }
-
-      tx.set(noteRef, {
-        ...data,
-        insights: data.insights ?? [],
-        reactionCounts: { applause: 0, fire: 0, star: 0, muscle: 0 },
-        commentCount: 0,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      tx.update(groupRef, { totalNoteCount: increment(1) });
-      // メンバードキュメントが存在する場合のみカウントを更新
-      if (memberSnap.exists()) {
-        tx.update(memberRef, { noteCount: increment(1) });
-      }
+    await setDoc(noteRef, {
+      ...data,
+      insights: data.insights ?? [],
+      reactionCounts: { applause: 0, fire: 0, star: 0, muscle: 0 },
+      commentCount: 0,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
 
-    // インサイトハイライトはトランザクション外で非ブロッキング処理
+    // インサイトハイライトは非ブロッキング処理
     if ((data.insights ?? []).length > 0) {
       await replaceInsightHighlights(
         data.userId, data.groupId, data.sport,
@@ -263,42 +251,13 @@ export async function updateNote(
 }
 
 // ノート削除
-// グループに参加している場合はカウンターをデクリメントする。
+// 集計方式に変更したため、削除時に保存フィールドのデクリメントは不要。
+// 残数表示は次回 fetchNoteCountInfo() の呼び出しで再集計される。
 export async function deleteNote(noteId: string, userId: string): Promise<void> {
   const ref = doc(db, 'notes', noteId);
   const snap = await getDoc(ref);
   if (!snap.exists() || snap.data()?.userId !== userId) {
     throw new Error('UNAUTHORIZED');
-  }
-
-  const noteData = snap.data() as Note;
-  const groupId = noteData.groupId;
-
-  // グループに参加しており、かつ下書きでない場合はカウンターをデクリメント
-  if (groupId && !noteData.isDraft) {
-    const groupRef = doc(db, 'groups', groupId);
-    const memberRef = doc(db, 'groups', groupId, 'members', userId);
-
-    await runTransaction(db, async (tx) => {
-      const groupSnap = await tx.get(groupRef);
-      const memberSnap = await tx.get(memberRef);
-
-      tx.delete(ref);
-
-      if (groupSnap.exists()) {
-        const currentTotal = (groupSnap.data().totalNoteCount ?? 0) as number;
-        if (currentTotal > 0) {
-          tx.update(groupRef, { totalNoteCount: increment(-1) });
-        }
-      }
-      if (memberSnap.exists()) {
-        const currentCount = (memberSnap.data().noteCount ?? 0) as number;
-        if (currentCount > 0) {
-          tx.update(memberRef, { noteCount: increment(-1) });
-        }
-      }
-    });
-    return;
   }
 
   await deleteDoc(ref);

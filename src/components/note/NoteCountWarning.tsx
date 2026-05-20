@@ -12,7 +12,7 @@ export function NoteCountWarning({ noteCountInfo }: NoteCountWarningProps) {
   // 残数が閾値を超えている場合は非表示
   if (noteCountInfo.remaining > LOW_COUNT_THRESHOLD) return null;
 
-  const isExceeded = noteCountInfo.isExceeded;
+  const isExceeded = noteCountInfo.isOverLimit;
 
   return (
     <motion.div

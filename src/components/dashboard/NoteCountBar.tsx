@@ -20,8 +20,8 @@ function getBarColor(percentage: number): string {
 }
 
 /** 残数テキストの色を決定する */
-function getCountColor(isExceeded: boolean, isLow: boolean): string {
-  if (isExceeded) return 'text-red-400';
+function getCountColor(isOverLimit: boolean, isLow: boolean): string {
+  if (isOverLimit) return 'text-red-400';
   if (isLow) return 'text-amber-400';
   return 'text-zinc-200';
 }
@@ -31,7 +31,7 @@ export function NoteCountBar({ noteCountInfo, isError, isGroupMember }: NoteCoun
   if (isError || !isGroupMember) return null;
 
   const percentage = noteCountInfo
-    ? Math.min(100, Math.round((noteCountInfo.totalNoteCount / noteCountInfo.limit) * 100))
+    ? Math.min(100, Math.round((noteCountInfo.totalCount / noteCountInfo.limit) * 100))
     : 0;
 
   const barColor = getBarColor(percentage);
@@ -52,7 +52,7 @@ export function NoteCountBar({ noteCountInfo, isError, isGroupMember }: NoteCoun
               <BarChart3 className="w-5 h-5 text-zinc-400" aria-hidden="true" />
               <span className="text-sm font-medium text-zinc-300">グループの記録残数</span>
             </div>
-            <span className={`text-sm font-bold ${getCountColor(noteCountInfo.isExceeded, noteCountInfo.isLow)}`}>
+            <span className={`text-sm font-bold ${getCountColor(noteCountInfo.isOverLimit, noteCountInfo.isLow)}`}>
               残り {noteCountInfo.remaining} 件 / {noteCountInfo.limit}件
             </span>
           </>
@@ -88,7 +88,7 @@ export function NoteCountBar({ noteCountInfo, isError, isGroupMember }: NoteCoun
 
       {/* 警告・上限到達メッセージ */}
       <AnimatePresence>
-        {noteCountInfo?.isExceeded && (
+        {noteCountInfo?.isOverLimit && (
           <motion.div
             key="exceeded"
             initial={{ opacity: 0, height: 0 }}
@@ -113,7 +113,7 @@ export function NoteCountBar({ noteCountInfo, isError, isGroupMember }: NoteCoun
           </motion.div>
         )}
 
-        {noteCountInfo?.isLow && !noteCountInfo.isExceeded && (
+        {noteCountInfo?.isLow && !noteCountInfo.isOverLimit && (
           <motion.div
             key="low"
             initial={{ opacity: 0, height: 0 }}

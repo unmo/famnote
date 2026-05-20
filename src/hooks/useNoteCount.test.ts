@@ -69,11 +69,11 @@ describe('useNoteCount', () => {
 
   it('グループ参加済みの場合は fetchNoteCountInfo を呼び出し結果を返す', async () => {
     const mockInfo = {
-      totalNoteCount: 8,
+      totalCount: 8,
       limit: 20,
       remaining: 12,
+      isOverLimit: false,
       isLow: false,
-      isExceeded: false,
       plan: 'free' as const,
     };
 

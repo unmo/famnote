@@ -1,15 +1,16 @@
 import {
+  collection,
   doc,
   getDoc,
-  runTransaction,
-  increment,
+  getCountFromServer,
+  query,
+  where,
 } from 'firebase/firestore';
 import { db } from './config';
 import {
   FREE_NOTE_LIMIT,
   PACK_NOTE_COUNT,
   LOW_COUNT_THRESHOLD,
-  NoteCountExceededError,
   type NoteCountInfo,
 } from '@/types/noteCount';
 
@@ -27,111 +28,56 @@ export function getNoteLimit(plan: 'free' | 'paid', purchasedCount: number): num
 /**
  * 残り件数を計算する（最小値0）
  */
-export function getRemainingCount(totalNoteCount: number, limit: number): number {
-  return Math.max(0, limit - totalNoteCount);
+export function getRemainingCount(totalCount: number, limit: number): number {
+  return Math.max(0, limit - totalCount);
 }
 
 /**
- * グループのノートカウンターをインクリメントする。
- * Firestoreトランザクションで原子的に実行し、上限を超える場合は NoteCountExceededError をスローする。
- * ownerUserId のプランと purchasedCount を参照して実際の上限を算出する。
+ * グループに紐づくノート総数を Firestore の count() 集計で取得する。
+ * 対象コレクション: notes / matchJournals / matches
+ * 各コレクションを `where('groupId', '==', groupId)` で絞り込み、
+ * getCountFromServer() の結果（サーバー側集計）を合計して返す。
  */
-export async function incrementNoteCount(
-  groupId: string,
-  memberId: string,
-  ownerUserId: string
-): Promise<void> {
-  const groupRef = doc(db, 'groups', groupId);
-  const memberRef = doc(db, 'groups', groupId, 'members', memberId);
-  const ownerRef = doc(db, 'users', ownerUserId);
+export async function fetchTotalNoteCount(groupId: string): Promise<number> {
+  const targets = ['notes', 'matchJournals', 'matches'] as const;
 
-  await runTransaction(db, async (tx) => {
-    const [groupSnap, memberSnap, ownerSnap] = await Promise.all([
-      tx.get(groupRef),
-      tx.get(memberRef),
-      tx.get(ownerRef),
-    ]);
+  const counts = await Promise.all(
+    targets.map(async (col) => {
+      const q = query(collection(db, col), where('groupId', '==', groupId));
+      const snap = await getCountFromServer(q);
+      return snap.data().count;
+    })
+  );
 
-    if (!groupSnap.exists()) {
-      throw new Error('GROUP_NOT_FOUND');
-    }
-    if (!memberSnap.exists()) {
-      throw new Error('MEMBER_NOT_FOUND');
-    }
-
-    const plan = (ownerSnap.data()?.plan ?? 'free') as 'free' | 'paid';
-    const purchasedCount = (ownerSnap.data()?.purchasedCount ?? 0) as number;
-    const limit = getNoteLimit(plan, purchasedCount);
-
-    const currentTotal = (groupSnap.data().totalNoteCount ?? 0) as number;
-    if (currentTotal >= limit) {
-      throw new NoteCountExceededError();
-    }
-
-    tx.update(groupRef, { totalNoteCount: increment(1) });
-    tx.update(memberRef, { noteCount: increment(1) });
-  });
-}
-
-/**
- * グループのノートカウンターをデクリメントする。
- * 最小値は0（0未満にならない）。
- */
-export async function decrementNoteCount(
-  groupId: string,
-  memberId: string
-): Promise<void> {
-  const groupRef = doc(db, 'groups', groupId);
-  const memberRef = doc(db, 'groups', groupId, 'members', memberId);
-
-  await runTransaction(db, async (tx) => {
-    const groupSnap = await tx.get(groupRef);
-    const memberSnap = await tx.get(memberRef);
-
-    if (!groupSnap.exists() || !memberSnap.exists()) {
-      // ドキュメントが存在しない場合はスキップ
-      return;
-    }
-
-    const currentGroupTotal = groupSnap.data().totalNoteCount ?? 0;
-    const currentMemberCount = memberSnap.data().noteCount ?? 0;
-
-    // 0未満にならないようクランプ
-    if (currentGroupTotal > 0) {
-      tx.update(groupRef, { totalNoteCount: increment(-1) });
-    }
-    if (currentMemberCount > 0) {
-      tx.update(memberRef, { noteCount: increment(-1) });
-    }
-  });
+  return counts.reduce((sum, n) => sum + n, 0);
 }
 
 /**
  * グループのノート残数情報を取得する。
- * ownerUserId のプランと purchasedCount を参照して上限を計算する。
+ * - 総数は fetchTotalNoteCount() で都度集計（保存フィールド非依存）
+ * - 上限は ownerUserId のプランと purchasedCount から算出
  */
 export async function fetchNoteCountInfo(
   groupId: string,
   ownerUserId: string
 ): Promise<NoteCountInfo> {
-  const [groupSnap, userSnap] = await Promise.all([
-    getDoc(doc(db, 'groups', groupId)),
+  const [totalCount, userSnap] = await Promise.all([
+    fetchTotalNoteCount(groupId),
     getDoc(doc(db, 'users', ownerUserId)),
   ]);
 
-  const totalNoteCount = (groupSnap.data()?.totalNoteCount ?? 0) as number;
   const plan = (userSnap.data()?.plan ?? 'free') as 'free' | 'paid';
   const purchasedCount = (userSnap.data()?.purchasedCount ?? 0) as number;
 
   const limit = getNoteLimit(plan, purchasedCount);
-  const remaining = getRemainingCount(totalNoteCount, limit);
+  const remaining = getRemainingCount(totalCount, limit);
 
   return {
-    totalNoteCount,
+    totalCount,
     limit,
     remaining,
+    isOverLimit: totalCount >= limit,
     isLow: remaining <= LOW_COUNT_THRESHOLD,
-    isExceeded: remaining === 0,
     plan,
   };
 }
