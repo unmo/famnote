@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Star, NotebookPen, Settings } from 'lucide-react';
+import { Home, BarChart2, Star, NotebookPen, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useActiveProfile } from '@/hooks/useActiveProfile';
 import { useUnreadCount } from '@/hooks/useNotifications';
@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { path: '/dashboard', icon: Home, labelKey: 'nav.home' },
   { path: '/journals', icon: NotebookPen, labelKey: 'journals.title' },
   { path: '/highlights', icon: Star, labelKey: 'highlights.title' },
-  { path: '/notes', icon: BookOpen, labelKey: 'nav.notes' },
+  { path: '/stats', icon: BarChart2, labelKey: 'nav.stats' },
   { path: '/settings', icon: Settings, labelKey: 'nav.settings' },
 ] as const;
 

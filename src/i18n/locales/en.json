@@ -7,10 +7,53 @@
     "home": "Home",
     "timeline": "Timeline",
     "notes": "Notes",
+    "stats": "Stats",
     "profile": "Profile",
     "settings": "Settings",
     "goals": "Goals",
     "matches": "Matches"
+  },
+  "stats": {
+    "pageTitle": "Growth Record",
+    "pageSubtitle": "Review your practice and match data from the last 6 months",
+    "summary": {
+      "streak": "Streak",
+      "streakUnit": "days",
+      "totalHours": "Total Practice",
+      "totalHoursUnit": "hrs",
+      "matchCount": "Last 6 months",
+      "matchCountUnit": "matches",
+      "winRate": "Win Rate",
+      "winRateUnit": "%"
+    },
+    "streak": {
+      "sectionTitle": "Streak",
+      "current": "Current",
+      "longest": "Best",
+      "unit": "days"
+    },
+    "tabs": {
+      "practice": "Practice",
+      "match": "Match"
+    },
+    "charts": {
+      "practiceCount": "Monthly Practice Count & Condition",
+      "practiceTime": "Monthly Practice Time",
+      "matchResult": "Monthly Match Results",
+      "winRate": "Monthly Win Rate"
+    },
+    "pastInsights": {
+      "sectionTitle": "From Past You",
+      "sectionSubtitle": "Revisit insights from months ago",
+      "1month": "1 month ago",
+      "3months": "3 months ago",
+      "6months": "6 months ago"
+    },
+    "empty": {
+      "title": "No records yet",
+      "description": "Write practice or match notes to see your growth record here",
+      "cta": "Write a Practice Note"
+    }
   },
   "auth": {
     "login": "Login",

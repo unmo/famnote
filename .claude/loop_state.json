@@ -1,29 +1,31 @@
 {
-  "feature": "note-count-aggregate",
+  "feature": "growth-visualization",
   "phase": "completed",
   "loop_count": 1,
   "max_loops": 3,
   "stop_requested": false,
   "history": [
     {
+      "phase": "planner",
+      "status": "completed",
+      "timestamp": "2026-05-30T00:00:00.000Z"
+    },
+    {
+      "phase": "designer",
+      "status": "completed",
+      "timestamp": "2026-05-30T01:00:00.000Z"
+    },
+    {
       "phase": "generator",
       "status": "completed",
-      "timestamp": "2026-05-07T17:30:00.000Z",
-      "summary": "ノート残数カウントを保存フィールドのインクリメント方式から Firestore getCountFromServer() による集計方式に変更。NoteCountInfo の型を { totalCount, limit, remaining, isOverLimit, isLow, plan } に統一。fetchTotalNoteCount を新設し notes/matchJournals/matches を groupId 条件で集計合算。createNote/createPreMatchNote/createPostMatchOnly は事前 fetchTotalNoteCount で上限チェック、deleteNote/deleteMatchJournal はカウンター操作を撤廃。Group.totalNoteCount と GroupMember.noteCount を型から削除し、firestore.rules の totalNoteCount/noteCount 特例許可を削除。表示コンポーネント・テストを新型に追従。tsc --noEmit OK・vitest run 249件全パス・vite build 成功。",
-      "changed_files": [
-        "src/types/noteCount.ts",
-        "src/types/group.ts",
-        "src/lib/firebase/noteCountService.ts",
-        "src/lib/firebase/firestore.ts",
-        "src/lib/firebase/matchJournalService.ts",
-        "src/components/dashboard/NoteCountBar.tsx",
-        "src/components/note/NoteCountWarning.tsx",
-        "src/routes/app/notes/NoteNewPage.tsx",
-        "src/routes/app/journals/JournalPrePage.tsx",
-        "src/lib/firebase/noteCountService.test.ts",
-        "src/hooks/useNoteCount.test.ts",
-        "firestore.rules"
-      ]
+      "timestamp": "2026-05-30T02:00:00.000Z",
+      "summary": "成長の見える化機能を実装完了。ビルド成功、264テスト全パス。"
+    },
+    {
+      "phase": "evaluator",
+      "status": "passed",
+      "timestamp": "2026-05-30T13:00:00.000Z",
+      "summary": "型エラー0件、264テスト全パス、ビルド成功。motion/reactインポート正常、anyなし、console.logなし。評価合格。"
     }
   ]
 }

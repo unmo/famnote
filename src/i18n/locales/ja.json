@@ -7,10 +7,53 @@
     "home": "ホーム",
     "timeline": "タイムライン",
     "notes": "ノート",
+    "stats": "統計",
     "profile": "プロフィール",
     "settings": "設定",
     "goals": "目標",
     "matches": "試合記録"
+  },
+  "stats": {
+    "pageTitle": "成長の記録",
+    "pageSubtitle": "直近6ヶ月の練習・試合データを振り返ろう",
+    "summary": {
+      "streak": "継続中",
+      "streakUnit": "日",
+      "totalHours": "練習時間（合計）",
+      "totalHoursUnit": "時間",
+      "matchCount": "直近6ヶ月",
+      "matchCountUnit": "試合",
+      "winRate": "勝率",
+      "winRateUnit": "%"
+    },
+    "streak": {
+      "sectionTitle": "継続記録",
+      "current": "現在の連続",
+      "longest": "最長記録",
+      "unit": "日"
+    },
+    "tabs": {
+      "practice": "練習",
+      "match": "試合"
+    },
+    "charts": {
+      "practiceCount": "月別練習回数と体調",
+      "practiceTime": "月別合計練習時間",
+      "matchResult": "月別試合結果",
+      "winRate": "月別勝率"
+    },
+    "pastInsights": {
+      "sectionTitle": "過去の自分から",
+      "sectionSubtitle": "あの日の気づきを振り返ろう",
+      "1month": "1ヶ月前",
+      "3months": "3ヶ月前",
+      "6months": "6ヶ月前"
+    },
+    "empty": {
+      "title": "まだ記録がありません",
+      "description": "練習ノートや試合ノートを書くと、ここに成長の記録が表示されます",
+      "cta": "練習ノートを書く"
+    }
   },
   "auth": {
     "login": "ログイン",

@@ -76,6 +76,43 @@ export function isStreakActive(lastRecordedDate: Date | null): boolean {
   return isSameDay(japanDate, today) || isYesterday(japanDate);
 }
 
+/**
+ * 最長連続記録日数を計算する。
+ * recordDates の全期間を走査して最大連続日数を返す。
+ */
+export function calculateLongestStreak(recordDates: Date[]): number {
+  if (recordDates.length === 0) return 0;
+
+  // 日本時間での日付文字列に正規化してユニーク化・昇順ソート
+  const uniqueDates = [
+    ...new Set(
+      recordDates.map((d) => {
+        const jd = toJapanDate(d);
+        return `${jd.getFullYear()}-${String(jd.getMonth()).padStart(2, '0')}-${String(jd.getDate()).padStart(2, '0')}`;
+      })
+    ),
+  ]
+    .map((str) => {
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(y, m, d);
+    })
+    .sort((a, b) => a.getTime() - b.getTime()); // 昇順
+
+  let longest = 1;
+  let current = 1;
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const diff = differenceInCalendarDays(uniqueDates[i], uniqueDates[i - 1]);
+    if (diff === 1) {
+      current++;
+      if (current > longest) longest = current;
+    } else {
+      current = 1;
+    }
+  }
+
+  return longest;
+}
+
 // 週7日分のストリーク状態を返す（ボトムナビのドット表示用）
 export function getWeeklyStreakStatus(recordDates: Date[]): boolean[] {
   const today = getJapanToday();

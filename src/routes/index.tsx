@@ -34,6 +34,7 @@ import { HelpPage } from '@/routes/app/HelpPage';
 import { PurchasePage } from '@/routes/app/PurchasePage';
 import { PurchaseSuccessPage } from '@/routes/app/PurchaseSuccessPage';
 import { PurchaseCancelPage } from '@/routes/app/PurchaseCancelPage';
+import { StatsPage } from '@/routes/app/stats/StatsPage';
 
 export const router = createBrowserRouter([
   {
@@ -117,6 +118,8 @@ export const router = createBrowserRouter([
           { path: '/purchase', element: <PurchasePage /> },
           { path: '/purchase/success', element: <PurchaseSuccessPage /> },
           { path: '/purchase/cancel', element: <PurchaseCancelPage /> },
+          // 成長の見える化
+          { path: '/stats', element: <StatsPage /> },
         ],
       },
     ],
