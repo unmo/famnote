@@ -19,7 +19,9 @@ export function HighlightsPage() {
   const { activeProfile } = useActiveProfile();
   const { data, isLoading } = useHighlights(activeProfile?.uid);
 
-  const insights = (data?.highlights ?? []).filter((h) => h.sourceType === 'journal_insight');
+  const insights = (data?.highlights ?? []).filter(
+    (h) => h.sourceType === 'journal_insight' || h.sourceType === 'note_insight'
+  );
 
   // 日付でグループ化
   const grouped = insights.reduce<Record<string, typeof insights>>((acc, h) => {
@@ -41,7 +43,7 @@ export function HighlightsPage() {
     >
       <header className="px-4 py-3 sticky top-0 bg-zinc-950/90 backdrop-blur-md z-10 border-b border-zinc-800/50">
         <h1 className="text-xl font-bold text-zinc-50">{t('highlights.title')}</h1>
-        <p className="text-xs text-zinc-500 mt-0.5">試合後ノートの「気づき」が自動で記録されます</p>
+        <p className="text-xs text-zinc-500 mt-0.5">練習・試合ノートの「気づき」が自動で記録されます</p>
       </header>
 
       <div className="px-4 pt-4">
@@ -60,14 +62,22 @@ export function HighlightsPage() {
             <p className="text-6xl opacity-20 mb-4">💡</p>
             <h2 className="text-lg font-semibold text-zinc-300">{t('highlights.emptyTitle')}</h2>
             <p className="text-sm text-zinc-500 mt-2 max-w-[280px] whitespace-pre-line">
-              試合後ノートの「気づき」欄に記録すると、ここに自動で蓄積されます
+              練習ノートや試合後ノートの「気づき」欄に記録すると、ここに自動で蓄積されます
             </p>
-            <button
-              onClick={() => navigate('/journals')}
-              className="mt-6 px-6 py-2.5 bg-[var(--color-brand-primary)] text-white rounded-xl text-sm font-medium"
-            >
-              {t('journals.title')}へ
-            </button>
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => navigate('/notes/new')}
+                className="px-5 py-2.5 bg-[var(--color-brand-primary)] text-white rounded-xl text-sm font-medium"
+              >
+                練習ノートを書く
+              </button>
+              <button
+                onClick={() => navigate('/journals')}
+                className="px-5 py-2.5 bg-zinc-800 text-zinc-300 rounded-xl text-sm font-medium"
+              >
+                {t('journals.title')}へ
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-6">
@@ -82,7 +92,11 @@ export function HighlightsPage() {
                       key={highlight.id}
                       highlight={highlight}
                       variant="full"
-                      onPress={(h) => navigate(`/journals/${h.sourceId}`)}
+                      onPress={(h) =>
+                        h.sourceType === 'note_insight'
+                          ? navigate(`/notes/${h.sourceId}`)
+                          : navigate(`/journals/${h.sourceId}`)
+                      }
                     />
                   ))}
                 </div>

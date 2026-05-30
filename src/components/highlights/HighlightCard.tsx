@@ -66,7 +66,7 @@ export function HighlightCard({ highlight, onPress, variant = 'full' }: Highligh
       {highlight.sourceId && (
         <p className="mt-2 text-xs text-zinc-500 flex items-center gap-1">
           <span className="text-zinc-600" aria-hidden="true">→</span>
-          <span>元のジャーナルを見る</span>
+          <span>{highlight.sourceType === 'note_insight' ? '元の練習ノートを見る' : '元のジャーナルを見る'}</span>
         </p>
       )}
     </div>
